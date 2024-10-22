@@ -14,10 +14,10 @@ public class RNGesus {
 	private static boolean extraInfo;
 	private static double increase;
 
-	public static void sendLog(GenericDiscordEvent e, String drop, boolean messageInOriginal) {
+	public static void sendLog(GenericDiscordEvent e, JSONObject data, String drop, boolean messageInOriginal) {
 		EmbedBuilder builder = new EmbedBuilder()
 				.setTitle("RNGesus Drop!")
-				.addField("User: **" + e.getAuthor().getName() + "** `" + e.getAuthor().getId() + "`", "Drop: " + drop, false);
+				.addField("User: **" + data.get("discordName") + "** `" + data.get("discordID") + "`", "Drop: " + drop, false);
 		switch(drop) {
 			case "Musician Kit" -> {
 				builder.setColor(Color.BLUE);
@@ -79,23 +79,23 @@ public class RNGesus {
 		} else if(chance > 0.004663 * increase) { //0.01 (1 in 100)
 			data.replace("kits", (long) data.get("kits") + 1);
 			data.replace("RNGesusWeight", (long) data.get("RNGesusWeight") + 3);
-			message.append("**Rare Drop!** " + Emoji.MUSICIAN_KIT + " <@").append(e.getAuthor().getId()).append(">\nYou found a Musician Kit while you were out and about.");
-			sendLog(e, "Musician Kit", true);
+			message.append("**Rare Drop!** " + Emoji.MUSICIAN_KIT + " <@").append(data.get("discordID")).append(">\nYou found a Musician Kit while you were out and about.");
+			sendLog(e, data, "Musician Kit", true);
 		} else if(chance > 0.001333 * increase) { //0.00333 (1 in 300)
 			data.replace("linglingBox", (long) data.get("linglingBox") + 1);
 			data.replace("RNGesusWeight", (long) data.get("RNGesusWeight") + 4);
-			message.append("**Very Rare Drop!** " + Emoji.LING_LING_BOX + " <@").append(e.getAuthor().getId()).append(">\nYou found a Ling Ling Box sitting in your room!");
-			sendLog(e, "Ling Ling Box", true);
+			message.append("**Very Rare Drop!** " + Emoji.LING_LING_BOX + " <@").append(data.get("discordID")).append(">\nYou found a Ling Ling Box sitting in your room!");
+			sendLog(e, data, "Ling Ling Box", true);
 		} else if(chance > 0.000333 * increase) { // 0.001 (1 in 1000)
 			data.replace("crazyBox", (long) data.get("crazyBox") + 1);
 			data.replace("RNGesusWeight", (long) data.get("RNGesusWeight") + 6);
-			message.append("**CRAZY RARE DROP!** " + Emoji.CRAZY_BOX + " <@").append(e.getAuthor().getId()).append(">\nYou see a CRAZY PERSON BOX appear in front of you!");
-			sendLog(e, "Crazy Person Box", true);
+			message.append("**CRAZY RARE DROP!** " + Emoji.CRAZY_BOX + " <@").append(data.get("discordID")).append(">\nYou see a CRAZY PERSON BOX appear in front of you!");
+			sendLog(e, data, "Crazy Person Box", true);
 		} else { // 0.000333 (1 in 3000)
 			data.replace("RNGesusBox", (long) data.get("RNGesusBox") + 1);
 			data.replace("RNGesusWeight", (long) data.get("RNGesusWeight") + 10);
-			message.append("https://imgur.com/a/SSjcgz3 " + Emoji.RNGESUS_BOX + " <@").append(e.getAuthor().getId()).append(">\nYou see an **__RNGESUS BOX__** appear in front of you! GG!");
-			sendLog(e, "RNGesus Box", true);
+			message.append("https://imgur.com/a/SSjcgz3 " + Emoji.RNGESUS_BOX + " <@").append(data.get("discordID")).append(">\nYou see an **__RNGESUS BOX__** appear in front of you! GG!");
+			sendLog(e, data, "RNGesus Box", true);
 		}
 		Achievement.calculateAchievement(e, data, "RNGesusWeight", "Lucky");
 	}
@@ -125,19 +125,19 @@ public class RNGesus {
 			} else if(chance > 0.035 * increase) { // 0.04 (1 in 25)
 				data.replace("kits", ((long) data.get("kits")) + 1);
 				localMessage += "\n\n**BONUS** You found an extra " + Emoji.MUSICIAN_KIT + "!";
-				sendLog(e, "Musician Kit", false);
+				sendLog(e, data, "Musician Kit", false);
 			} else if(chance > 0.015 * increase) { // 0.02 (1 in 50)
 				data.replace("linglingBox", ((long) data.get("linglingBox")) + 1);
 				localMessage += "\n\n**BONUS** You found an extra " + Emoji.LING_LING_BOX + "!";
-				sendLog(e, "Ling Ling Box", false);
+				sendLog(e, data, "Ling Ling Box", false);
 			} else if(chance > 0.005 * increase) { // 0.01 (1 in 100)
 				data.replace("crazyBox", ((long) data.get("crazyBox")) + 1);
 				localMessage += "\n\n**BONUS** You found an extra " + Emoji.CRAZY_BOX + "!";
-				sendLog(e, "Crazy Person Box", false);
+				sendLog(e, data, "Crazy Person Box", false);
 			} else { // 0.005 (1 in 200)
 				data.replace("RNGesusBox", ((long) data.get("RNGesusBox")) + 1);
 				localMessage += "\n\n**BONUS** You found an extra " + Emoji.RNGESUS_BOX + "!\nhttps://imgur.com/a/SSjcgz3";
-				sendLog(e, "RNGesus Box", false);
+				sendLog(e, data, "RNGesus Box", false);
 			}
 			if((boolean) data.get("banned")) {
 				localMessage += "\n\nUnfortunately, you are currently banned from using the economy, but I am nice and have rewarded you anyway in the unlikely case you do get unbanned.";

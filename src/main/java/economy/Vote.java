@@ -40,19 +40,19 @@ public class Vote {
 			} else if(chance > 0.035 * increase) { // 0.04 (1 in 25)
 				data.replace("kits", ((long) data.get("kits")) + 1);
 				message += "\n\n**BONUS** You found an extra " + Emoji.MUSICIAN_KIT + "!";
-				RNGesus.sendLog(e, "Musician Kit", false);
+				RNGesus.sendLog(e, data, "Musician Kit", false);
 			} else if(chance > 0.015 * increase) { // 0.02 (1 in 50)
 				data.replace("linglingBox", ((long) data.get("linglingBox")) + 1);
 				message += "\n\n**BONUS** You found an extra " + Emoji.LING_LING_BOX + "!";
-				RNGesus.sendLog(e, "Ling Ling Box", false);
+				RNGesus.sendLog(e, data, "Ling Ling Box", false);
 			} else if(chance > 0.005 * increase) { // 0.01 (1 in 100)
 				data.replace("crazyBox", ((long) data.get("crazyBox")) + 1);
 				message += "\n\n**BONUS** You found an extra " + Emoji.CRAZY_BOX + "!";
-				RNGesus.sendLog(e, "Crazy Person Box", false);
+				RNGesus.sendLog(e, data, "Crazy Person Box", false);
 			} else { // 0.005 (1 in 200)
 				data.replace("RNGesusBox", ((long) data.get("RNGesusBox")) + 1);
 				message += "\n\n**BONUS** You found an extra " + Emoji.RNGESUS_BOX + "! https://imgur.com/a/SSjcgz3";
-				RNGesus.sendLog(e, "RNGesus Box", false);
+				RNGesus.sendLog(e, data, "RNGesus Box", false);
 			}
 			message += "\n\nRemember to vote for Ling Ling at <https://top.gg/bot/733409243222507670/vote>!";
 			if((long) data.get("votes") % 40 == 0) {

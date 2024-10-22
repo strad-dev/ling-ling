@@ -10,12 +10,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class GenericDiscordEvent {
-	private final User author;
+	private User author;
 	private Message message;
 	private final MessageChannel channel;
 	private final JDA jda;
 	private final Guild guild;
 	private SlashCommandInteractionEvent slashEvent = null;
+
 
 	public GenericDiscordEvent(SlashCommandInteractionEvent e) {
 		this.author = e.getUser();
@@ -31,6 +32,10 @@ public class GenericDiscordEvent {
 		this.jda = e.getJDA();
 		this.message = e.getMessage();
 		this.guild = e.getGuild();
+	}
+
+	public void setAuthor(User author) {
+		this.author = author;
 	}
 
 	public User getAuthor() {
