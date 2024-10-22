@@ -83,7 +83,7 @@ public class Craft {
 				return Emoji.SERVICE;
 			}
 			default -> {
-				return "404 Error - Yell at the developer for being stupid.";
+				return "Error 404 - Yell at the developer for being stupid.";
 			}
 		}
 	}

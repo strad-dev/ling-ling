@@ -3,9 +3,8 @@ package processes;
 import org.json.simple.JSONObject;
 
 public class InterestPenalty {
-	public static String interestPenalty(JSONObject data) {
+	public static long interestPenalty(JSONObject data) {
 		//BANK INTEREST
-		String message = "";
 		long balance = (long) data.get("bank");
 		double interest = 0.01;
 		if((boolean) data.get("moreInterest")) {
@@ -17,7 +16,6 @@ public class InterestPenalty {
 		if(earned + balance > max) {
 			earned -= (earned + balance) - max;
 		}
-		message += "Interest Earned: " + Numbers.formatNumber(earned);
 
 		long loan = (long) data.get("loan");
 		long violins = (long) data.get("violins");
@@ -55,6 +53,6 @@ public class InterestPenalty {
 		data.replace("loan", loan);
 		data.replace("bank", balance);
 		data.replace("interestEarned", (long) data.get("interestEarned") + earned);
-		return message;
+		return earned;
 	}
 }

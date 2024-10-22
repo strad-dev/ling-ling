@@ -44,6 +44,13 @@ public class Leveling {
 
 	public static boolean doesMessageCount(GenericDiscordEvent e) {
 		String message = e.getMessage().getContentRaw();
+
+		if(message.length() < 15) {
+			return false;
+		} else if(message.split(" ").length < 3) {
+			return false;
+		}
+
 		List<Message> list = e.getChannel().getHistory().retrievePast(100).complete();
 		try {
 			if(list.get(1).getAuthor().equals(e.getAuthor()) && !list.get(2).getAuthor().equals(e.getAuthor())) {
@@ -69,6 +76,7 @@ public class Leveling {
 		} catch(Exception exception) {
 			return false;
 		}
+
 		Map<String, Integer> map = new HashMap<>();
 		String[] messageArray = removePunctuation(message).toLowerCase().split(" ");
 		for(String s : messageArray) {
@@ -84,20 +92,15 @@ public class Leveling {
 				return false;
 			}
 		}
-		if(message.length() < 15) {
+
+		Random random = new Random();
+		if(e.getAuthor().getId().equals("799074539157979136") && !random.nextBoolean()) {
 			return false;
-		} else if(message.split(" ").length < 3) {
-			return false;
-		} else {
-			Random random = new Random();
-			if(e.getAuthor().getId().equals("799074539157979136") && !random.nextBoolean()) {
-				return false;
-			}
-			if(Objects.requireNonNull(e.getGuild().getMember(e.getAuthor())).getRoles().contains(e.getGuild().getRoleById("991908732692865114")) && !e.getAuthor().getId().equals("619989388109152256")) {
-				return random.nextBoolean();
-			}
-			return true;
 		}
+		if(Objects.requireNonNull(e.getGuild().getMember(e.getAuthor())).getRoles().contains(e.getGuild().getRoleById("991908732692865114")) && !e.getAuthor().getId().equals("619989388109152256")) {
+			return random.nextBoolean();
+		}
+		return true;
 	}
 
 	public static String removePunctuation(String s) {

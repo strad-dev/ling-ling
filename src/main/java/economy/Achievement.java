@@ -10,17 +10,17 @@ import java.awt.*;
 
 public class Achievement {
 	private static JSONObject data;
-	public static final long[] ACHIEVEMNT_NUMS_100B = new long[]{10000000, 100000000, 1000000000, 10000000000L, 100000000000L};
-	public static final long[] ACHIEVEMNT_NUMS_2B = new long[]{5000000, 25000000, 100000000, 500000000, 2000000000};
-	public static final long[] ACHIEVEMNT_NUMS_1B = new long[]{1000000, 10000000, 100000000, 250000000, 1000000000};
-	public static final long[] ACHIEVEMNT_NUMS_200K = new long[]{1000, 5000, 20000, 10000, 200000};
-	public static final long[] ACHIEVEMNT_NUMS_10K = new long[]{100, 250, 1000, 2500, 10000};
-	public static final long[] ACHIEVEMNT_NUMS_5K = new long[]{40, 150, 500, 1500, 5000};
-	public static final long[] ACHIEVEMNT_NUMS_1500 = new long[]{25, 75, 200, 500, 1500};
-	public static final long[] ACHIEVEMNT_NUMS_1000 = new long[]{10, 30, 100, 300, 1000};
-	public static final long[] ACHIEVEMNT_NUMS_500 = new long[]{15, 40, 100, 200, 500};
-	public static final long[] ACHIEVEMNT_NUMS_365 = new long[]{7, 28, 84, 168, 365};
-	public static final long[] ACHIEVEMNT_NUMS_SCALE_CHALLENGE = new long[]{60, 150, 360, 720, 1380};
+	private static final long[] ACHIEVEMNT_NUMS_100B = new long[]{10000000, 100000000, 1000000000, 10000000000L, 100000000000L};
+	private static final long[] ACHIEVEMNT_NUMS_2B = new long[]{5000000, 25000000, 100000000, 500000000, 2000000000};
+	private static final long[] ACHIEVEMNT_NUMS_1B = new long[]{1000000, 10000000, 100000000, 250000000, 1000000000};
+	private static final long[] ACHIEVEMNT_NUMS_200K = new long[]{1000, 5000, 20000, 10000, 200000};
+	private static final long[] ACHIEVEMNT_NUMS_10K = new long[]{100, 250, 1000, 2500, 10000};
+	private static final long[] ACHIEVEMNT_NUMS_5K = new long[]{40, 150, 500, 1500, 5000};
+	private static final long[] ACHIEVEMNT_NUMS_1500 = new long[]{25, 75, 200, 500, 1500};
+	private static final long[] ACHIEVEMNT_NUMS_1000 = new long[]{10, 30, 100, 300, 1000};
+	private static final long[] ACHIEVEMNT_NUMS_500 = new long[]{15, 40, 100, 200, 500};
+	private static final long[] ACHIEVEMNT_NUMS_365 = new long[]{7, 28, 84, 168, 365};
+	private static final long[] ACHIEVEMNT_NUMS_SCALE_CHALLENGE = new long[]{60, 150, 360, 720, 1380};
 
 	public static void generateField(EmbedBuilder builder, String achievement, long[] thresholds, long actual) {
 		String description;
@@ -39,7 +39,7 @@ public class Achievement {
 					description = "Reach a Daily Streak of $$$ days\nCurrent streak: " + Numbers.formatNumber(data.get("streak"));
 			case "English Major" -> description = "Unscramble $$$ Luthiers";
 			case "Generous" -> description = "Give $$$ Gifts";
-			case "Heartless" -> description = "Rob a net total of $$$ " + Emoji.VIOLINS;
+			case "Heartless" -> description = "Rob a total of $$$ " + Emoji.VIOLINS;
 			case "Gambling Addict" -> description = "Earn a net total of $$$ " + Emoji.VIOLINS + " from gambling";
 			case "No-Life" ->
 					description = "Play $$$ scales in a 24-hour period.\nYou can reset the timer using `!resetscales`.\nCurrent streak: " + Numbers.formatNumber(data.get("scaleStreak"));

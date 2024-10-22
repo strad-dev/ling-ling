@@ -15,6 +15,7 @@ public class HourlyIncome {
 		long interestCD = (long) data.get("interestCD");
 		double howManyHours = 0;
 		long originalHours = 0;
+		long interest = 0;
 		String message = "";
 		while(lastIncome < time) {
 			if(time <= (long) data.get("rosinExpire")) {
@@ -30,7 +31,7 @@ public class HourlyIncome {
 				howManyHours += 0.25;
 			}
 			if(time > interestCD) {
-				message = InterestPenalty.interestPenalty(data);
+				interest += InterestPenalty.interestPenalty(data);
 				interestCD += 259200000;
 			}
 			originalHours++;
@@ -74,8 +75,8 @@ public class HourlyIncome {
 				"\nIncome Lost to Inactive Items: " + Numbers.formatNumber(originalIncome - gross) + Emoji.VIOLINS +
 				"\nLoans Paid: " + Numbers.formatNumber(loanPaid) + Emoji.VIOLINS +
 				"\n\nNet Income: " + Numbers.formatNumber(net) + Emoji.VIOLINS;
-		if(!message.isEmpty()) {
-			reply += "\n\n" + message + Emoji.VIOLINS;
+		if(interest != 0) {
+			reply += "\n\nInterest Earned: " + Numbers.formatNumber(interest) + Emoji.VIOLINS;
 		}
 		e.reply(reply);
 		SaveData.saveData(e, data);
