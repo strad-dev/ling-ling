@@ -96,7 +96,38 @@ public class Numbers {
 	}
 
 	public static long maxBank(JSONObject data) {
-		return 20000000 * (long) data.get("storage") + 1000000 * (long) data.get("benevolentBankers");
+		long level = (long) data.get("storage");
+		long base;
+		if(level == 0) {
+			base = 10000000;
+		} else if(level == 1) {
+			base = 30000000;
+		} else if(level == 2) {
+			base = 60000000;
+		} else if(level == 3) {
+			base = 100000000;
+		} else if(level == 4) {
+			base = 150000000;
+		} else if(level == 5) {
+			base = 210000000;
+		} else if(level == 6) {
+			base = 280000000;
+		} else if(level == 7) {
+			base = 360000000;
+		} else if(level == 8) {
+			base = 450000000;
+		} else if(level == 9) {
+			base = 550000000;
+		} else if(level == 10) {
+			base = 655000000;
+		} else if(level == 11) {
+			base = 765000000;
+		} else if(level == 12) {
+			base = 880000000;
+		} else {
+			base = (level - 12) * 125000000 + 875000000;
+		}
+		return (long) (base * (1.01 * (long) data.get("benevolentBankers")));
 	}
 
 	public static String makeCooldownTime(long milliseconds) {

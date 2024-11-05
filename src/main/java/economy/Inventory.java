@@ -78,7 +78,7 @@ public class Inventory {
 							.addField("Extra Income Voucher", "Count: " + Numbers.formatNumber(data.get("freeIncome")) +
 									"\nEffect: Grants +" + Numbers.formatNumber((long) data.get("freeIncome") * 100) + Emoji.VIOLINS + "/hour income", true)
 							.addField("Benevolent Banker", "Count: " + Numbers.formatNumber(data.get("benevolentBankers")) +
-									"\nEffect: Grants +" + Numbers.formatNumber((long) data.get("benevolentBankers") * 1000000) + " bank space", true)
+									"\nEffect: Grants +" + Numbers.formatNumber(data.get("benevolentBankers")) + "% bank space", true)
 							.addField("Item Quality Boost Potion", "Count: " + Numbers.formatNumber(data.get("qualityItems")) +
 									"\nEffect: Grants +" + Numbers.formatNumber((long) data.get("qualityItems") * 5) + "% item duration (where applicable)", true)
 							.addField("Medal Generator", "Count: " + Numbers.formatNumber(data.get("bonusMedals")) +

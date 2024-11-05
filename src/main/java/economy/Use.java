@@ -351,8 +351,8 @@ public class Use {
 					}
 					if(addItems.containsKey("benevolentBankers")) {
 						message += "\n**CRAZY RARE DROP!**  In front of you appears " +
-								Numbers.formatNumber(addItems.get("benevolentBankers")) + " banker(s)!  They are nice, and grant you a total of " +
-								Numbers.formatNumber(addItems.get("benevolentBankers") * 1000000) + " extra Bank Space!";
+								Numbers.formatNumber(addItems.get("benevolentBankers")) + " banker(s)!  They are nice, and grant you a total of +" +
+								Numbers.formatNumber(addItems.get("benevolentBankers")) + "% extra Bank Space!";
 					}
 					e.reply(message);
 				}
