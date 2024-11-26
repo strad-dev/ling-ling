@@ -2,12 +2,9 @@ package processes;
 
 import eventListeners.GenericDiscordEvent;
 import eventListeners.ILoveJava;
-import leveling.CheckMessages;
-import leveling.Leaderboard;
-import leveling.Rank;
-import leveling.SetLevel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import regular.*;
+import leveling.*;
 
 import java.util.Objects;
 // BEETHOVEN-ONLY CLASS
@@ -101,6 +98,13 @@ class CreateThreadBeethoven implements Runnable {
 				case "updatehypixel" -> {
 					if(e.getAuthor().getId().equals("619989388109152256") || e.getAuthor().getId().equals("488487157372157962")) {
 						UpdateHypixel.updateHypixel(e);
+					} else {
+						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command!");
+					}
+				}
+				case "levelsettings" -> {
+					if(e.getAuthor().getId().equals("619989388109152256") || e.getAuthor().getId().equals("488487157372157962")) {
+						Settings.settings(e);
 					} else {
 						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command!");
 					}

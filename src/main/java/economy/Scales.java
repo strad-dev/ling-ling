@@ -8,8 +8,6 @@ import processes.Numbers;
 import java.util.Random;
 
 public class Scales {
-
-
 	public static void scales(GenericDiscordEvent e) {
 		JSONObject data = DatabaseManager.getEconomyData(e);
 		if(data == null) {
