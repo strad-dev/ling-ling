@@ -51,7 +51,6 @@ public class Emojify {
 		}
 		send.append("\n`").append(e.getAuthor().getEffectiveName()).append("`");
 		try {
-			e.reply("Done!");
 			e.getChannel().sendMessage(send.toString()).queue();
 		} catch(Exception exception) {
 			e.reply("Your message ended up being too long, try shortening it.");

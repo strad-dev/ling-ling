@@ -87,6 +87,7 @@ public class Help {
 								`updateroles`
 								`setpermlevel`
 								`globalstats`
+								`sudo`
 								**`forcestop`**""", false);
 				
 				// PAGE 1
@@ -293,6 +294,10 @@ public class Help {
 						Syntax: `!globalstats`
 						Usage: Shows the global statistics of the bot.  Aka combining the stats from all users.
 						Restrictions: Usable only by Developers, due to crash concerns.""", false);
+				case "sudo" -> builder.addField("Sudo Command", """
+						Syntax: `!sudo <user> <command>`
+						Usage: Runs the given command as if the given user ran it.  Mostly to help with debugging.
+						Restrictions: Usable only by Developers.""", false);
 				case "forcestop" -> builder.addField("ForceStop Command", """
 						Syntax: `!forcestop`
 						Usage: Forces the bot to stop.  **USE IN EMERGENCY CIRCUMSTANCES**

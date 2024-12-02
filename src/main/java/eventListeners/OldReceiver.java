@@ -135,10 +135,11 @@ class CreateThreadMessage implements Runnable {
 						for(int i = 2; i < message.length; i++) {
 							message1.append(message[i]).append(' ');
 						}
-						message1.deleteCharAt(message1.length());
+						message1.deleteCharAt(message1.length() - 1);
 					} catch(Exception exception) {
 						message1 = new StringBuilder();
 					}
+					e.getChannel().deleteMessageById(e.getMessage().getId()).queue();
 					Emojify.emojify(e, String.valueOf(message1));
 				}
 				case "invite" -> e.reply("You can add the bot to your server using the below link:" +
@@ -775,8 +776,7 @@ class CreateThreadMessage implements Runnable {
 						for(int i = 3; i < message.length; i ++) {
 							message[i - 2] = message[i];
 						}
-						message[message.length - 2] = "";
-						message[message.length - 1] = "";
+						message = Arrays.copyOfRange(message, 0, message.length - 2);
 						run();
 						return;
 					} else {
