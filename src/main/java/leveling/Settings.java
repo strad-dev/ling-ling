@@ -36,10 +36,12 @@ public class Settings {
 				case "cooldown" -> data.replace("levelCooldown", Long.parseLong(message[3]));
 				default -> {
 					e.reply("Not a valid option!  Valid options: `min` `max` `cooldown`");
+					return;
 				}
 			}
 		} catch(Exception exception) {
 			e.reply("Did not provide an Integer, or did not provide an input.  Bald idiot.");
+			return;
 		}
 		DatabaseManager.saveMiscData(data);
 		e.reply("Changed setting `" + message[2] + "` to `" + message[3] + "`");

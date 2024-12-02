@@ -565,7 +565,6 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "warn" -> {
-					e.getChannel().deleteMessageById(e.getMessage().getId()).queue();
 					if(CheckPermLevel(e) >= 1) {
 						String idToModerate;
 						String reason;
@@ -585,7 +584,6 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "resetsave" -> {
-					e.getChannel().deleteMessageById(e.getMessage().getId()).queue();
 					if(CheckPermLevel(e) >= 1) {
 						String idToModerate;
 						String reason;
@@ -605,7 +603,6 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "ban" -> {
-					e.getChannel().deleteMessageById(e.getMessage().getId()).queue();
 					if(CheckPermLevel(e) >= 2) {
 						String idToModerate;
 						String reason;
@@ -625,7 +622,6 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "unban" -> {
-					e.getChannel().deleteMessageById(e.getMessage().getId()).queue();
 					if(CheckPermLevel(e) >= 2) {
 						String idToModerate;
 						String reason;
