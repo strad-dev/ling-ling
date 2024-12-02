@@ -127,7 +127,7 @@ public class Numbers {
 		} else {
 			base = (level - 12) * 125000000 + 875000000;
 		}
-		return (long) (base * (1.01 * (long) data.get("benevolentBankers")));
+		return (long) (base * (1 + 0.01 * (long) data.get("benevolentBankers")));
 	}
 
 	public static String makeCooldownTime(long milliseconds) {
