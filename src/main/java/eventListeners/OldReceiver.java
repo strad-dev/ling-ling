@@ -259,7 +259,9 @@ class CreateThreadMessage implements Runnable {
 					}
 					Buy.buy(e, item);
 				}
-				case "cooldowns", "c" -> Cooldowns.cooldowns(e);
+				case "cooldowns", "c" -> {
+					Cooldowns.cooldowns(e);
+				}
 				case "use" -> {
 					String item;
 					String amount;

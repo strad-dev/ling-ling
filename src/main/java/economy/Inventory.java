@@ -25,6 +25,7 @@ public class Inventory {
 		} catch(Exception exception) {
 			user = "Someone";
 		}
+
 		EmbedBuilder builder = new EmbedBuilder()
 				.setColor(Color.decode((String) data.get("color")))
 				.setFooter("Ling Ling", e.getJDA().getSelfUser().getAvatarUrl());

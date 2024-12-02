@@ -10,22 +10,29 @@ import java.awt.*;
 
 public class Balance {
 	public static void balance(GenericDiscordEvent e, String user) {
+		if(user.isEmpty()) {
+			user = e.getAuthor().getId();
+		}
+
 		JSONObject data = DatabaseManager.getDataForUser(e, "Economy Data", user);
 		if(data == null) {
 			e.reply("This save file does not exist!");
 			return;
 		}
+
 		if(user.equals(e.getAuthor().getId())) {
 			if(!data.get("discordName").toString().equals(e.getAuthor().getEffectiveName())) {
 				data.replace("discordName", e.getAuthor().getEffectiveName());
 				SaveData.saveData(e, data);
 			}
 		}
+
 		try {
 			user = data.get("discordName").toString();
 		} catch(Exception exception) {
 			user = "Someone";
 		}
+
 		EmbedBuilder builder = new EmbedBuilder()
 				.setColor(Color.decode((String) data.get("color")))
 				.setFooter("Ling Ling", e.getJDA().getSelfUser().getAvatarUrl())

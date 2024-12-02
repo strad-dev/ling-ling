@@ -68,9 +68,9 @@ public class Achievement {
 		} else {
 			description = description.replace("$$$", Numbers.formatNumber(thresholds[4]));
 			if(achievement.equals("No-Life")) {
-				builder.addField("Go Touch Grass", description + "\n`" + Numbers.formatNumber(actual) + " :white_check_mark:\njesus christ stop now pls and ty", false);
+				builder.addField("Go Touch Grass", description + "\n" + Numbers.formatNumber(actual) + " :white_check_mark:\njesus christ stop now pls and ty", false);
 			} else {
-				builder.addField(achievement + " V", description + "\n`" + Numbers.formatNumber(actual) + " :white_check_mark:", false);
+				builder.addField(achievement + " V", description + "\n" + Numbers.formatNumber(actual) + " :white_check_mark:", false);
 			}
 		}
 	}
