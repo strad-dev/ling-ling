@@ -762,6 +762,25 @@ class CreateThreadMessage implements Runnable {
 						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not nave permission to run this command.");
 					}
 				}
+				case "sudo" -> {
+					if(CheckPermLevel(e) == 3) {
+						try {
+							e.setAuthor(e.getJDA().retrieveUserById(message[2]).complete());
+						} catch(Exception exception) {
+							e.reply("Invalid user provided!");
+							return;
+						}
+						for(int i = 3; i < message.length; i ++) {
+							message[i - 2] = message[i];
+						}
+						message[message.length - 2] = "";
+						message[message.length - 1] = "";
+						run();
+						return;
+					} else {
+						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not nave permission to run this command.");
+					}
+				}
 				case "custom" -> //noinspection RedundantLabeledSwitchRuleCodeBlock
 				{
 					/*File[] files = new File("Ling Ling Bot Data\\Economy Data").listFiles();
