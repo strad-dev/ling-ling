@@ -95,8 +95,7 @@ public class Numbers {
 		return input.contains("@everyone") || input.contains("@here") || input.contains("<@&") || input.contains("nigg") || input.contains("nibba") || input.contains("cunt") || input.contains("chink");
 	}
 
-	public static long maxBank(JSONObject data) {
-		long level = (long) data.get("storage");
+	public static long maxBank(long level, long benevolentBankers) {
 		long base;
 		if(level == 0) {
 			base = 10000000;
@@ -127,7 +126,7 @@ public class Numbers {
 		} else {
 			base = (level - 12) * 125000000 + 875000000;
 		}
-		return (long) (base * (1 + 0.01 * (long) data.get("benevolentBankers")));
+		return (long) (base * (1 + 0.01 * benevolentBankers));
 	}
 
 	public static String makeCooldownTime(long milliseconds) {

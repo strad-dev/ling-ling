@@ -29,7 +29,7 @@ public class Deposit {
 		if(amount < 1) {
 			e.reply("Stop wasting my time trying to deposit a negative amount.");
 		} else {
-			long max = Numbers.maxBank(data);
+			long max = Numbers.maxBank((long) data.get("storage"), (long) data.get("benevolentBankers"));
 			long balance = (long) data.get("bank");
 			if(balance + amount > max) {
 				amount = max - balance;

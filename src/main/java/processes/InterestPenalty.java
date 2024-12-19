@@ -12,7 +12,7 @@ public class InterestPenalty {
 		}
 		interest += 0.001 * (long) data.get("bonusInterest");
 		long earned = (long) (balance * interest);
-		long max = Numbers.maxBank(data);
+		long max = Numbers.maxBank((long) data.get("storage"), (long) data.get("benevolentBankers"));
 		if(earned + balance > max) {
 			earned -= (earned + balance) - max;
 		}

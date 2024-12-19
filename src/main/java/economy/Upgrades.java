@@ -406,7 +406,8 @@ public class Upgrades {
 		builder.setTitle("__**Bank Upgrades**__")
 				.addField("Storage Space " + Numbers.formatNumber(data.get("storage")),
 						"Price: " + Numbers.formatNumber(3 * (long) data.get("storage")) + Emoji.MEDALS +
-								"\nEffect: `+20 000 000` bankspace\nID: `storage`", true);
+								"\nEffect: +" + Numbers.formatNumber(Numbers.maxBank((long) data.get("storage") + 1, (long) data.get("benevolentBankers"))
+								- Numbers.maxBank((long) data.get("storage"), (long) data.get("benevolentBankers"))) + " bankspace\nID: `storage`", true);
 		if((boolean) data.get("moreInterest")) {
 			builder.addField("Higher Interest :white_check_mark:", "Effect: Gain `2%` interest instead of `1%`", true);
 		} else {

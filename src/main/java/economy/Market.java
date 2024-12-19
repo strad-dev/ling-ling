@@ -285,7 +285,7 @@ public class Market {
 			}
 			itemSwitch((String) data.get("item"));
 			String[] orders = ((String) data.get("data")).split("\n");
-			if(orders.length == 0) {
+			if(orders.length == 1 && orders[0].isEmpty()) {
 				builder.addField(item + " " + emoji, "No offers!", true);
 				continue;
 			}
@@ -318,7 +318,7 @@ public class Market {
 			}
 			itemSwitch((String) itemDAta.get("item"));
 			String[] orders = ((String) itemDAta.get("data")).split("\n");
-			if(orders.length == 0) {
+			if(orders.length == 1 && orders[0].isEmpty()) {
 				continue;
 			}
 			for(int i = 0; i < orders.length; i++) {
