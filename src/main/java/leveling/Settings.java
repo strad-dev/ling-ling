@@ -31,8 +31,22 @@ public class Settings {
 		}
 		try {
 			switch(option) {
-				case "min" -> data.replace("levelMin", Long.parseLong(message[3]));
-				case "max" -> data.replace("levelMax", Long.parseLong(message[3]));
+				case "min" -> {
+					if(Long.parseLong(message[3]) > (long) data.get("levelMax")) {
+						e.reply("You cannot set a minimum higher than the maximum!");
+						return;
+					} else {
+						data.replace("levelMin", Long.parseLong(message[3]));
+					}
+				}
+				case "max" -> {
+					if(Long.parseLong(message[3]) < (long) data.get("levelMin")) {
+						e.reply("You cannot set a maximum lower than the minimum!");
+						return;
+					} else {
+						data.replace("levelMax", Long.parseLong(message[3]));
+					}
+				}
 				case "cooldown" -> data.replace("levelCooldown", Long.parseLong(message[3]));
 				default -> {
 					e.reply("Not a valid option!  Valid options: `min` `max` `cooldown`");
