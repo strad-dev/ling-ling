@@ -13,7 +13,7 @@ public class Withdraw {
 			e.reply("You have to withdraw something.");
 			return;
 		}
-		if(temp.equals("max")) {
+		if(temp.equals("max") || temp.equals("all")) {
 			amount = balance;
 		} else {
 			try {

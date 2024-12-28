@@ -13,7 +13,7 @@ public class Deposit {
 			e.reply("You have to deposit something.");
 			return;
 		}
-		if(temp.equals("max")) {
+		if(temp.equals("max") || temp.equals("all")) {
 			amount = wallet;
 		} else {
 			try {
