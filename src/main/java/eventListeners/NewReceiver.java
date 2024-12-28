@@ -191,7 +191,10 @@ class CreateThreadSlash implements Runnable {
 					amount = "1";
 				}
 				try {
-					price = Objects.requireNonNull(e1.getOption("price")).getAsInt();
+					price = Objects.requireNonNull(e1.getOption("price")).getAsLong();
+					if(price > 2147483647) {
+						price = 2147483647;
+					}
 				} catch(Exception exception) {
 					price = -1;
 				}

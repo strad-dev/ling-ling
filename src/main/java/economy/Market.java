@@ -119,8 +119,8 @@ public class Market {
 
 	public static void buy() {
 		JSONParser parser = new JSONParser();
-		ArrayList<String> files = DatabaseManager.getItemData(item);
-		if(files == null || files.getFirst().isEmpty()) {
+		ArrayList<String> orders = DatabaseManager.getItemData(item);
+		if(orders == null || orders.getFirst().isEmpty()) {
 			e.reply("Nobody is selling this item!");
 			return;
 		}
@@ -130,11 +130,11 @@ public class Market {
 		boolean ranOutOfOrders = false;
 		boolean ranOutOfViolins = false;
 		for(int i = 0; amount > 0; i++) {
-			if(i == files.size()) {
+			if(i == orders.size()) {
 				ranOutOfOrders = true;
 				break;
 			}
-			String[] orderData = files.get(i).split(" ");
+			String[] orderData = orders.get(i).split(" ");
 			long offerAmount = Long.parseLong(orderData[1]);
 			long offerPrice = Long.parseLong(orderData[0]);
 			String offererID = orderData[2];
@@ -157,7 +157,7 @@ public class Market {
 				offerAmount -= amount;
 				gained += amount;
 				paid += price;
-				files.set(i, offerPrice + " " + offerAmount + " " + offererID);
+				orders.set(i, offerPrice + " " + offerAmount + " " + offererID);
 				try {
 					if((boolean) tempData.get("DMs")) {
 						long finalAmount = amount;
@@ -175,7 +175,7 @@ public class Market {
 						.setFooter("Ling Ling Bot", e.getJDA().getSelfUser().getAvatarUrl())
 						.setColor(Color.GREEN)
 						.setTitle("**__Sell Offer Partially Filled__**")
-						.addField("Buyer: " + data.get("discordName") + " " + e.getAuthor().getId(), "Seller: " + tempData.get("discordName") + "\nItem: " + item + "\nPurchased: " + purchased + "\nPrice: " + price, false);
+						.addField("Buyer: " + data.get("discordName") + " " + e.getAuthor().getId(), "Seller: " + tempData.get("discordName") + " `" + tempData.get("discordID") + "`\nItem: " + item + "\nPurchased: " + purchased + "\nPrice: " + price, false);
 				Objects.requireNonNull(Objects.requireNonNull(e.getJDA().getGuildById("670725611207262219")).getTextChannelById("1028934753270894592")).sendMessageEmbeds(builder.build()).queue();
 			} else {
 				price = offerAmount * offerPrice;
@@ -187,7 +187,7 @@ public class Market {
 				amount -= offerAmount;
 				gained += offerAmount;
 				paid += price;
-				files.set(i, "");
+				orders.set(i, "");
 				try {
 					if((boolean) tempData.get("DMs")) {
 						long finalOfferAmount = offerAmount;
@@ -204,7 +204,7 @@ public class Market {
 						.setFooter("Ling Ling Bot", e.getJDA().getSelfUser().getAvatarUrl())
 						.setColor(Color.GREEN)
 						.setTitle("**__Sell Offer Filled__**")
-						.addField("Buyer: " + data.get("discordName") + " " + e.getAuthor().getId(), "Seller: " + tempData.get("discordName") + "\nItem: " + item + "\n# Purchased: " + purchased + "\nPrice: " + price, false);
+						.addField("Buyer: " + data.get("discordName") + " " + e.getAuthor().getId(), "Seller: " + tempData.get("discordName") + " `" + tempData.get("discordID") + "`\nItem: " + item + "\n# Purchased: " + purchased + "\nPrice: " + price, false);
 				Objects.requireNonNull(Objects.requireNonNull(e.getJDA().getGuildById("670725611207262219")).getTextChannelById("1028934753270894592")).sendMessageEmbeds(builder.build()).queue();
 			}
 			DatabaseManager.saveDataForUser(e, "Economy Data", offererID, tempData);
@@ -213,29 +213,31 @@ public class Market {
 		data.replace("itemsBought", (long) data.get("itemsBought") + gained);
 		data.replace("moneySpent", (long) data.get("moneySpent") + paid);
 		data.replace(item, (long) data.get(item) + gained);
-		if(ranOutOfOrders) {
+		if(!ranOutOfViolins && gained == 0) {
+			e.reply("There was none of this item for sale!");
+		} else if(ranOutOfViolins && gained == 0) {
+			e.reply("You don't have enough violins to purchase anything!  Try lowering the amount of items you're buying.");
+		} else if(ranOutOfOrders) {
 			e.reply("You purchased " + Numbers.formatNumber(gained) + emoji + " for " + Numbers.formatNumber(paid) + Emoji.VIOLINS + "\nAverage price paid: " + Numbers.formatNumber(paid / gained) + Emoji.VIOLINS + "\n*you kind of bought out everything...*");
 		} else if(ranOutOfViolins && gained > 0) {
 			e.reply("You purchased " + Numbers.formatNumber(gained) + emoji + " for " + Numbers.formatNumber(paid) + Emoji.VIOLINS + "\nAverage price paid: " + Numbers.formatNumber(paid / gained) + Emoji.VIOLINS + "\n*you ran out of violins though...*");
-		} else if(ranOutOfViolins && gained == 0) {
-			e.reply("You don't have enough violins to purchase anything!  Try lowering the amount of items you're buying.");
 		} else {
 			e.reply("You purchased " + Numbers.formatNumber(gained) + emoji + " for " + Numbers.formatNumber(paid) + Emoji.VIOLINS + "\nAverage price paid: " + Numbers.formatNumber(paid / gained) + Emoji.VIOLINS);
 		}
 		Achievement.calculateAchievement(e, data, "moneySpent", "Big Spender");
 		SaveData.saveData(e, data);
-		DatabaseManager.saveMarketData(item, files);
+		DatabaseManager.saveMarketData(item, orders);
 	}
 
 	public static void sell() {
-		ArrayList<String> files = DatabaseManager.getItemData(item);
-		if(price == -1 && (files == null || files.isEmpty())) {
-			e.reply("Nobody is selling this item!  Be the one to set the price!");
-			return;
-		}
 		long userAmount = (long) data.get(item);
 		if(userAmount == 0) {
 			e.reply("You don't have any of this item!");
+			return;
+		}
+		ArrayList<String> orders = DatabaseManager.getItemData(item);
+		if(price == -1 && (orders == null || orders.getFirst().isEmpty())) {
+			e.reply("Nobody is selling this item!  Be the one to set the price!");
 			return;
 		}
 		if(amount > userAmount) {
@@ -246,25 +248,24 @@ public class Market {
 			return;
 		}
 		if(price == -1) {
-			assert files != null;
-			price = Long.parseLong(files.getFirst().split(" ")[0]) - 1;
+			price = Long.parseLong(orders.getFirst().split(" ")[0]) - 1;
 		}
 		if(price <= 0) {
 			e.reply("You cannot sell items for a negative amount of violins, I know that scamming trick.");
 			return;
 		}
 		String newString = price + " " + amount + " " + e.getAuthor().getId();
-		assert files != null;
-		if(files.contains(newString)) {
-			int index = files.indexOf(newString);
-			files.set(index, price + " " + (amount + Long.parseLong(files.get(index).split(" ")[2])) + " " + e.getAuthor().getId());
+		assert orders != null;
+		if(orders.contains(newString)) {
+			int index = orders.indexOf(newString);
+			orders.set(index, price + " " + (amount + Long.parseLong(orders.get(index).split(" ")[2])) + " " + e.getAuthor().getId());
 		} else {
-			files.add(newString);
+			orders.add(newString);
 		}
 		data.replace(item, (long) data.get(item) - amount);
 		e.reply("You set up a Sell Offer for " + Numbers.formatNumber(amount) + emoji + " at " + Numbers.formatNumber(price) + Emoji.VIOLINS + " per!");
 		SaveData.saveData(e, data);
-		DatabaseManager.saveMarketData(item, files);
+		DatabaseManager.saveMarketData(item, orders);
 		builder = new EmbedBuilder()
 				.setFooter("Ling Ling Bot", e.getJDA().getSelfUser().getAvatarUrl())
 				.setColor(Color.BLUE)
@@ -290,14 +291,23 @@ public class Market {
 				continue;
 			}
 			StringBuilder stringBuilder = new StringBuilder();
+			long count = 0;
 			for(String order : orders) {
 				String[] orderArray = order.split(" ");
 				if(orderArray[2].equals(e.getAuthor().getId())) {
-					stringBuilder.append(Numbers.formatNumber(Long.parseLong(orderArray[1]))).append(emoji).append(" for ").append(Numbers.formatNumber(Long.parseLong(orderArray[0]))).append(Emoji.VIOLINS + " per").append("\n");
+					String toAppend = Numbers.formatNumber(Long.parseLong(orderArray[1])) + emoji + " for " + Numbers.formatNumber(Long.parseLong(orderArray[0])) + Emoji.VIOLINS + " per" + "\n";
+					if(stringBuilder.length() + toAppend.length() > 1012) {
+						count++;
+					} else {
+						stringBuilder.append(Numbers.formatNumber(Long.parseLong(orderArray[1]))).append(emoji).append(" for ").append(Numbers.formatNumber(Long.parseLong(orderArray[0]))).append(Emoji.VIOLINS + " per").append("\n");
+					}
 				}
 			}
 			if(stringBuilder.isEmpty()) {
 				stringBuilder.append("No offers!");
+			}
+			if(count > 0) {
+				stringBuilder.append("+").append(Numbers.formatNumber(count)).append(" more ");
 			}
 			builder.addField(item + emoji, stringBuilder.deleteCharAt(stringBuilder.length() - 1).toString(), true);
 		}
@@ -310,14 +320,14 @@ public class Market {
 		StringBuilder stringBuilder = new StringBuilder();
 		for(Document file : allItems) {
 			JSONParser parser = new JSONParser();
-			JSONObject itemDAta;
+			JSONObject itemData;
 			try {
-				itemDAta = (JSONObject) parser.parse(file.toJson());
+				itemData = (JSONObject) parser.parse(file.toJson());
 			} catch(Exception exception) {
 				continue;
 			}
-			itemSwitch((String) itemDAta.get("item"));
-			String[] orders = ((String) itemDAta.get("data")).split("\n");
+			itemSwitch((String) itemData.get("item"));
+			String[] orders = ((String) itemData.get("data")).split("\n");
 			if(orders.length == 1 && orders[0].isEmpty()) {
 				continue;
 			}
@@ -328,10 +338,10 @@ public class Market {
 					stringBuilder.append(Numbers.formatNumber(Long.parseLong(orderArray[1]))).append(emoji).append("\n");
 					orders[i] = "";
 					long num;
-					if(itemDAta.get(item) == null) {
+					if(data.get(item) == null) {
 						num = 0;
 					} else {
-						num = (long) itemDAta.get(item);
+						num = (long) data.get(item);
 					}
 					data.replace(item, num + Long.parseLong(orderArray[1]));
 				}

@@ -218,6 +218,9 @@ class CreateThreadMessage implements Runnable {
 					}
 					try {
 						price = Long.parseLong(message[5]);
+						if(price > 2147483647) {
+							price = 2147483647;
+						}
 					} catch(Exception exception) {
 						price = -1;
 					}

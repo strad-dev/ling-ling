@@ -85,7 +85,7 @@ public class Inventory {
 							.addField("Medal Generator", "Count: " + Numbers.formatNumber(data.get("bonusMedals")) +
 									"\nEffect: Grants +" + Numbers.formatNumber(data.get("bonusMedals")) + Emoji.MEDALS + " each time `!daily` is run", true)
 							.addField("Bonus Interest", "Count: " + Numbers.formatNumber(data.get("bonusInterest")) +
-									"\nEffect: Grants +" + ((long) data.get("bonusInterest")) * 0.1 + "% extra interest", true);
+									"\nEffect: Grants +`" + ((long) data.get("bonusInterest")) * 0.1 + "`% extra interest", true);
 					if((long) data.get("RNGesusItemThatDoesAbsolutelyNothingLMAO") == 0) {
 						builder.addField("???", "Count: `0`\nEffect: ???", true);
 					} else {

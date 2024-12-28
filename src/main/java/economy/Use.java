@@ -588,7 +588,7 @@ public class Use {
 						message += "\n**RARE DROP!**  You found " + Numbers.formatNumber(addItems.get("blessings")) + Emoji.BLESSING + " in the box!";
 					}
 					if(addItems.containsKey("bonusInterest")) {
-						message += "\n**CRAZY RARE DROP!**  The Bank of TwoSet is imporessed by your dedication and grants you +" + addItems.get("bonusInterest") * 0.1 + "% extra interest!";
+						message += "\n**CRAZY RARE DROP!**  The Bank of TwoSet is imporessed by your dedication and grants you +`" + addItems.get("bonusInterest") * 0.1 + "`% extra interest!";
 					}
 					e.reply(message);
 				}
