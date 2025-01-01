@@ -77,6 +77,6 @@ public class Leaderboard {
 				.setFooter("Ling Ling", e.getJDA().getSelfUser().getAvatarUrl())
 				.setTitle("__**XP Leaderboard**__")
 				.addField("Most Active Users", board.toString(), false);
-		e.getMessage().replyEmbeds(builder.build()).mentionRepliedUser(false).queue();
+		e.replyEmbeds(builder.build());
 	}
 }

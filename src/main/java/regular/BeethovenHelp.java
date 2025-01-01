@@ -104,7 +104,7 @@ public class BeethovenHelp {
 						Example: `beethoven baldness akc0303` `beethoven baldness beethoven_ pomegranate`
 						""", false);
 				case "levelsettings" -> builder.addField("LevelSettings Command", """
-						Synatx: `beethoven levelsettings [min | max | cooldown] [amount]
+						Synatx: `beethoven levelsettings [min | max | cooldown] [amount]`
 						Usage: Checks or updates the leveling settings.
 						Example: `beethoven levelsettings min 15` `beethoven levelsettings cooldown 20`""", false);
 				default -> builder.addField("Command Doesn't Exist!", "`beethoven " + message[2] + "` doesn't exist you idiot.", false);

@@ -27,9 +27,9 @@ public class SetLevel {
 				return;
 			}
 			DatabaseManager.saveDataForUser(e, "Leveling Data", id, data);
-			e.getMessage().reply("Successfully set `" + Objects.requireNonNull(e.getGuild().getMemberById(id)).getNickname() + "`'s " + field + " to `" + message[4] + "`.").queue();
+			e.reply("Successfully set `" + Objects.requireNonNull(e.getGuild().getMemberById(id)).getNickname() + "`'s " + field + " to `" + message[4] + "`.");
 		} else {
-			e.getMessage().reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command!").mentionRepliedUser(false).queue();
+			e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command!");
 		}
 	}
 }
