@@ -28,7 +28,7 @@ public class WordAutomod {
 			builder.addField("Offender: " + e.getAuthor().getName(), "Category: " + category + "\n" + e.getMessage().getJumpUrl(), false)
 					.setTitle("Beethoven Warning");
 			e.getAuthor().openPrivateChannel().complete().sendMessage("You have been warned for the following reason: " + category +
-					"\nYou have lost 10 XP and 1 Message\n**This is NOT a Carl-bot Warning**").queue();
+					"\nYou have lost 10 XP and 1 Message").queue();
 		}
 		Objects.requireNonNull(e.getGuild().getTextChannelById("734697496688853012")).sendMessageEmbeds(builder.build()).queue();
 		JSONObject data = Leveling.loadData(e);
@@ -42,6 +42,21 @@ public class WordAutomod {
 		String message = EmojiParser.parseToAliases(e.getMessage().getContentRaw()).toLowerCase();
 		if(messageArray.contains("kys")) {
 			moderate(e, "kys", true);
+		}
+		if(messageArray.contains("retard")) {
+			moderate(e, "r-word", true);
+		}
+		if(messageArray.contains("cunt")) {
+			moderate(e, "c-word", true);
+		}
+		if(messageArray.contains("chink")) {
+			moderate(e, "other c-word", true);
+		}
+		if(messageArray.contains("nigg") || messageArray.contains("nibba")) {
+			moderate(e, "n-word", true);
+		}
+		if(messageArray.contains("discord.gg/")) {
+			moderate(e, "advertising", true);
 		}
 		if(message.contains("foraging")) {
 			moderate(e, "f\\*raging", false);
