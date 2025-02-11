@@ -24,14 +24,14 @@ public class Craft {
 		if(craftAmount == 0) {
 			result = new StringBuilder("You did not have enough materials to craft any ").append(getEmoji(what)).append("  Check that you have enough Raw Materials...\n");
 			for(String key : recipe.keySet()) {
-				result.append("\n").append(Numbers.formatNumber(data.get(key))).deleteCharAt(result.length() - 1)
+				result.append("\n").append(getEmoji(key)).append(" ").append(Numbers.formatNumber(data.get(key))).deleteCharAt(result.length() - 1)
 						.append("/").append(recipe.get(key)).append("`");
 			}
 		} else {
 			result = new StringBuilder("You crafted ").append(Numbers.formatNumber(craftAmount)).append(getEmoji(what)).append(" for...\n");
 			for(String key : recipe.keySet()) {
 				data.replace(key, (long) data.get(key) - (recipe.get(key) * craftAmount));
-				result.append('\n').append(Numbers.formatNumber(recipe.get(key) * craftAmount)).append(getEmoji(key));
+				result.append('\n').append(Numbers.formatNumber(recipe.get(key) * craftAmount)).append(getEmoji(key)).append(" ");
 			}
 			data.replace(what, (long) data.get(what) + craftAmount);
 		}
@@ -162,11 +162,11 @@ public class Craft {
 			case "string" -> {
 				recipe.put("steel", 40L);
 			}
-			case "bowhair", "bowHair" -> {
+			case "hair", "bowhair", "bowHair" -> {
 				item = "bowHair";
 				recipe.put("horseHair", 60L);
 			}
-			case "violinservice", "violinService" -> {
+			case "service", "violinservice", "violinService" -> {
 				item = "violinService";
 				recipe.put("grains", 20L);
 				recipe.put("plastic", 20L);
