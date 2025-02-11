@@ -2,9 +2,9 @@ package processes;
 
 import eventListeners.GenericDiscordEvent;
 import eventListeners.ILoveJava;
+import leveling.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import regular.*;
-import leveling.*;
 
 import java.util.Objects;
 // BEETHOVEN-ONLY CLASS

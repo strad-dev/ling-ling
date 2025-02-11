@@ -1,6 +1,9 @@
 package processes;
 
-import com.mongodb.*;
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.ServerApi;
+import com.mongodb.ServerApiVersion;
 import com.mongodb.client.*;
 import economy.MarketComparator;
 import eventListeners.GenericDiscordEvent;

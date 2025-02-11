@@ -3,13 +3,10 @@ package economy;
 import eventListeners.GenericDiscordEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.json.simple.JSONObject;
-import processes.DatabaseManager;
 import processes.Numbers;
 
-import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class Craft {
 	private static void craftItems(GenericDiscordEvent e, JSONObject data, String what, Map<String, Long> recipe, long craftAmount) {
@@ -24,8 +21,8 @@ public class Craft {
 		if(craftAmount == 0) {
 			result = new StringBuilder("You did not have enough materials to craft any ").append(getEmoji(what)).append("  Check that you have enough Raw Materials...\n");
 			for(String key : recipe.keySet()) {
-				result.append("\n").append(getEmoji(key)).append(" ").append(Numbers.formatNumber(data.get(key))).deleteCharAt(result.length() - 1)
-						.append("/").append(recipe.get(key)).append("`");
+				result.append("\n").append(Numbers.formatNumber(data.get(key))).deleteCharAt(result.length() - 1)
+						.append("/").append(recipe.get(key)).append("`").append(" ").append(getEmoji(key));
 			}
 		} else {
 			result = new StringBuilder("You crafted ").append(Numbers.formatNumber(craftAmount)).append(getEmoji(what)).append(" for...\n");
@@ -117,7 +114,7 @@ public class Craft {
 							"\n`" + data.get("horseHair") + "/20`" + Emoji.HORSE_HAIR +
 							"\nID: `violinService`", true)
 					.addBlankField(true)
-					.addField("**1x Luthier** " + Emoji.SERVICE, "`" + data.get("grains") + "/250`" + Emoji.GRAINS +
+					.addField("**~~1x Luthier~~**\n**Temporarily Disabled**", "`" + data.get("grains") + "/250`" + Emoji.GRAINS +
 							"\n`" + data.get("plastic") + "/250`" + Emoji.PLASTIC +
 							"\n`" + data.get("water") + "/250`" + Emoji.WATER +
 							"\n`" + data.get("teaBase") + "/250`" + Emoji.TEABAG +
@@ -180,6 +177,8 @@ public class Craft {
 
 			// TODO finish refactoring when luthier is a consumable item
 			case "luthier" -> {
+				e.reply("This recipe has been disabled due to a revamp of the Luthier system in 3-5 business days.");
+				/*
 				if(Objects.requireNonNull(e.getGuild()).getId().equals("670725611207262219")) {
 					e.reply("Strad find you trying to sneakily mess with the only buffed Luthier around.  " +
 							"He kicks you out, and slaps you with a fine equal to 24x your hourly income." +
@@ -255,7 +254,7 @@ public class Craft {
 						.setColor(Color.BLUE)
 						.setTitle("**__Luthier Crafted__**")
 						.addField("Crafter: " + data.get("discordName") + " `" + e.getAuthor().getId() + "`", "Server: " + e.getGuild().getName() + " `" + e.getGuild().getId() + "`" + "\nAmount Crafted: " + Numbers.formatNumber(i), false);
-				DatabaseManager.saveDataByGuild(e, "Luthier Data", luthierData);
+				DatabaseManager.saveDataByGuild(e, "Luthier Data", luthierData);*/
 				return;
 			}
 			default -> {
