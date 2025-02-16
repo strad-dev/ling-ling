@@ -675,7 +675,7 @@ class CreateThreadMessage implements Runnable {
 						} catch(Exception exception) {
 							newValue = new StringBuilder();
 						}
-						AdminLuthier.adminLuthier(e, actionType, editOption, newValue.toString());
+						LuthierConfig.luthierConfig(e, actionType, editOption, newValue.toString());
 					} else {
 						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command.");
 					}

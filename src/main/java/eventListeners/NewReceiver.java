@@ -605,7 +605,7 @@ class CreateThreadSlash implements Runnable {
 					} catch(Exception exception) {
 						newValue = "";
 					}
-					AdminLuthier.adminLuthier(e, actionType, editOption, newValue);
+					LuthierConfig.luthierConfig(e, actionType, editOption, newValue);
 				} else {
 					e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command.");
 				}

@@ -39,7 +39,7 @@ public class Luthier {
 					String original = word;
 					long money = 0;
 					for(int i = 0; i < word.length(); i++) {
-						money += random.nextInt(200) + 901;
+						money += random.nextInt(401) + 1800;
 					}
 					money *= (long) data.get("multiplier");
 					char[] scrambler = new char[word.length()];

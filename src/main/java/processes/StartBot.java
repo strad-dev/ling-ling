@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.json.simple.JSONObject;
 
 public class StartBot {
-	private static final boolean BETA = false; // TODO UPDATE THIS BEFORE DOING BETAS OR FULL RELEASES
+	private static final boolean BETA = true; // TODO UPDATE THIS BEFORE DOING BETAS OR FULL RELEASES
 
 	public static boolean isBeta() {
 		return BETA;
@@ -179,7 +179,7 @@ public class StartBot {
 				Commands.slash("inv", "View your inventory.")
 						.addOptions(optionData)
 						.addOption(OptionType.STRING, "otheruser", "Use this to view another user's inventory.")
-		).queue();*/
+		).queue();
 		OptionData data1 = new OptionData(OptionType.STRING, "action", "Choose whether to Buy, Sell, or view an item or your offers.")
 				.addChoice("Buy Items", "buy")
 				.addChoice("Sell Items", "sell")
