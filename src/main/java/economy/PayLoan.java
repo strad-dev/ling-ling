@@ -2,7 +2,7 @@ package economy;
 
 import eventListeners.GenericDiscordEvent;
 import org.json.simple.JSONObject;
-import processes.Numbers;
+import processes.Utils;
 
 public class PayLoan {
 	public static void payLoan(GenericDiscordEvent e, String temp) {
@@ -33,7 +33,7 @@ public class PayLoan {
 				amount = Math.min(amount, owed);
 				data.replace("loan", owed - amount);
 				data.replace("violins", violins - amount);
-				e.reply("You paid back " + Numbers.formatNumber(amount) + Emoji.VIOLINS + ".  You now owe " + Numbers.formatNumber(owed - amount) + Emoji.VIOLINS + ".");
+				e.reply("You paid back " + Utils.formatNumber(amount) + Emoji.VIOLINS + ".  You now owe " + Utils.formatNumber(owed - amount) + Emoji.VIOLINS + ".");
 				SaveData.saveData(e, data);
 			}
 		}

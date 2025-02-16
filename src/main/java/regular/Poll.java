@@ -3,12 +3,12 @@ package regular;
 import eventListeners.GenericDiscordEvent;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import processes.Numbers;
+import processes.Utils;
 
 public class Poll {
 	
 	public static void poll(GenericDiscordEvent e, String title, String choices) {
-		if(Numbers.containsBadLanguage(title)) {
+		if(Utils.containsBadLanguage(title)) {
 			title = "NICE TRY";
 		}
 		StringBuilder send = new StringBuilder("**POLL: ").append(title).append("**\n");
@@ -17,7 +17,7 @@ public class Poll {
 			e.reply("You must provide choices.  Can't have people vote on nothing, you know.");
 			return;
 		}
-		if(Numbers.containsBadLanguage(choices)) {
+		if(Utils.containsBadLanguage(choices)) {
 			choices = "NICE TRY";
 		}
 		

@@ -6,7 +6,7 @@ import org.bson.Document;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import processes.DatabaseManager;
-import processes.Numbers;
+import processes.Utils;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -79,13 +79,13 @@ public class Market {
 				// price count ID
 				String[] nameSplit = order.split(" ");
 				if(nameSplit[2].equals(e.getAuthor().getId())) {
-					line.append(Numbers.formatNumber(Long.parseLong(nameSplit[1]))).append("x for ").append(Numbers.formatNumber(Long.parseLong(nameSplit[0]))).append(Emoji.VIOLINS + " **Your Order**\n");
+					line.append(Utils.formatNumber(Long.parseLong(nameSplit[1]))).append("x for ").append(Utils.formatNumber(Long.parseLong(nameSplit[0]))).append(Emoji.VIOLINS + " **Your Order**\n");
 					continue;
 				}
-				line.append(Numbers.formatNumber(Long.parseLong(nameSplit[1]))).append("x for ").append(Numbers.formatNumber(Long.parseLong(nameSplit[0]))).append(Emoji.VIOLINS + "\n");
+				line.append(Utils.formatNumber(Long.parseLong(nameSplit[1]))).append("x for ").append(Utils.formatNumber(Long.parseLong(nameSplit[0]))).append(Emoji.VIOLINS + "\n");
 			}
 			if(files.size() > 10) {
-				line.append("+").append(Numbers.formatNumber((long) files.size() - 10)).append(" more");
+				line.append("+").append(Utils.formatNumber((long) files.size() - 10)).append(" more");
 			}
 			builder.addField("Best Sell Offers", line.toString(), false);
 		}
@@ -111,7 +111,7 @@ public class Market {
 				builder.addField(currentItem, "No Sell Offers!", true);
 			} else {
 				String[] fileName = itemData.getFirst().split(" ");
-				builder.addField(currentItem + " " + emoji, "Price: " + Numbers.formatNumber(Long.parseLong(fileName[0])) + Emoji.VIOLINS, true);
+				builder.addField(currentItem + " " + emoji, "Price: " + Utils.formatNumber(Long.parseLong(fileName[0])) + Emoji.VIOLINS, true);
 			}
 		}
 		e.replyEmbeds(builder.build());
@@ -161,7 +161,7 @@ public class Market {
 				try {
 					if((boolean) tempData.get("DMs")) {
 						long finalAmount = amount;
-						Objects.requireNonNull(e.getJDA().getUserById(offererID)).openPrivateChannel().queue((channel) -> channel.sendMessage("Someone just purchased " + Numbers.formatNumber(finalAmount) + emoji + " at " + Numbers.formatNumber(offerPrice) + Emoji.VIOLINS + " each.  You made " + Numbers.formatNumber((long) (price * 0.99)) + Emoji.VIOLINS + "!\n*Ling Ling taxed you " + Numbers.formatNumber((long) (price * 0.01)) + Emoji.VIOLINS + "*").queue());
+						Objects.requireNonNull(e.getJDA().getUserById(offererID)).openPrivateChannel().queue((channel) -> channel.sendMessage("Someone just purchased " + Utils.formatNumber(finalAmount) + emoji + " at " + Utils.formatNumber(offerPrice) + Emoji.VIOLINS + " each.  You made " + Utils.formatNumber((long) (price * 0.99)) + Emoji.VIOLINS + "!\n*Ling Ling taxed you " + Utils.formatNumber((long) (price * 0.01)) + Emoji.VIOLINS + "*").queue());
 					}
 				} catch(Exception exception) {
 					// nothing here
@@ -191,7 +191,7 @@ public class Market {
 				try {
 					if((boolean) tempData.get("DMs")) {
 						long finalOfferAmount = offerAmount;
-						Objects.requireNonNull(e.getJDA().getUserById(offererID)).openPrivateChannel().queue((channel) -> channel.sendMessage("Someone just purchased " + Numbers.formatNumber(finalOfferAmount) + emoji + " at " + Numbers.formatNumber(offerPrice) + Emoji.VIOLINS + " each.  You made " + Numbers.formatNumber((long) (price * 0.99)) + Emoji.VIOLINS + "!\n*Ling Ling taxed you " + Numbers.formatNumber((long) (price * 0.01)) + Emoji.VIOLINS + "*").queue());
+						Objects.requireNonNull(e.getJDA().getUserById(offererID)).openPrivateChannel().queue((channel) -> channel.sendMessage("Someone just purchased " + Utils.formatNumber(finalOfferAmount) + emoji + " at " + Utils.formatNumber(offerPrice) + Emoji.VIOLINS + " each.  You made " + Utils.formatNumber((long) (price * 0.99)) + Emoji.VIOLINS + "!\n*Ling Ling taxed you " + Utils.formatNumber((long) (price * 0.01)) + Emoji.VIOLINS + "*").queue());
 					}
 				} catch(Exception exception) {
 					// nothing here
@@ -218,11 +218,11 @@ public class Market {
 		} else if(ranOutOfViolins && gained == 0) {
 			e.reply("You don't have enough violins to purchase anything!  Try lowering the amount of items you're buying.");
 		} else if(ranOutOfOrders) {
-			e.reply("You purchased " + Numbers.formatNumber(gained) + emoji + " for " + Numbers.formatNumber(paid) + Emoji.VIOLINS + "\nAverage price paid: " + Numbers.formatNumber(paid / gained) + Emoji.VIOLINS + "\n*you kind of bought out everything...*");
+			e.reply("You purchased " + Utils.formatNumber(gained) + emoji + " for " + Utils.formatNumber(paid) + Emoji.VIOLINS + "\nAverage price paid: " + Utils.formatNumber(paid / gained) + Emoji.VIOLINS + "\n*you kind of bought out everything...*");
 		} else if(ranOutOfViolins && gained > 0) {
-			e.reply("You purchased " + Numbers.formatNumber(gained) + emoji + " for " + Numbers.formatNumber(paid) + Emoji.VIOLINS + "\nAverage price paid: " + Numbers.formatNumber(paid / gained) + Emoji.VIOLINS + "\n*you ran out of violins though...*");
+			e.reply("You purchased " + Utils.formatNumber(gained) + emoji + " for " + Utils.formatNumber(paid) + Emoji.VIOLINS + "\nAverage price paid: " + Utils.formatNumber(paid / gained) + Emoji.VIOLINS + "\n*you ran out of violins though...*");
 		} else {
-			e.reply("You purchased " + Numbers.formatNumber(gained) + emoji + " for " + Numbers.formatNumber(paid) + Emoji.VIOLINS + "\nAverage price paid: " + Numbers.formatNumber(paid / gained) + Emoji.VIOLINS);
+			e.reply("You purchased " + Utils.formatNumber(gained) + emoji + " for " + Utils.formatNumber(paid) + Emoji.VIOLINS + "\nAverage price paid: " + Utils.formatNumber(paid / gained) + Emoji.VIOLINS);
 		}
 		Achievement.calculateAchievement(e, data, "moneySpent", "Big Spender");
 		SaveData.saveData(e, data);
@@ -263,14 +263,14 @@ public class Market {
 			orders.add(newString);
 		}
 		data.replace(item, (long) data.get(item) - amount);
-		e.reply("You set up a Sell Offer for " + Numbers.formatNumber(amount) + emoji + " at " + Numbers.formatNumber(price) + Emoji.VIOLINS + " per!");
+		e.reply("You set up a Sell Offer for " + Utils.formatNumber(amount) + emoji + " at " + Utils.formatNumber(price) + Emoji.VIOLINS + " per!");
 		SaveData.saveData(e, data);
 		DatabaseManager.saveMarketData(item, orders);
 		builder = new EmbedBuilder()
 				.setFooter("Ling Ling Bot", e.getJDA().getSelfUser().getAvatarUrl())
 				.setColor(Color.BLUE)
 				.setTitle("**__Sell Offer Setup__**")
-				.addField("User: " + e.getAuthor().getGlobalName() + " " + e.getAuthor().getId(), "Item: " + item + "\nAmount: " + Numbers.formatNumber(amount) + "\nPrice: " + Numbers.formatNumber(price), false);
+				.addField("User: " + e.getAuthor().getGlobalName() + " " + e.getAuthor().getId(), "Item: " + item + "\nAmount: " + Utils.formatNumber(amount) + "\nPrice: " + Utils.formatNumber(price), false);
 		Objects.requireNonNull(Objects.requireNonNull(e.getJDA().getGuildById("670725611207262219")).getTextChannelById("1028934753270894592")).sendMessageEmbeds(builder.build()).queue();
 	}
 
@@ -295,11 +295,11 @@ public class Market {
 			for(String order : orders) {
 				String[] orderArray = order.split(" ");
 				if(orderArray[2].equals(e.getAuthor().getId())) {
-					String toAppend = Numbers.formatNumber(Long.parseLong(orderArray[1])) + emoji + " for " + Numbers.formatNumber(Long.parseLong(orderArray[0])) + Emoji.VIOLINS + " per" + "\n";
+					String toAppend = Utils.formatNumber(Long.parseLong(orderArray[1])) + emoji + " for " + Utils.formatNumber(Long.parseLong(orderArray[0])) + Emoji.VIOLINS + " per" + "\n";
 					if(stringBuilder.length() + toAppend.length() > 1012) {
 						count++;
 					} else {
-						stringBuilder.append(Numbers.formatNumber(Long.parseLong(orderArray[1]))).append(emoji).append(" for ").append(Numbers.formatNumber(Long.parseLong(orderArray[0]))).append(Emoji.VIOLINS + " per").append("\n");
+						stringBuilder.append(Utils.formatNumber(Long.parseLong(orderArray[1]))).append(emoji).append(" for ").append(Utils.formatNumber(Long.parseLong(orderArray[0]))).append(Emoji.VIOLINS + " per").append("\n");
 					}
 				}
 			}
@@ -307,7 +307,7 @@ public class Market {
 				stringBuilder.append("No offers!");
 			}
 			if(count > 0) {
-				stringBuilder.append("+").append(Numbers.formatNumber(count)).append(" more ");
+				stringBuilder.append("+").append(Utils.formatNumber(count)).append(" more ");
 			}
 			builder.addField(item + emoji, stringBuilder.deleteCharAt(stringBuilder.length() - 1).toString(), true);
 		}
@@ -335,7 +335,7 @@ public class Market {
 				String order = orders[i];
 				String[] orderArray = order.split(" ");
 				if(orderArray[2].equals(e.getAuthor().getId())) {
-					stringBuilder.append(Numbers.formatNumber(Long.parseLong(orderArray[1]))).append(emoji).append("\n");
+					stringBuilder.append(Utils.formatNumber(Long.parseLong(orderArray[1]))).append(emoji).append("\n");
 					orders[i] = "";
 					long num;
 					if(data.get(item) == null) {

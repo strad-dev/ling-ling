@@ -406,7 +406,7 @@ class CreateThreadSlash implements Runnable {
 								Leaderboard.leaderboard(e, ":scales:", "Most In Need of Touching Grass", "scaleStreakRecord", (long) data.get("scaleStreakRecord"), (String) data.get("color"));
 						default -> e.reply("""
 								You must provide a valid leaderboard type.  Valid types...
-
+								
 								`violins`: Richest Users
 								`income`: Highest Hourly Incomes
 								`streak`: Longest Daily Streaks
@@ -432,7 +432,7 @@ class CreateThreadSlash implements Runnable {
 				} catch(Exception exception) {
 					e.reply("""
 							**__Leaderboard Types__**
-
+							
 							`violins`: Richest Users
 							`income`: Highest Hourly Incomes
 							`streak`: Longest Daily Streaks
@@ -586,29 +586,25 @@ class CreateThreadSlash implements Runnable {
 				}
 			}
 			case "luthier" -> {
-				if(CheckPermLevel(e) >= 2) {
-					String actionType;
-					String editOption;
-					String newValue;
-					try {
-						actionType = Objects.requireNonNull(e1.getOption("actiontype")).getAsString();
-					} catch(Exception exception) {
-						actionType = "";
-					}
-					try {
-						editOption = Objects.requireNonNull(e1.getOption("editOption")).getAsString();
-					} catch(Exception exception) {
-						editOption = "";
-					}
-					try {
-						newValue = Objects.requireNonNull(e1.getOption("newValue")).getAsString();
-					} catch(Exception exception) {
-						newValue = "";
-					}
-					LuthierConfig.luthierConfig(e, actionType, editOption, newValue);
-				} else {
-					e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command.");
+				String actionType;
+				String editOption;
+				String newValue;
+				try {
+					actionType = Objects.requireNonNull(e1.getOption("actiontype")).getAsString();
+				} catch(Exception exception) {
+					actionType = "";
 				}
+				try {
+					editOption = Objects.requireNonNull(e1.getOption("editOption")).getAsString();
+				} catch(Exception exception) {
+					editOption = "";
+				}
+				try {
+					newValue = Objects.requireNonNull(e1.getOption("newValue")).getAsString();
+				} catch(Exception exception) {
+					newValue = "";
+				}
+				LuthierConfig.luthierConfig(e, actionType, editOption, newValue);
 			}
 			case "resetincomes" -> {
 				if(CheckPermLevel(e) >= 2) {

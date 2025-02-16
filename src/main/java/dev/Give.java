@@ -4,7 +4,7 @@ import eventListeners.GenericDiscordEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.json.simple.JSONObject;
 import processes.DatabaseManager;
-import processes.Numbers;
+import processes.Utils;
 
 import java.awt.*;
 import java.util.Objects;
@@ -48,11 +48,11 @@ public class Give {
 		data.replace(item, oldAmount + amount);
 		EmbedBuilder builder = new EmbedBuilder().setColor(Color.BLUE).setFooter("Ling Ling", e.getJDA().getSelfUser().getAvatarUrl())
 				.addField("Moderator: " + e.getAuthor().getName(), "User: <@" + receiver + ">\nItem type: " + item +
-						"\nAmount given: " + Numbers.formatNumber(amount), false).setTitle("__**Currency Alteration Info**__");
+						"\nAmount given: " + Utils.formatNumber(amount), false).setTitle("__**Currency Alteration Info**__");
 		Objects.requireNonNull(Objects.requireNonNull(e.getJDA().getGuildById("670725611207262219")).getTextChannelById("863135059712409632")).sendMessageEmbeds(builder.build()).queue();
 		DatabaseManager.saveDataForUser(e, "Economy Data", receiver, data);
 		Objects.requireNonNull(e.getJDA().getUserById(receiver)).openPrivateChannel().queue((channel) -> channel.sendMessage("**SPAWNED BY AN ADMIN LOL**\nA Mod/Admin has given you " +
-				Numbers.formatNumber(amount) + " " + item).queue());
-		e.reply("Successfully gave " + Numbers.formatNumber(amount) + " " + item + " to " + user);
+				Utils.formatNumber(amount) + " " + item).queue());
+		e.reply("Successfully gave " + Utils.formatNumber(amount) + " " + item + " to " + user);
 	}
 }

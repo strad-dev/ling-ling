@@ -10,7 +10,7 @@ import net.hypixel.api.http.HypixelHttpClient;
 import net.hypixel.api.reply.skyblock.SkyBlockProfilesReply;
 import processes.DatabaseManager;
 import processes.HypixelManager;
-import processes.Numbers;
+import processes.Utils;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -129,15 +129,15 @@ public class Baldness {
 			JsonObject skills;
 			try {
 				skills = profile.getAsJsonObject("player_data").getAsJsonObject("experience");
-				long combatLevel = Numbers.skillLevel(skills.get("SKILL_COMBAT").getAsLong());
-				long farmingLevel = Numbers.skillLevel(skills.get("SKILL_FARMING").getAsLong());
-				long fishingLevel = Numbers.skillLevel(skills.get("SKILL_FISHING").getAsLong());
-				long miningLevel = Numbers.skillLevel(skills.get("SKILL_MINING").getAsLong());
-				long foragingLevel = Numbers.skillLevel(skills.get("SKILL_FORAGING").getAsLong());
-				long enchantingLevel = Numbers.skillLevel(skills.get("SKILL_ENCHANTING").getAsLong());
-				long alchemyLevel = Numbers.skillLevel(skills.get("SKILL_ALCHEMY").getAsLong());
-				long carpentryLevel = Numbers.skillLevel(skills.get("SKILL_CARPENTRY").getAsLong());
-				long tamingLevel = Numbers.skillLevel(skills.get("SKILL_TAMING").getAsLong());
+				long combatLevel = Utils.skillLevel(skills.get("SKILL_COMBAT").getAsLong());
+				long farmingLevel = Utils.skillLevel(skills.get("SKILL_FARMING").getAsLong());
+				long fishingLevel = Utils.skillLevel(skills.get("SKILL_FISHING").getAsLong());
+				long miningLevel = Utils.skillLevel(skills.get("SKILL_MINING").getAsLong());
+				long foragingLevel = Utils.skillLevel(skills.get("SKILL_FORAGING").getAsLong());
+				long enchantingLevel = Utils.skillLevel(skills.get("SKILL_ENCHANTING").getAsLong());
+				long alchemyLevel = Utils.skillLevel(skills.get("SKILL_ALCHEMY").getAsLong());
+				long carpentryLevel = Utils.skillLevel(skills.get("SKILL_CARPENTRY").getAsLong());
+				long tamingLevel = Utils.skillLevel(skills.get("SKILL_TAMING").getAsLong());
 
 				if(combatLevel < 60) {
 					double result = (60 - combatLevel) * 0.002;
@@ -216,7 +216,7 @@ public class Baldness {
 
 			try {
 				JsonObject cata = profile.getAsJsonObject("dungeons").getAsJsonObject("dungeon_types");
-				long cataLevel = Numbers.cataLevel(cata.getAsJsonObject("catacombs").get("experience").getAsLong());
+				long cataLevel = Utils.cataLevel(cata.getAsJsonObject("catacombs").get("experience").getAsLong());
 				if(cataLevel < 50) {
 					double result = (50 - cataLevel) * 0.03;
 					causes += "Cata Level: +" + result + "\n";
@@ -224,11 +224,11 @@ public class Baldness {
 				}
 
 				JsonObject classes = profile.getAsJsonObject("dungeons").getAsJsonObject("player_classes");
-				long healLevel = Numbers.cataLevel(classes.getAsJsonObject("healer").get("experience").getAsLong());
-				long mageLevel = Numbers.cataLevel(classes.getAsJsonObject("mage").get("experience").getAsLong());
-				long bersLevel = Numbers.cataLevel(classes.getAsJsonObject("berserk").get("experience").getAsLong());
-				long archLevel = Numbers.cataLevel(classes.getAsJsonObject("archer").get("experience").getAsLong());
-				long tankLevel = Numbers.cataLevel(classes.getAsJsonObject("tank").get("experience").getAsLong());
+				long healLevel = Utils.cataLevel(classes.getAsJsonObject("healer").get("experience").getAsLong());
+				long mageLevel = Utils.cataLevel(classes.getAsJsonObject("mage").get("experience").getAsLong());
+				long bersLevel = Utils.cataLevel(classes.getAsJsonObject("berserk").get("experience").getAsLong());
+				long archLevel = Utils.cataLevel(classes.getAsJsonObject("archer").get("experience").getAsLong());
+				long tankLevel = Utils.cataLevel(classes.getAsJsonObject("tank").get("experience").getAsLong());
 
 				if(healLevel < 50) {
 					double result = (50 - healLevel) * 0.004;
@@ -301,39 +301,39 @@ public class Baldness {
 			JsonObject slayers = profile.getAsJsonObject("slayer").getAsJsonObject("slayer_bosses");
 			long zombieLevel;
 			try {
-				zombieLevel = Numbers.slayerLevel(slayers.getAsJsonObject("zombie").get("xp").getAsLong());
+				zombieLevel = Utils.slayerLevel(slayers.getAsJsonObject("zombie").get("xp").getAsLong());
 			} catch(Exception exception) {
 				zombieLevel = 0;
 			}
 			long spiderLevel;
 			try {
-				spiderLevel = Numbers.slayerLevel(slayers.getAsJsonObject("spider").get("xp").getAsLong());
+				spiderLevel = Utils.slayerLevel(slayers.getAsJsonObject("spider").get("xp").getAsLong());
 			} catch(Exception exception) {
 				spiderLevel = 0;
 			}
 			long wolfLevel;
 			try {
-				wolfLevel = Numbers.slayerLevel(slayers.getAsJsonObject("wolf").get("xp").getAsLong());
+				wolfLevel = Utils.slayerLevel(slayers.getAsJsonObject("wolf").get("xp").getAsLong());
 			} catch(Exception exception) {
 				wolfLevel = 0;
 			}
 			long emanLevel;
 			try {
-				emanLevel = Numbers.slayerLevel(slayers.getAsJsonObject("enderman").get("xp").getAsLong());
+				emanLevel = Utils.slayerLevel(slayers.getAsJsonObject("enderman").get("xp").getAsLong());
 			} catch(Exception exception) {
 				emanLevel = 0;
 			}
 
 			long blazeLevel;
 			try {
-				blazeLevel = Numbers.slayerLevel(slayers.getAsJsonObject("blaze").get("xp").getAsLong());
+				blazeLevel = Utils.slayerLevel(slayers.getAsJsonObject("blaze").get("xp").getAsLong());
 			} catch(Exception exception) {
 				blazeLevel = 0;
 			}
 
 			long vampLevel;
 			try {
-				vampLevel = Math.min(5, Numbers.skillLevel(slayers.getAsJsonObject("vampire").get("xp").getAsLong() / 2)); // inaccurate but it works
+				vampLevel = Math.min(5, Utils.skillLevel(slayers.getAsJsonObject("vampire").get("xp").getAsLong() / 2)); // inaccurate but it works
 			} catch(Exception exception) {
 				vampLevel = 0;
 			}
@@ -1218,7 +1218,7 @@ public class Baldness {
 			JsonObject hotm = profile.getAsJsonObject("mining_core");
 			long hotmLevel;
 			try {
-				hotmLevel = Numbers.hotmLevel(hotm.get("experience").getAsLong());
+				hotmLevel = Utils.hotmLevel(hotm.get("experience").getAsLong());
 			} catch(Exception exception) {
 				hotmLevel = 0;
 			}
@@ -1475,16 +1475,16 @@ public class Baldness {
 
 			try {
 				JsonObject milestones = garden.getAsJsonObject("resources_collected");
-				long wheatMilestone = Numbers.cropMilestone(milestones.get("WHEAT").getAsLong(), 1);
-				long carrotMilestone = Numbers.cropMilestone(milestones.get("CARROT_ITEM").getAsLong(), 3.25);
-				long potatoMilestone = Numbers.cropMilestone(milestones.get("POTATO_ITEM").getAsLong(), 3.25);
-				long melonMilestone = Numbers.cropMilestone(milestones.get("MELON").getAsLong(), 5);
-				long pumpkinMilestone = Numbers.cropMilestone(milestones.get("PUMPKIN").getAsLong(), 1);
-				long cocoaMilestone = Numbers.cropMilestone(milestones.get("INK_SACK:3").getAsLong(), 3);
-				long caneMilestone = Numbers.cropMilestone(milestones.get("SUGAR_CANE").getAsLong(), 2);
-				long cactusMilestone = Numbers.cropMilestone(milestones.get("CACTUS").getAsLong(), 2);
-				long mushroomMilestone = Numbers.cropMilestone(milestones.get("MUSHROOM_COLLECTION").getAsLong(), 1);
-				long wartMilestone = Numbers.cropMilestone(milestones.get("NETHER_STALK").getAsLong(), 3);
+				long wheatMilestone = Utils.cropMilestone(milestones.get("WHEAT").getAsLong(), 1);
+				long carrotMilestone = Utils.cropMilestone(milestones.get("CARROT_ITEM").getAsLong(), 3.25);
+				long potatoMilestone = Utils.cropMilestone(milestones.get("POTATO_ITEM").getAsLong(), 3.25);
+				long melonMilestone = Utils.cropMilestone(milestones.get("MELON").getAsLong(), 5);
+				long pumpkinMilestone = Utils.cropMilestone(milestones.get("PUMPKIN").getAsLong(), 1);
+				long cocoaMilestone = Utils.cropMilestone(milestones.get("INK_SACK:3").getAsLong(), 3);
+				long caneMilestone = Utils.cropMilestone(milestones.get("SUGAR_CANE").getAsLong(), 2);
+				long cactusMilestone = Utils.cropMilestone(milestones.get("CACTUS").getAsLong(), 2);
+				long mushroomMilestone = Utils.cropMilestone(milestones.get("MUSHROOM_COLLECTION").getAsLong(), 1);
+				long wartMilestone = Utils.cropMilestone(milestones.get("NETHER_STALK").getAsLong(), 3);
 
 				if(wheatMilestone < 46) {
 					double result = (46 - wheatMilestone) * 0.002;

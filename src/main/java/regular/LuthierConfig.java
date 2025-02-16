@@ -7,7 +7,7 @@ import eventListeners.GenericDiscordEvent;
 import org.bson.Document;
 import org.json.simple.JSONObject;
 import processes.DatabaseManager;
-import processes.Numbers;
+import processes.Utils;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -30,6 +30,7 @@ public class LuthierConfig {
 		}
 		switch(mainAction) {
 			case "setup" -> {
+				if()
 				MongoDatabase database = DatabaseManager.getDatabase();
 				MongoCollection<Document> collection = database.getCollection("Luthier Data");
 				Document document = collection.find(eq("discordID", id)).first();
@@ -41,7 +42,7 @@ public class LuthierConfig {
 						InsertOneResult result = collection.insertOne(new Document()
 								.append("channel", e.getChannel().getId())
 								.append("multiplier", 0)
-								.append("chance", Numbers.luthierChance(serverMembers))
+								.append("chance", Utils.luthierChance(serverMembers))
 								.append("hasWord", false)
 								.append("word", "blank")
 								.append("amount", 0)

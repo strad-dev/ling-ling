@@ -6,7 +6,7 @@ import org.bson.Document;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import processes.DatabaseManager;
-import processes.Numbers;
+import processes.Utils;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -58,11 +58,11 @@ public class Leaderboard {
 			JSONObject temp = DatabaseManager.getDataForUser(e, "Economy Data", id);
 			assert temp != null;
 			board.append("**").append(i + 1).append("\\. ").append(temp.get("discordName")).append("** `").append(id).append("`: ")
-					.append(Numbers.formatNumber(Long.parseLong(entry[i].split(" ")[1]))).append(" ").append(emoji).append("\n");
+					.append(Utils.formatNumber(Long.parseLong(entry[i].split(" ")[1]))).append(" ").append(emoji).append("\n");
 		}
 
 		if(place >= 11L) {
-			board.append("\n**").append(place).append("\\. You**: ").append(Numbers.formatNumber(userNum)).append(emoji);
+			board.append("\n**").append(place).append("\\. You**: ").append(Utils.formatNumber(userNum)).append(emoji);
 		}
 		EmbedBuilder builder = new EmbedBuilder()
 				.setColor(Color.decode(color))

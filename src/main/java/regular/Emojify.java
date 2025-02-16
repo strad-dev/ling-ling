@@ -1,7 +1,7 @@
 package regular;
 
 import eventListeners.GenericDiscordEvent;
-import processes.Numbers;
+import processes.Utils;
 
 public class Emojify {
 	public static void emojify(GenericDiscordEvent e, String message) {
@@ -9,7 +9,7 @@ public class Emojify {
 			e.reply("how are we going to emojify nothing");
 			return;
 		}
-		if(Numbers.containsBadLanguage(message)) {
+		if(Utils.containsBadLanguage(message)) {
 			message = "NICE TRY";
 		}
 		message = message.toLowerCase();

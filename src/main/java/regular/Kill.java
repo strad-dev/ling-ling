@@ -1,7 +1,7 @@
 package regular;
 
 import eventListeners.GenericDiscordEvent;
-import processes.Numbers;
+import processes.Utils;
 
 import java.util.Random;
 
@@ -25,7 +25,7 @@ public class Kill {
 			e.reply("Do not harm yourself.  I will not allow it.");
 		} else if(check.contains("ludwig") || check.contains("beethoven")) {
 			e.reply("killing the best composer ever is ILLEGAL.  i am banning you.");
-		} else if(Numbers.containsBadLanguage(check)) {
+		} else if(Utils.containsBadLanguage(check)) {
 			e.reply("NICE TRY");
 		} else {
 			Random random = new Random();

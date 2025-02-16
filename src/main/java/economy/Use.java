@@ -2,7 +2,7 @@ package economy;
 
 import eventListeners.GenericDiscordEvent;
 import org.json.simple.JSONObject;
-import processes.Numbers;
+import processes.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,14 +38,14 @@ public class Use {
 	}
 
 	public static String generateMessage(Map<String, Long> addItems) {
-		return Numbers.formatNumber(addItems.get("grains")) + Emoji.GRAINS
-				+ Numbers.formatNumber(addItems.get("plastic")) + Emoji.PLASTIC
-				+ Numbers.formatNumber(addItems.get("water")) + Emoji.WATER
-				+ Numbers.formatNumber(addItems.get("teaBase")) + Emoji.TEABAG
-				+ Numbers.formatNumber(addItems.get("wood")) + Emoji.WOOD
-				+ Numbers.formatNumber(addItems.get("pineSap")) + Emoji.SAP
-				+ Numbers.formatNumber(addItems.get("steel")) + Emoji.STEEL
-				+ Numbers.formatNumber(addItems.get("horseHair")) + Emoji.HORSE_HAIR;
+		return Utils.formatNumber(addItems.get("grains")) + Emoji.GRAINS
+				+ Utils.formatNumber(addItems.get("plastic")) + Emoji.PLASTIC
+				+ Utils.formatNumber(addItems.get("water")) + Emoji.WATER
+				+ Utils.formatNumber(addItems.get("teaBase")) + Emoji.TEABAG
+				+ Utils.formatNumber(addItems.get("wood")) + Emoji.WOOD
+				+ Utils.formatNumber(addItems.get("pineSap")) + Emoji.SAP
+				+ Utils.formatNumber(addItems.get("steel")) + Emoji.STEEL
+				+ Utils.formatNumber(addItems.get("horseHair")) + Emoji.HORSE_HAIR;
 	}
 
 	public static void addTime(JSONObject data, String item, long amount) {
@@ -148,8 +148,8 @@ public class Use {
 				} else {
 					long baseAmount = income * 2 * useAmount;
 					addItems.put("violins", (long) (baseAmount * magicFindBonus));
-					e.reply("You ate " + Numbers.formatNumber(useAmount) + Emoji.RICE + "  The God of Rice gave you " + Numbers.formatNumber(baseAmount) + Emoji.VIOLINS +
-							"\nYour Magic Find gave you a bonus of " + Numbers.formatNumber((long) (baseAmount * (magicFindBonus - 1))) + Emoji.VIOLINS);
+					e.reply("You ate " + Utils.formatNumber(useAmount) + Emoji.RICE + "  The God of Rice gave you " + Utils.formatNumber(baseAmount) + Emoji.VIOLINS +
+							"\nYour Magic Find gave you a bonus of " + Utils.formatNumber((long) (baseAmount * (magicFindBonus - 1))) + Emoji.VIOLINS);
 				}
 			}
 			case "tea" -> {
@@ -162,8 +162,8 @@ public class Use {
 				} else {
 					long baseAmount = income * 6 * useAmount;
 					addItems.put("violins", (long) (baseAmount * magicFindBonus));
-					e.reply("You drank " + Numbers.formatNumber(useAmount) + Emoji.TEA + "  Brett and Eddy approved and gave you " + Numbers.formatNumber(baseAmount) + Emoji.VIOLINS +
-							"\nYour Magic Find gave you a bonus of " + Numbers.formatNumber((long) (baseAmount * (magicFindBonus - 1))) + Emoji.VIOLINS);
+					e.reply("You drank " + Utils.formatNumber(useAmount) + Emoji.TEA + "  Brett and Eddy approved and gave you " + Utils.formatNumber(baseAmount) + Emoji.VIOLINS +
+							"\nYour Magic Find gave you a bonus of " + Utils.formatNumber((long) (baseAmount * (magicFindBonus - 1))) + Emoji.VIOLINS);
 				}
 			}
 			case "blessings" -> {
@@ -191,9 +191,9 @@ public class Use {
 						}
 					}
 					addItems.put("medals", add);
-					String reply = "Ling Ling blessed you thanks to your " + Numbers.formatNumber(useAmount) + " performances!  You received " + Numbers.formatNumber(add) + Emoji.MEDALS;
+					String reply = "Ling Ling blessed you thanks to your " + Utils.formatNumber(useAmount) + " performances!  You received " + Utils.formatNumber(add) + Emoji.MEDALS;
 					if(bonus > 0) {
-						reply += "\nYour Magic Find created " + Numbers.formatNumber(bonus) + Emoji.MEDALS + " for you out of thin air!";
+						reply += "\nYour Magic Find created " + Utils.formatNumber(bonus) + Emoji.MEDALS + " for you out of thin air!";
 					}
 					e.reply(reply);
 				}
@@ -254,26 +254,26 @@ public class Use {
 							}
 						}
 					}
-					String message = "You opened " + Numbers.formatNumber(useAmount) + Emoji.FREE_BOX + "  You received the following items...\n\n" + generateMessage(addItems) + "\n";
+					String message = "You opened " + Utils.formatNumber(useAmount) + Emoji.FREE_BOX + "  You received the following items...\n\n" + generateMessage(addItems) + "\n";
 					if(addItems.containsKey("violins")) {
-						message += "\n**BONUS!**  You received an additional " + Numbers.formatNumber(bonusHours) + " hours of income totaling to " +
-								Numbers.formatNumber(income * bonusHours) + Emoji.VIOLINS;
+						message += "\n**BONUS!**  You received an additional " + Utils.formatNumber(bonusHours) + " hours of income totaling to " +
+								Utils.formatNumber(income * bonusHours) + Emoji.VIOLINS;
 					}
 					if(addItems.containsKey("rice")) {
-						message += "\n**BONUS!**  You found " + Numbers.formatNumber(addItems.get("rice")) + Emoji.RICE + " in the box!";
+						message += "\n**BONUS!**  You found " + Utils.formatNumber(addItems.get("rice")) + Emoji.RICE + " in the box!";
 					}
 					if(addItems.containsKey("tea")) {
-						message += "\n**BONUS!**  You found " + Numbers.formatNumber(addItems.get("tea")) + Emoji.TEA + " in the box!";
+						message += "\n**BONUS!**  You found " + Utils.formatNumber(addItems.get("tea")) + Emoji.TEA + " in the box!";
 					}
 					if(addItems.containsKey("medals")) {
-						message += "\n**RARE DROP!**  You found " + Numbers.formatNumber(addItems.get("medals")) + Emoji.MEDALS + " sitting at the bottom of the box!";
+						message += "\n**RARE DROP!**  You found " + Utils.formatNumber(addItems.get("medals")) + Emoji.MEDALS + " sitting at the bottom of the box!";
 					}
 					if(addItems.containsKey("blessings")) {
-						message += "\n**RARE DROP!**  You found " + Numbers.formatNumber(addItems.get("blessings")) + Emoji.BLESSING + " in the box!";
+						message += "\n**RARE DROP!**  You found " + Utils.formatNumber(addItems.get("blessings")) + Emoji.BLESSING + " in the box!";
 					}
 					if(addItems.containsKey("freeIncome")) {
-						message += "\n**CRAZY RARE DROP!**  You found " + Numbers.formatNumber(addItems.get("freeIncome")) + " income voucher(s), granting you a total of " +
-								Numbers.formatNumber(addItems.get("income")) + Emoji.VIOLINS + "/hour extra income!";
+						message += "\n**CRAZY RARE DROP!**  You found " + Utils.formatNumber(addItems.get("freeIncome")) + " income voucher(s), granting you a total of " +
+								Utils.formatNumber(addItems.get("income")) + Emoji.VIOLINS + "/hour extra income!";
 					}
 					e.reply(message);
 				}
@@ -332,27 +332,27 @@ public class Use {
 							}
 						}
 					}
-					String message = "You opened " + Numbers.formatNumber(useAmount) + Emoji.GIFT_BOX + "  You received the following items...\n\n" + generateMessage(addItems) + "\n";
+					String message = "You opened " + Utils.formatNumber(useAmount) + Emoji.GIFT_BOX + "  You received the following items...\n\n" + generateMessage(addItems) + "\n";
 					if(addItems.containsKey("violins")) {
-						message += "\n**BONUS!**  You received an additional " + Numbers.formatNumber(bonusHours) + " hours of income totaling to " +
-								Numbers.formatNumber(income * bonusHours) + Emoji.VIOLINS;
+						message += "\n**BONUS!**  You received an additional " + Utils.formatNumber(bonusHours) + " hours of income totaling to " +
+								Utils.formatNumber(income * bonusHours) + Emoji.VIOLINS;
 					}
 					if(addItems.containsKey("rice")) {
-						message += "\n**BONUS!**  You found " + Numbers.formatNumber(addItems.get("rice")) + Emoji.RICE + " in the box!";
+						message += "\n**BONUS!**  You found " + Utils.formatNumber(addItems.get("rice")) + Emoji.RICE + " in the box!";
 					}
 					if(addItems.containsKey("tea")) {
-						message += "\n**BONUS!**  You found " + Numbers.formatNumber(addItems.get("tea")) + Emoji.TEA + " in the box!";
+						message += "\n**BONUS!**  You found " + Utils.formatNumber(addItems.get("tea")) + Emoji.TEA + " in the box!";
 					}
 					if(addItems.containsKey("medals")) {
-						message += "\n**RARE DROP!**  You found " + Numbers.formatNumber(addItems.get("medals")) + Emoji.MEDALS + " sitting at the bottom of the box!";
+						message += "\n**RARE DROP!**  You found " + Utils.formatNumber(addItems.get("medals")) + Emoji.MEDALS + " sitting at the bottom of the box!";
 					}
 					if(addItems.containsKey("blessings")) {
-						message += "\n**RARE DROP!**  You found " + Numbers.formatNumber(addItems.get("blessings")) + Emoji.BLESSING + " in the box!";
+						message += "\n**RARE DROP!**  You found " + Utils.formatNumber(addItems.get("blessings")) + Emoji.BLESSING + " in the box!";
 					}
 					if(addItems.containsKey("benevolentBankers")) {
 						message += "\n**CRAZY RARE DROP!**  In front of you appears " +
-								Numbers.formatNumber(addItems.get("benevolentBankers")) + " banker(s)!  They are nice, and grant you a total of +" +
-								Numbers.formatNumber(addItems.get("benevolentBankers")) + "% extra Bank Space!";
+								Utils.formatNumber(addItems.get("benevolentBankers")) + " banker(s)!  They are nice, and grant you a total of +" +
+								Utils.formatNumber(addItems.get("benevolentBankers")) + "% extra Bank Space!";
 					}
 					e.reply(message);
 				}
@@ -411,27 +411,27 @@ public class Use {
 							}
 						}
 					}
-					String message = "You opened " + Numbers.formatNumber(useAmount) + Emoji.MUSICIAN_KIT + "  You received the following items...\n\n" + generateMessage(addItems) + "\n";
+					String message = "You opened " + Utils.formatNumber(useAmount) + Emoji.MUSICIAN_KIT + "  You received the following items...\n\n" + generateMessage(addItems) + "\n";
 					if(addItems.containsKey("violins")) {
-						message += "\n**BONUS!**  You received an additional " + Numbers.formatNumber(bonusHours) + " hours of income totaling to " +
-								Numbers.formatNumber(income * bonusHours) + Emoji.VIOLINS;
+						message += "\n**BONUS!**  You received an additional " + Utils.formatNumber(bonusHours) + " hours of income totaling to " +
+								Utils.formatNumber(income * bonusHours) + Emoji.VIOLINS;
 					}
 					if(addItems.containsKey("rice")) {
-						message += "\n**BONUS!**  You found " + Numbers.formatNumber(addItems.get("rice")) + Emoji.RICE + " in the box!";
+						message += "\n**BONUS!**  You found " + Utils.formatNumber(addItems.get("rice")) + Emoji.RICE + " in the box!";
 					}
 					if(addItems.containsKey("tea")) {
-						message += "\n**BONUS!**  You found " + Numbers.formatNumber(addItems.get("tea")) + Emoji.TEA + " in the box!";
+						message += "\n**BONUS!**  You found " + Utils.formatNumber(addItems.get("tea")) + Emoji.TEA + " in the box!";
 					}
 					if(addItems.containsKey("medals")) {
-						message += "\n**RARE DROP!**  You found " + Numbers.formatNumber(addItems.get("medals")) + Emoji.MEDALS + " sitting at the bottom of the box!";
+						message += "\n**RARE DROP!**  You found " + Utils.formatNumber(addItems.get("medals")) + Emoji.MEDALS + " sitting at the bottom of the box!";
 					}
 					if(addItems.containsKey("blessings")) {
-						message += "\n**RARE DROP!**  You found " + Numbers.formatNumber(addItems.get("blessings")) + Emoji.BLESSING + " in the box!";
+						message += "\n**RARE DROP!**  You found " + Utils.formatNumber(addItems.get("blessings")) + Emoji.BLESSING + " in the box!";
 					}
 					if(addItems.containsKey("qualityItems")) {
-						message += "\n**CRAZY RARE DROP!**  " + Numbers.formatNumber(addItems.get("qualityItems")) +
+						message += "\n**CRAZY RARE DROP!**  " + Utils.formatNumber(addItems.get("qualityItems")) +
 								" bottle(s) of Item Quality Boost Potion appear in front of you!  Your items now last " +
-								Numbers.formatNumber(addItems.get("qualityItems") * 5) + "% longer.";
+								Utils.formatNumber(addItems.get("qualityItems") * 5) + "% longer.";
 					}
 					e.reply(message);
 				}
@@ -491,26 +491,26 @@ public class Use {
 							}
 						}
 					}
-					String message = "You opened " + Numbers.formatNumber(useAmount) + Emoji.LING_LING_BOX + "  You received the following items...\n\n" + generateMessage(addItems) + "\n";
+					String message = "You opened " + Utils.formatNumber(useAmount) + Emoji.LING_LING_BOX + "  You received the following items...\n\n" + generateMessage(addItems) + "\n";
 					if(addItems.containsKey("violins")) {
-						message += "\n**BONUS!**  You received an additional " + Numbers.formatNumber(bonusHours) + " hours of income totaling to " +
-								Numbers.formatNumber(income * bonusHours) + Emoji.VIOLINS;
+						message += "\n**BONUS!**  You received an additional " + Utils.formatNumber(bonusHours) + " hours of income totaling to " +
+								Utils.formatNumber(income * bonusHours) + Emoji.VIOLINS;
 					}
 					if(addItems.containsKey("rice")) {
-						message += "\n**BONUS!**  You found " + Numbers.formatNumber(addItems.get("rice")) + Emoji.RICE + " in the box!";
+						message += "\n**BONUS!**  You found " + Utils.formatNumber(addItems.get("rice")) + Emoji.RICE + " in the box!";
 					}
 					if(addItems.containsKey("tea")) {
-						message += "\n**BONUS!**  You found " + Numbers.formatNumber(addItems.get("tea")) + Emoji.TEA + " in the box!";
+						message += "\n**BONUS!**  You found " + Utils.formatNumber(addItems.get("tea")) + Emoji.TEA + " in the box!";
 					}
 					if(addItems.containsKey("medals")) {
-						message += "\n**RARE DROP!**  You found " + Numbers.formatNumber(addItems.get("medals")) + Emoji.MEDALS + " sitting at the bottom of the box!";
+						message += "\n**RARE DROP!**  You found " + Utils.formatNumber(addItems.get("medals")) + Emoji.MEDALS + " sitting at the bottom of the box!";
 					}
 					if(addItems.containsKey("blessings")) {
-						message += "\n**RARE DROP!**  You found " + Numbers.formatNumber(addItems.get("blessings")) + Emoji.BLESSING + " in the box!";
+						message += "\n**RARE DROP!**  You found " + Utils.formatNumber(addItems.get("blessings")) + Emoji.BLESSING + " in the box!";
 					}
 					if(addItems.containsKey("bonusMedals")) {
 						message += "\n**CRAZY RARE DROP!**  Ling Ling has shown favor upon you, and is granting you +" +
-								Numbers.formatNumber(addItems.get("bonusMedals")) + Emoji.MEDALS + " bonus medals each time you run `daily`!";
+								Utils.formatNumber(addItems.get("bonusMedals")) + Emoji.MEDALS + " bonus medals each time you run `daily`!";
 					}
 					e.reply(message);
 				}
@@ -570,22 +570,22 @@ public class Use {
 							}
 						}
 					}
-					String message = "You opened " + Numbers.formatNumber(useAmount) + Emoji.CRAZY_BOX + "  You received the following items...\n\n" + generateMessage(addItems) + "\n";
+					String message = "You opened " + Utils.formatNumber(useAmount) + Emoji.CRAZY_BOX + "  You received the following items...\n\n" + generateMessage(addItems) + "\n";
 					if(addItems.containsKey("violins")) {
-						message += "\n**BONUS!**  You received an additional " + Numbers.formatNumber(bonusHours) + " hours of income totaling to " +
-								Numbers.formatNumber(income * bonusHours) + Emoji.VIOLINS;
+						message += "\n**BONUS!**  You received an additional " + Utils.formatNumber(bonusHours) + " hours of income totaling to " +
+								Utils.formatNumber(income * bonusHours) + Emoji.VIOLINS;
 					}
 					if(addItems.containsKey("rice")) {
-						message += "\n**BONUS!**  You found " + Numbers.formatNumber(addItems.get("rice")) + Emoji.RICE + " in the box!";
+						message += "\n**BONUS!**  You found " + Utils.formatNumber(addItems.get("rice")) + Emoji.RICE + " in the box!";
 					}
 					if(addItems.containsKey("tea")) {
-						message += "\n**BONUS!**  You found " + Numbers.formatNumber(addItems.get("tea")) + Emoji.TEA + " in the box!";
+						message += "\n**BONUS!**  You found " + Utils.formatNumber(addItems.get("tea")) + Emoji.TEA + " in the box!";
 					}
 					if(addItems.containsKey("medals")) {
-						message += "\n**RARE DROP!**  You found " + Numbers.formatNumber(addItems.get("medals")) + Emoji.MEDALS + " sitting at the bottom of the box!";
+						message += "\n**RARE DROP!**  You found " + Utils.formatNumber(addItems.get("medals")) + Emoji.MEDALS + " sitting at the bottom of the box!";
 					}
 					if(addItems.containsKey("blessings")) {
-						message += "\n**RARE DROP!**  You found " + Numbers.formatNumber(addItems.get("blessings")) + Emoji.BLESSING + " in the box!";
+						message += "\n**RARE DROP!**  You found " + Utils.formatNumber(addItems.get("blessings")) + Emoji.BLESSING + " in the box!";
 					}
 					if(addItems.containsKey("bonusInterest")) {
 						message += "\n**CRAZY RARE DROP!**  The Bank of TwoSet is imporessed by your dedication and grants you +`" + addItems.get("bonusInterest") * 0.1 + "`% extra interest!";
@@ -648,25 +648,25 @@ public class Use {
 							}
 						}
 					}
-					String message = "You opened " + Numbers.formatNumber(useAmount) + Emoji.RNGESUS_BOX + "  You received the following items...\n\n" + generateMessage(addItems) + "\n";
+					String message = "You opened " + Utils.formatNumber(useAmount) + Emoji.RNGESUS_BOX + "  You received the following items...\n\n" + generateMessage(addItems) + "\n";
 					if(addItems.containsKey("violins")) {
-						message += "\n**BONUS!**  You received an additional " + Numbers.formatNumber(bonusHours) + " hours of income totaling to " +
-								Numbers.formatNumber(income * bonusHours) + Emoji.VIOLINS;
+						message += "\n**BONUS!**  You received an additional " + Utils.formatNumber(bonusHours) + " hours of income totaling to " +
+								Utils.formatNumber(income * bonusHours) + Emoji.VIOLINS;
 					}
 					if(addItems.containsKey("rice")) {
-						message += "\n**BONUS!**  You found " + Numbers.formatNumber(addItems.get("rice")) + Emoji.RICE + " in the box!";
+						message += "\n**BONUS!**  You found " + Utils.formatNumber(addItems.get("rice")) + Emoji.RICE + " in the box!";
 					}
 					if(addItems.containsKey("tea")) {
-						message += "\n**BONUS!**  You found " + Numbers.formatNumber(addItems.get("tea")) + Emoji.TEA + " in the box!";
+						message += "\n**BONUS!**  You found " + Utils.formatNumber(addItems.get("tea")) + Emoji.TEA + " in the box!";
 					}
 					if(addItems.containsKey("medals")) {
-						message += "\n**RARE DROP!**  You found " + Numbers.formatNumber(addItems.get("medals")) + Emoji.MEDALS + " sitting at the bottom of the box!";
+						message += "\n**RARE DROP!**  You found " + Utils.formatNumber(addItems.get("medals")) + Emoji.MEDALS + " sitting at the bottom of the box!";
 					}
 					if(addItems.containsKey("blessings")) {
-						message += "\n**RARE DROP!**  You found " + Numbers.formatNumber(addItems.get("blessings")) + Emoji.BLESSING + " in the box!";
+						message += "\n**RARE DROP!**  You found " + Utils.formatNumber(addItems.get("blessings")) + Emoji.BLESSING + " in the box!";
 					}
 					if(addItems.containsKey("RNGesusItemThatDoesAbsolutelyNothingLMAO")) {
-						message += "\n\n# INSANE DROP\nYou found " + Numbers.formatNumber(addItems.get("RNGesusItemThatDoesAbsolutelyNothingLMAO")) +
+						message += "\n\n# INSANE DROP\nYou found " + Utils.formatNumber(addItems.get("RNGesusItemThatDoesAbsolutelyNothingLMAO")) +
 								" \"RNGesus Item That Does Absolutely Nothing LMAO\"!  Now you can flex this utterly useless item in your inventory! https://imgur.com/a/SSjcgz3";
 					}
 					e.reply(message);
@@ -680,7 +680,7 @@ public class Use {
 					addItems.put("rosin", -useAmount);
 					addTime(data, "rosinExpire", (long) (useAmount * 180000000 * bonusItemDuration));
 					e.reply(Emoji.ROSIN + "  You apply rosin to your bow.  Your rosin now lasts for an additional " +
-							Numbers.formatNumber((long) (50 * useAmount * bonusItemDuration)) + " hours before needing to be reapplied.");
+							Utils.formatNumber((long) (50 * useAmount * bonusItemDuration)) + " hours before needing to be reapplied.");
 				}
 			}
 			case "string" -> {
@@ -691,7 +691,7 @@ public class Use {
 					addItems.put("string", -useAmount);
 					addTime(data, "stringsExpire", (long) (useAmount * 360000000 * bonusItemDuration));
 					e.reply(Emoji.STRING + "  You change the strings on your violin.  Your strings now last for an additional " +
-							Numbers.formatNumber((long) (100 * useAmount * bonusItemDuration)) + " hours before needing to be changed.");
+							Utils.formatNumber((long) (100 * useAmount * bonusItemDuration)) + " hours before needing to be changed.");
 				}
 			}
 			case "bowHair" -> {
@@ -702,7 +702,7 @@ public class Use {
 					addItems.put("bowHair", -useAmount);
 					addTime(data, "bowHairExpire", (long) (useAmount * 540000000 * bonusItemDuration));
 					e.reply(Emoji.BOW_HAIR + "  You asked Olaf to rehair your bow, to which he agreed.  Your bow now lasts for an additional " +
-							Numbers.formatNumber((long) (150 * useAmount * bonusItemDuration)) + " hours before needing to be rehaired.");
+							Utils.formatNumber((long) (150 * useAmount * bonusItemDuration)) + " hours before needing to be rehaired.");
 				}
 			}
 			case "violinService" -> {
@@ -713,7 +713,7 @@ public class Use {
 					addItems.put("violinService", -useAmount);
 					addTime(data, "serviceExpire", (long) (useAmount * 900000000 * bonusItemDuration));
 					e.reply(Emoji.SERVICE + "  You asked Olaf to service your violin, to which he agreed.  Your violins now lasts for an additional " +
-							Numbers.formatNumber((long) (250 * useAmount * bonusItemDuration)) + " hours before needing to be reserviced.");
+							Utils.formatNumber((long) (250 * useAmount * bonusItemDuration)) + " hours before needing to be reserviced.");
 				}
 			}
 			default -> {

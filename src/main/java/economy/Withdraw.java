@@ -2,7 +2,7 @@ package economy;
 
 import eventListeners.GenericDiscordEvent;
 import org.json.simple.JSONObject;
-import processes.Numbers;
+import processes.Utils;
 
 public class Withdraw {
 	public static void withdraw(GenericDiscordEvent e, String temp) {
@@ -32,8 +32,8 @@ public class Withdraw {
 			balance -= amount;
 			data.replace("violins", (long) data.get("violins") + amount);
 			data.replace("bank", balance);
-			e.reply("You withdrew " + Numbers.formatNumber(amount) + Emoji.VIOLINS + " from your bank.  You now have " +
-					Numbers.formatNumber(balance) + Emoji.VIOLINS + " in your bank.");
+			e.reply("You withdrew " + Utils.formatNumber(amount) + Emoji.VIOLINS + " from your bank.  You now have " +
+					Utils.formatNumber(balance) + Emoji.VIOLINS + " in your bank.");
 			SaveData.saveData(e, data);
 		}
 	}

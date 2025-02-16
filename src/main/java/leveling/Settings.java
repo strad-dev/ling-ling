@@ -4,7 +4,7 @@ import eventListeners.GenericDiscordEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.json.simple.JSONObject;
 import processes.DatabaseManager;
-import processes.Numbers;
+import processes.Utils;
 
 import java.awt.*;
 
@@ -22,9 +22,9 @@ public class Settings {
 			EmbedBuilder builder = new EmbedBuilder()
 					.setTitle("**__Leveling Settings__**")
 					.setFooter("Beethoven (1770-1827)", e.getJDA().getSelfUser().getAvatarUrl())
-					.addField("**Current Settings**", "Min: " + Numbers.formatNumber(data.get("levelMin")) +
-							"\nMax: " + Numbers.formatNumber(data.get("levelMax")) +
-							"\nCooldown: " + Numbers.formatNumber(data.get("levelCooldown")) + " milliseconds", true)
+					.addField("**Current Settings**", "Min: " + Utils.formatNumber(data.get("levelMin")) +
+							"\nMax: " + Utils.formatNumber(data.get("levelMax")) +
+							"\nCooldown: " + Utils.formatNumber(data.get("levelCooldown")) + " milliseconds", true)
 					.setColor(Color.BLUE);
 			e.replyEmbeds(builder.build());
 			return;

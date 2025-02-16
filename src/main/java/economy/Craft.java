@@ -3,7 +3,7 @@ package economy;
 import eventListeners.GenericDiscordEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.json.simple.JSONObject;
-import processes.Numbers;
+import processes.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,14 +21,14 @@ public class Craft {
 		if(craftAmount == 0) {
 			result = new StringBuilder("You did not have enough materials to craft any ").append(getEmoji(what)).append("  Check that you have enough Raw Materials...\n");
 			for(String key : recipe.keySet()) {
-				result.append("\n").append(Numbers.formatNumber(data.get(key))).deleteCharAt(result.length() - 1)
+				result.append("\n").append(Utils.formatNumber(data.get(key))).deleteCharAt(result.length() - 1)
 						.append("/").append(recipe.get(key)).append("`").append(" ").append(getEmoji(key));
 			}
 		} else {
-			result = new StringBuilder("You crafted ").append(Numbers.formatNumber(craftAmount)).append(getEmoji(what)).append(" for...\n");
+			result = new StringBuilder("You crafted ").append(Utils.formatNumber(craftAmount)).append(getEmoji(what)).append(" for...\n");
 			for(String key : recipe.keySet()) {
 				data.replace(key, (long) data.get(key) - (recipe.get(key) * craftAmount));
-				result.append('\n').append(Numbers.formatNumber(recipe.get(key) * craftAmount)).append(getEmoji(key)).append(" ");
+				result.append('\n').append(Utils.formatNumber(recipe.get(key) * craftAmount)).append(getEmoji(key)).append(" ");
 			}
 			data.replace(what, (long) data.get(what) + craftAmount);
 		}

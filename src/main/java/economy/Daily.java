@@ -2,7 +2,7 @@ package economy;
 
 import eventListeners.GenericDiscordEvent;
 import org.json.simple.JSONObject;
-import processes.Numbers;
+import processes.Utils;
 
 public class Daily {
 	public static void daily(GenericDiscordEvent e) {
@@ -28,13 +28,13 @@ public class Daily {
 				streak = 0;
 			}
 			long base = income + (streak * (income / 100));
-			Numbers.calculateLoan(data, base);
+			Utils.calculateLoan(data, base);
 			data.replace("earnings", (long) data.get("earnings") + base);
 			data.replace("dailyCD", time + 85500000); // 23.75 hours cooldown
-			message += "You received a total of " + Numbers.formatNumber(base) + Emoji.VIOLINS + ", with " +
-					Numbers.formatNumber(streak * (income / 100)) + Emoji.VIOLINS + " coming from your " + Numbers.formatNumber(streak) + "-day streak!";
+			message += "You received a total of " + Utils.formatNumber(base) + Emoji.VIOLINS + ", with " +
+					Utils.formatNumber(streak * (income / 100)) + Emoji.VIOLINS + " coming from your " + Utils.formatNumber(streak) + "-day streak!";
 			if(bonusMedals > 0) {
-				message += "\nLing Ling's favor grants you an additional " + Numbers.formatNumber(bonusMedals) + Emoji.MEDALS;
+				message += "\nLing Ling's favor grants you an additional " + Utils.formatNumber(bonusMedals) + Emoji.MEDALS;
 				data.replace("medals", (long) data.get("medals") + bonusMedals);
 			}
 			message += "\n\nRemember to vote for Ling Ling at <https://top.gg/bot/733409243222507670/vote>!";

@@ -3,7 +3,7 @@ package economy;
 import eventListeners.GenericDiscordEvent;
 import org.json.simple.JSONObject;
 import processes.DatabaseManager;
-import processes.Numbers;
+import processes.Utils;
 
 import java.util.Random;
 
@@ -21,14 +21,14 @@ public class Scales {
 			milliseconds -= seconds * 1000;
 			e.reply("Chill, you can't play two scales at once!  Wait " + seconds + " seconds " + milliseconds + " milliseconds!");
 		} else {
-			long base = Numbers.calculateAmount(data, random.nextInt(11) + 15);
-			Numbers.calculateLoan(data, base);
+			long base = Utils.calculateAmount(data, random.nextInt(11) + 15);
+			Utils.calculateLoan(data, base);
 			if((boolean) data.get("timeCrunch")) {
 				data.replace("scaleCD", time + 59500);
 			} else {
 				data.replace("scaleCD", time + 89500);
 			}
-			String message = "You played your scales and earned " + Numbers.formatNumber(base) + Emoji.VIOLINS + "\n";
+			String message = "You played your scales and earned " + Utils.formatNumber(base) + Emoji.VIOLINS + "\n";
 			data.replace("scalesPlayed", (long) data.get("scalesPlayed") + 1);
 			data.replace("earnings", (long) data.get("earnings") + base);
 
@@ -38,7 +38,7 @@ public class Scales {
 				data.replace("scaleStreak", 1);
 				data.replace("scaleStreakExpire", time + 86460000);
 			} else if(time > streakExpires) {
-				message += "\nYour Scale Streak has expired!  You reached a streak of " + Numbers.formatNumber(data.get("scaleStreak")) + ".  The timer has reset and your streak now expires in `24:01:00.000`";
+				message += "\nYour Scale Streak has expired!  You reached a streak of " + Utils.formatNumber(data.get("scaleStreak")) + ".  The timer has reset and your streak now expires in `24:01:00.000`";
 				data.replace("scaleStreak", 1);
 				data.replace("scaleStreakExpire", time + 86460000);
 			} else {
@@ -49,7 +49,7 @@ public class Scales {
 				} else if (streak == (long) data.get("scaleStreakRecord")) {
 					message += "\n**PERSONAL BEST**";
 				}
-				message += "\nYour Scale Streak is now " + Numbers.formatNumber(data.get("scaleStreak")) + ".  It will expire in " + Numbers.makeCooldownTime(streakExpires - time);
+				message += "\nYour Scale Streak is now " + Utils.formatNumber(data.get("scaleStreak")) + ".  It will expire in " + Utils.makeCooldownTime(streakExpires - time);
 			}
 			e.reply(message);
 			RNGesus.lootbox(e, data);

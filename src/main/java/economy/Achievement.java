@@ -4,7 +4,7 @@ import eventListeners.GenericDiscordEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.json.simple.JSONObject;
 import processes.DatabaseManager;
-import processes.Numbers;
+import processes.Utils;
 
 import java.awt.*;
 
@@ -36,41 +36,41 @@ public class Achievement {
 			case "Big Spender" -> description = "Spend $$$ " + Emoji.VIOLINS + " in the Market";
 			case "Entrepeneur" -> description = "Earn $$$ " + Emoji.VIOLINS + " in the Market";
 			case "Dedication" ->
-					description = "Reach a Daily Streak of $$$ days\nCurrent streak: " + Numbers.formatNumber(data.get("streak"));
+					description = "Reach a Daily Streak of $$$ days\nCurrent streak: " + Utils.formatNumber(data.get("streak"));
 			case "English Major" -> description = "Unscramble $$$ Luthiers";
 			case "Generous" -> description = "Give $$$ Gifts";
 			case "Heartless" -> description = "Rob a total of $$$ " + Emoji.VIOLINS;
 			case "Gambling Addict" -> description = "Earn a net total of $$$ " + Emoji.VIOLINS + " from gambling";
 			case "No-Life" ->
-					description = "Play $$$ scales in a 24-hour period.\nYou can reset the timer using `!resetscales`.\nCurrent streak: " + Numbers.formatNumber(data.get("scaleStreak"));
+					description = "Play $$$ scales in a 24-hour period.\nYou can reset the timer using `!resetscales`.\nCurrent streak: " + Utils.formatNumber(data.get("scaleStreak"));
 			default ->
 					description = "Non-existent achievement!  Contact `stradivariusviolin` to yell at him for being stupid.";
 		}
 		if(actual < thresholds[0]) {
-			description = description.replace("$$$", Numbers.formatNumber(thresholds[0]));
-			builder.addField(achievement + " I", description + "\n" + Numbers.formatNumber(actual) + "/" + Numbers.formatNumber(thresholds[0]) + " **(`" + String.format("%,.2f", ((actual * 100) / (double) thresholds[0])) + "%`)**", false);
+			description = description.replace("$$$", Utils.formatNumber(thresholds[0]));
+			builder.addField(achievement + " I", description + "\n" + Utils.formatNumber(actual) + "/" + Utils.formatNumber(thresholds[0]) + " **(`" + String.format("%,.2f", ((actual * 100) / (double) thresholds[0])) + "%`)**", false);
 		} else if(actual < thresholds[1]) {
-			description = description.replace("$$$", Numbers.formatNumber(thresholds[1]));
-			builder.addField(achievement + " II", description + "\n" + Numbers.formatNumber(actual) + "/" + Numbers.formatNumber(thresholds[1]) + " **(`" + String.format("%,.2f", (actual * 100) / (double) thresholds[1]) + "%`)**", false);
+			description = description.replace("$$$", Utils.formatNumber(thresholds[1]));
+			builder.addField(achievement + " II", description + "\n" + Utils.formatNumber(actual) + "/" + Utils.formatNumber(thresholds[1]) + " **(`" + String.format("%,.2f", (actual * 100) / (double) thresholds[1]) + "%`)**", false);
 		} else if(actual < thresholds[2]) {
-			description = description.replace("$$$", Numbers.formatNumber(thresholds[2]));
-			builder.addField(achievement + " III", description + "\n" + Numbers.formatNumber(actual) + "/" + Numbers.formatNumber(thresholds[2]) + " **(`" + String.format("%,.2f", (actual * 100) / (double) thresholds[2]) + "%`)**", false);
+			description = description.replace("$$$", Utils.formatNumber(thresholds[2]));
+			builder.addField(achievement + " III", description + "\n" + Utils.formatNumber(actual) + "/" + Utils.formatNumber(thresholds[2]) + " **(`" + String.format("%,.2f", (actual * 100) / (double) thresholds[2]) + "%`)**", false);
 		} else if(actual < thresholds[3]) {
-			description = description.replace("$$$", Numbers.formatNumber(thresholds[3]));
-			builder.addField(achievement + " IV", description + "\n" + Numbers.formatNumber(actual) + "/" + Numbers.formatNumber(thresholds[3]) + " **(`" + String.format("%,.2f", (actual * 100) / (double) thresholds[3]) + "%`)**", false);
+			description = description.replace("$$$", Utils.formatNumber(thresholds[3]));
+			builder.addField(achievement + " IV", description + "\n" + Utils.formatNumber(actual) + "/" + Utils.formatNumber(thresholds[3]) + " **(`" + String.format("%,.2f", (actual * 100) / (double) thresholds[3]) + "%`)**", false);
 		} else if(actual < thresholds[4]) {
-			description = description.replace("$$$", Numbers.formatNumber(thresholds[4]));
+			description = description.replace("$$$", Utils.formatNumber(thresholds[4]));
 			if(achievement.equals("No-Life")) {
-				builder.addField("Go Touch Grass", description + "\n" + Numbers.formatNumber(actual) + "/" + Numbers.formatNumber(thresholds[4]) + " **(`" + String.format("%,.2f", (actual * 100) / (double) thresholds[4]) + "%`)**", false);
+				builder.addField("Go Touch Grass", description + "\n" + Utils.formatNumber(actual) + "/" + Utils.formatNumber(thresholds[4]) + " **(`" + String.format("%,.2f", (actual * 100) / (double) thresholds[4]) + "%`)**", false);
 			} else {
-				builder.addField(achievement + " V", description + "\n" + Numbers.formatNumber(actual) + "/" + Numbers.formatNumber(thresholds[4]) + " **(`" + String.format("%,.2f", (actual * 100) / (double) thresholds[4]) + "%`)**", false);
+				builder.addField(achievement + " V", description + "\n" + Utils.formatNumber(actual) + "/" + Utils.formatNumber(thresholds[4]) + " **(`" + String.format("%,.2f", (actual * 100) / (double) thresholds[4]) + "%`)**", false);
 			}
 		} else {
-			description = description.replace("$$$", Numbers.formatNumber(thresholds[4]));
+			description = description.replace("$$$", Utils.formatNumber(thresholds[4]));
 			if(achievement.equals("No-Life")) {
-				builder.addField("Go Touch Grass", description + "\n" + Numbers.formatNumber(actual) + " :white_check_mark:\njesus christ stop now pls and ty", false);
+				builder.addField("Go Touch Grass", description + "\n" + Utils.formatNumber(actual) + " :white_check_mark:\njesus christ stop now pls and ty", false);
 			} else {
-				builder.addField(achievement + " V", description + "\n" + Numbers.formatNumber(actual) + " :white_check_mark:", false);
+				builder.addField(achievement + " V", description + "\n" + Utils.formatNumber(actual) + " :white_check_mark:", false);
 			}
 		}
 	}

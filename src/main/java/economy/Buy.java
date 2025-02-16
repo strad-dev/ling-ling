@@ -2,7 +2,7 @@ package economy;
 
 import eventListeners.GenericDiscordEvent;
 import org.json.simple.JSONObject;
-import processes.Numbers;
+import processes.Utils;
 
 public class Buy {
 	private static JSONObject data;
@@ -96,13 +96,13 @@ public class Buy {
 		if((boolean) data.get(item)) {
 			e.reply("You already purchased `" + item + "`!");
 		} else if(amount < cost) {
-			e.reply("You do not have enough " + currency + " to purchase `" + item + "`!\nYou need " + Numbers.formatNumber(cost - amount) + " more " + currency + ".");
+			e.reply("You do not have enough " + currency + " to purchase `" + item + "`!\nYou need " + Utils.formatNumber(cost - amount) + " more " + currency + ".");
 		} else {
 			data.replace(currency, amount - cost);
 			data.replace("income", (long) data.get("income") + add);
 			data.replace(item, true);
-			e.reply("Successfully purchased `" + item + "` for " + Numbers.formatNumber(cost) + currencyEmoji +
-					"\nYou have " + Numbers.formatNumber(amount - cost) +  currencyEmoji + " left.");
+			e.reply("Successfully purchased `" + item + "` for " + Utils.formatNumber(cost) + currencyEmoji +
+					"\nYou have " + Utils.formatNumber(amount - cost) +  currencyEmoji + " left.");
 			if(item.equals("orchestra")) {
 				data.replace("storage", 1);
 				e.sendMessage("The Bank of TwoSet has noticed you, and has given you space to store violins!  " +
@@ -121,7 +121,7 @@ public class Buy {
 		if((long) data.get(item) == maxAmount) {
 			e.reply("You already purchased the maximum amount of `" + item + "`!");
 		} else if(amount < cost) {
-			e.reply("You do not have enough " + currency + " to purchase `" + item + "`!\nYou need " + Numbers.formatNumber(cost - amount) + " more " + currency + ".");
+			e.reply("You do not have enough " + currency + " to purchase `" + item + "`!\nYou need " + Utils.formatNumber(cost - amount) + " more " + currency + ".");
 		} else {
 			data.replace(currency, amount - cost);
 			data.replace("income", (long) data.get("income") + add);
@@ -131,15 +131,15 @@ public class Buy {
 				data.replace("magicFind", (long) data.get("magicFind") + 1);
 			}
 			if(maxAmount == 2147483647) {
-				e.reply("Successfully purchased `" + item + " #" + itemCount + "` for " + Numbers.formatNumber(cost) + currencyEmoji +
-						"\nYou have " + Numbers.formatNumber(amount - cost) + currencyEmoji + " left.");
+				e.reply("Successfully purchased `" + item + " #" + itemCount + "` for " + Utils.formatNumber(cost) + currencyEmoji +
+						"\nYou have " + Utils.formatNumber(amount - cost) + currencyEmoji + " left.");
 			} else {
 				if(amount == maxAmount) {
 					e.reply("**MAX LEVEL**\nSuccessfully purchased `" + item + " #" + itemCount + "/" + maxAmount + "` for `" + cost + "`" + currencyEmoji +
-							"\nYou have " + Numbers.formatNumber(amount - cost) + currencyEmoji + " left.");
+							"\nYou have " + Utils.formatNumber(amount - cost) + currencyEmoji + " left.");
 				} else {
-					e.reply("Successfully purchased `" + item + " #" + itemCount + "/" + maxAmount + "` for " + Numbers.formatNumber(cost) + currencyEmoji +
-							"\nYou have " + Numbers.formatNumber(amount - cost) + currencyEmoji + " left.");
+					e.reply("Successfully purchased `" + item + " #" + itemCount + "/" + maxAmount + "` for " + Utils.formatNumber(cost) + currencyEmoji +
+							"\nYou have " + Utils.formatNumber(amount - cost) + currencyEmoji + " left.");
 				}
 			}
 			RNGesus.lootbox(e, data);
@@ -169,7 +169,7 @@ public class Buy {
 				case "lessonCharge" ->
 						processUpgrade(3000000 * ((long) data.get("lessonCharge") + 1), 3000, 5, "violins");
 				case "students" ->
-						processUpgrade(Numbers.itemCost((long) data.get("students"), 1.9, 1000000), 2000, 2147483647, "violins");
+						processUpgrade(Utils.itemCost((long) data.get("students"), 1.9, 1000000), 2000, 2147483647, "violins");
 				default -> boughtItem = false;
 			}
 		}
@@ -209,11 +209,11 @@ public class Buy {
 				case "soloist" ->
 						processUpgrade(250000 * ((long) data.get("soloist") + 1), 60, 4, "violins");
 				case "conductor" ->
-						processUpgrade(Numbers.itemCost((long) data.get("conductor"), 2.8, 100000), 500, 2147483647, "violins");
+						processUpgrade(Utils.itemCost((long) data.get("conductor"), 2.8, 100000), 500, 2147483647, "violins");
 				case "advertising" ->
 						processUpgrade(100000 * ((long) data.get("advertising") + 1), 100, 20, "violins");
 				case "tickets" ->
-						processUpgrade(Numbers.itemCost((long) data.get("tickets"), 1.9, 1000000), 1000, 2147483647, "violins");
+						processUpgrade(Utils.itemCost((long) data.get("tickets"), 1.9, 1000000), 1000, 2147483647, "violins");
 				case "moreInterest", "lessPenalty" -> processBooleanUpgrade(15, 0, "medals");
 				case "storage" -> processUpgrade(3 * (long) data.get("storage"), 0, 2147483647, "medals");
 				case "certificate" -> {
@@ -231,21 +231,21 @@ public class Buy {
 				case "insurance" -> processBooleanUpgrade(2500000, 0, "violins");
 				case "timeCrunch" -> processBooleanUpgrade(120000000, 0, "violins");
 				case "efficiency" ->
-						processUpgrade(Numbers.itemCost((long) data.get("efficiency"), 1.09, 400), 0, 2147483647, "violins");
+						processUpgrade(Utils.itemCost((long) data.get("efficiency"), 1.09, 400), 0, 2147483647, "violins");
 				case "luck" ->
-						processUpgrade(Numbers.itemCost((long) data.get("luck"), 1.22, 1000), 0, 50, "violins");
+						processUpgrade(Utils.itemCost((long) data.get("luck"), 1.22, 1000), 0, 50, "violins");
 				case "sophistication" ->
-						processUpgrade(Numbers.itemCost((long) data.get("sophistication"), 1.35, 5000), 0, 30, "violins");
+						processUpgrade(Utils.itemCost((long) data.get("sophistication"), 1.35, 5000), 0, 30, "violins");
 				case "violinQuality" ->
-						processUpgrade(Numbers.itemCost((long) data.get("violinQuality"), 2.8, 1000), 600, 2147483647, "violins");
+						processUpgrade(Utils.itemCost((long) data.get("violinQuality"), 2.8, 1000), 600, 2147483647, "violins");
 				case "skills" ->
-						processUpgrade(Numbers.itemCost((long) data.get("skills"), 1.9, 500), 250, 2147483647, "violins");
+						processUpgrade(Utils.itemCost((long) data.get("skills"), 1.9, 500), 250, 2147483647, "violins");
 				case "lessonQuality" ->
-						processUpgrade(Numbers.itemCost((long) data.get("lessonQuality"), 1.9, 400), 200, 2147483647, "violins");
+						processUpgrade(Utils.itemCost((long) data.get("lessonQuality"), 1.9, 400), 200, 2147483647, "violins");
 				case "stringQuality" ->
-						processUpgrade(Numbers.itemCost((long) data.get("stringQuality"), 1.45, 300), 150, 2147483647, "violins");
+						processUpgrade(Utils.itemCost((long) data.get("stringQuality"), 1.45, 300), 150, 2147483647, "violins");
 				case "bowQuality" ->
-						processUpgrade(Numbers.itemCost((long) data.get("bowQuality"), 2.3, 600), 250, 2147483647, "violins");
+						processUpgrade(Utils.itemCost((long) data.get("bowQuality"), 2.3, 600), 250, 2147483647, "violins");
 				case "math" -> processBooleanUpgrade(10000000, 6500, "violins");
 				case "moreIncome" ->
 						processUpgrade((long) data.get("moreIncome") + 1, 2000, 2147483647, "medals");
@@ -258,7 +258,7 @@ public class Buy {
 				case "shield" -> processBooleanUpgrade(10, 0, "medals");
 				case "duplicator" -> processBooleanUpgrade(15, 0, "medals");
 				case "magicFindViolins" ->
-						processUpgrade(Numbers.itemCost((long) data.get("magicFindViolins"), 3, 1000000), 0, 2147483647, "violins");
+						processUpgrade(Utils.itemCost((long) data.get("magicFindViolins"), 3, 1000000), 0, 2147483647, "violins");
 				case "magicFindMedals" ->
 						processUpgrade((long) Math.pow(2, (long) data.get("magicFindMedals")), 0, 2147483647, "medals");
 				case "orchestra" -> {
@@ -270,9 +270,9 @@ public class Buy {
 				}
 				case "hall" -> {
 					if(!hasOrchestra) {
-						processUpgrade(Numbers.itemCost((long) data.get("hall"), 3.5, 100000), 300, 3, "violins");
+						processUpgrade(Utils.itemCost((long) data.get("hall"), 3.5, 100000), 300, 3, "violins");
 					} else {
-						processUpgrade(Numbers.itemCost((long) data.get("hall"), 3.5, 100000), 300, 2147483647, "violins");
+						processUpgrade(Utils.itemCost((long) data.get("hall"), 3.5, 100000), 300, 2147483647, "violins");
 					}
 				}
 				default -> e.reply("You can't buy something that's not for sale, that would be quite a waste of time and violins.");

@@ -42,7 +42,7 @@ public class HourlyIncome {
 		long net;
 		long loanPaid = 0;
 		long loan = (long) data.get("loan");
-		long maxLoan = Numbers.maxLoan(data);
+		long maxLoan = Utils.maxLoan(data);
 
 		if(loan > maxLoan * 2) {
 			net = (long) (gross * -0.3);
@@ -68,14 +68,14 @@ public class HourlyIncome {
 		data.replace("incomeCD", lastIncome);
 		data.replace("interestCD", interestCD);
 		long originalIncome = originalHours * income;
-		String reply = "You collected " + Numbers.formatNumber(originalHours) + " hours of income!" +
-				"\n\nOriginal Income: " + Numbers.formatNumber(originalIncome) + Emoji.VIOLINS +
-				"\nGross Income: " + Numbers.formatNumber(gross) + Emoji.VIOLINS +
-				"\nIncome Lost to Inactive Items: " + Numbers.formatNumber(originalIncome - gross) + Emoji.VIOLINS +
-				"\nLoans Paid: " + Numbers.formatNumber(loanPaid) + Emoji.VIOLINS +
-				"\n\nNet Income: " + Numbers.formatNumber(net) + Emoji.VIOLINS;
+		String reply = "You collected " + Utils.formatNumber(originalHours) + " hours of income!" +
+				"\n\nOriginal Income: " + Utils.formatNumber(originalIncome) + Emoji.VIOLINS +
+				"\nGross Income: " + Utils.formatNumber(gross) + Emoji.VIOLINS +
+				"\nIncome Lost to Inactive Items: " + Utils.formatNumber(originalIncome - gross) + Emoji.VIOLINS +
+				"\nLoans Paid: " + Utils.formatNumber(loanPaid) + Emoji.VIOLINS +
+				"\n\nNet Income: " + Utils.formatNumber(net) + Emoji.VIOLINS;
 		if(interest != 0) {
-			reply += "\n\nInterest Earned: " + Numbers.formatNumber(interest) + Emoji.VIOLINS;
+			reply += "\n\nInterest Earned: " + Utils.formatNumber(interest) + Emoji.VIOLINS;
 		}
 		e.reply(reply);
 		SaveData.saveData(e, data);

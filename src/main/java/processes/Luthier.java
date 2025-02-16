@@ -45,7 +45,7 @@ public class Luthier {
 					char[] scrambler = new char[word.length()];
 					int i = 0;
 					StringBuilder send = new StringBuilder().append(original);
-					while(send.toString().equals(original) || Numbers.containsBadLanguage(send.toString())) {
+					while(send.toString().equals(original) || Utils.containsBadLanguage(send.toString())) {
 						while(!word.isEmpty()) {
 							int num = random.nextInt(word.length());
 							StringBuilder newWord = new StringBuilder();
@@ -65,7 +65,7 @@ public class Luthier {
 						}
 					}
 					assert channel != null;
-					channel.sendMessage("Olaf is giving away violins!  Unscramble `" + send + "` to get " + Numbers.formatNumber(money) + Emoji.VIOLINS).queue();
+					channel.sendMessage("Olaf is giving away violins!  Unscramble `" + send + "` to get " + Utils.formatNumber(money) + Emoji.VIOLINS).queue();
 					data.replace("hasWord", true);
 					data.replace("amount", money);
 					data.replace("word", original);
@@ -91,7 +91,7 @@ public class Luthier {
 					userData.replace("violins", (long) userData.get("violins") + gain);
 					userData.replace("earnings", (long) userData.get("earnings") + gain);
 					userData.replace("luthiers", (long) userData.get("luthiers") + 1);
-					e.reply("**" + name + "** unscrambled `" + target + "` and gained " + Numbers.formatNumber(gain) + Emoji.VIOLINS);
+					e.reply("**" + name + "** unscrambled `" + target + "` and gained " + Utils.formatNumber(gain) + Emoji.VIOLINS);
 					RNGesus.lootbox(e, userData);
 					Achievement.calculateAchievement(e, userData, "luthiers", "English Major");
 					DatabaseManager.saveDataByUser(e, "Economy Data", userData);

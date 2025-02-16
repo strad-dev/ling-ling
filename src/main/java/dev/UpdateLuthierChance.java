@@ -6,7 +6,7 @@ import org.bson.Document;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import processes.DatabaseManager;
-import processes.Numbers;
+import processes.Utils;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -29,7 +29,7 @@ public class UpdateLuthierChance {
 				continue;
 			}
 			try {
-				data.replace("chance", Numbers.luthierChance(Objects.requireNonNull(e.getJDA().getGuildById(data.get("discordID").toString())).getMemberCount()));
+				data.replace("chance", Utils.luthierChance(Objects.requireNonNull(e.getJDA().getGuildById(data.get("discordID").toString())).getMemberCount()));
 			} catch(Exception exception) {
 				continue;
 			}

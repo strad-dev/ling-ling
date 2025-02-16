@@ -2,7 +2,7 @@ package economy;
 
 import eventListeners.GenericDiscordEvent;
 import org.json.simple.JSONObject;
-import processes.Numbers;
+import processes.Utils;
 
 public class Deposit {
 	public static void deposit(GenericDiscordEvent e, String temp) {
@@ -29,17 +29,17 @@ public class Deposit {
 		if(amount < 1) {
 			e.reply("Stop wasting my time trying to deposit a negative amount.");
 		} else {
-			long max = Numbers.maxBank((long) data.get("storage"), (long) data.get("benevolentBankers"));
+			long max = Utils.maxBank((long) data.get("storage"), (long) data.get("benevolentBankers"));
 			long balance = (long) data.get("bank");
 			if(balance + amount > max) {
 				amount = max - balance;
 				balance = max;
-				e.reply("**MAX VIOLINS**\nYou deposited " + Numbers.formatNumber(amount) + Emoji.VIOLINS + " into your bank.  You now have " +
-						Numbers.formatNumber(balance) + Emoji.VIOLINS + " in your bank.");
+				e.reply("**MAX VIOLINS**\nYou deposited " + Utils.formatNumber(amount) + Emoji.VIOLINS + " into your bank.  You now have " +
+						Utils.formatNumber(balance) + Emoji.VIOLINS + " in your bank.");
 			} else {
 				balance += amount;
-				e.reply("You deposited " + Numbers.formatNumber(amount) + Emoji.VIOLINS + " into your bank.  You now have " +
-						Numbers.formatNumber(balance) + Emoji.VIOLINS + " in your bank.");
+				e.reply("You deposited " + Utils.formatNumber(amount) + Emoji.VIOLINS + " into your bank.  You now have " +
+						Utils.formatNumber(balance) + Emoji.VIOLINS + " in your bank.");
 			}
 			data.replace("violins", wallet - amount);
 			data.replace("bank", balance);

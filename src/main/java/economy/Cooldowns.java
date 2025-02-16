@@ -3,7 +3,7 @@ package economy;
 import eventListeners.GenericDiscordEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.json.simple.JSONObject;
-import processes.Numbers;
+import processes.Utils;
 
 import java.awt.*;
 
@@ -24,7 +24,7 @@ public class Cooldowns {
 			if(milliseconds < 0) {
 				builder.addField("**Rob**", ":white_check_mark:", true);
 			} else {
-				builder.addField("**Rob**", Numbers.makeCooldownTime(milliseconds), true);
+				builder.addField("**Rob**", Utils.makeCooldownTime(milliseconds), true);
 			}
 
 			//scales
@@ -32,7 +32,7 @@ public class Cooldowns {
 			if(milliseconds < 0) {
 				builder.addField("**Scales**", ":white_check_mark:", true);
 			} else {
-				builder.addField("**Scales**", Numbers.makeCooldownTime(milliseconds), true);
+				builder.addField("**Scales**", Utils.makeCooldownTime(milliseconds), true);
 			}
 
 			//practice
@@ -40,7 +40,7 @@ public class Cooldowns {
 			if(milliseconds < 0) {
 				builder.addField("**Practice**", ":white_check_mark:", true);
 			} else {
-				builder.addField("**Practice**", Numbers.makeCooldownTime(milliseconds), true);
+				builder.addField("**Practice**", Utils.makeCooldownTime(milliseconds), true);
 			}
 
 			//teach
@@ -49,7 +49,7 @@ public class Cooldowns {
 				if(milliseconds < 0) {
 					builder.addField("**Teach**", ":white_check_mark:", true);
 				} else {
-					builder.addField("**Teach**", Numbers.makeCooldownTime(milliseconds), true);
+					builder.addField("**Teach**", Utils.makeCooldownTime(milliseconds), true);
 				}
 			}
 
@@ -59,7 +59,7 @@ public class Cooldowns {
 				if(milliseconds < 0) {
 					builder.addField("**Rehearse**", ":white_check_mark:", true);
 				} else {
-					builder.addField("**Rehearse**", Numbers.makeCooldownTime(milliseconds), true);
+					builder.addField("**Rehearse**", Utils.makeCooldownTime(milliseconds), true);
 				}
 			}
 
@@ -68,7 +68,7 @@ public class Cooldowns {
 			if(milliseconds < 0) {
 				builder.addField("**Perform**", ":white_check_mark:", true);
 			} else {
-				builder.addField("**Perform**", Numbers.makeCooldownTime(milliseconds), true);
+				builder.addField("**Perform**", Utils.makeCooldownTime(milliseconds), true);
 			}
 
 			//daily
@@ -76,7 +76,7 @@ public class Cooldowns {
 			if(milliseconds < 0) {
 				builder.addField("**Daily**", ":white_check_mark:", true);
 			} else {
-				builder.addField("**Daily**", Numbers.makeCooldownTime(milliseconds), true);
+				builder.addField("**Daily**", Utils.makeCooldownTime(milliseconds), true);
 			}
 
 			//gift
@@ -84,7 +84,7 @@ public class Cooldowns {
 			if(milliseconds < 0) {
 				builder.addField("**Gift**", ":white_check_mark:", true);
 			} else {
-				builder.addField("**Gift**", Numbers.makeCooldownTime(milliseconds), true);
+				builder.addField("**Gift**", Utils.makeCooldownTime(milliseconds), true);
 			}
 
 			//claim
@@ -92,7 +92,7 @@ public class Cooldowns {
 			if(milliseconds < 0) {
 				builder.addField("**Claim**", ":white_check_mark:", true);
 			} else {
-				builder.addField("**Claim**", Numbers.makeCooldownTime(milliseconds), true);
+				builder.addField("**Claim**", Utils.makeCooldownTime(milliseconds), true);
 			}
 
 			//income - rosin
@@ -101,9 +101,9 @@ public class Cooldowns {
 				builder2.addField("**Rosin Income**", ":x:", true);
 			} else {
 				if(milliseconds < 86400000) {
-					builder2.addField("**Rosin Income**", ":warning:\n" + Numbers.makeCooldownTime(milliseconds), true);
+					builder2.addField("**Rosin Income**", ":warning:\n" + Utils.makeCooldownTime(milliseconds), true);
 				} else {
-					builder2.addField("**Rosin Income**", ":white_check_mark:\n" + Numbers.makeCooldownTime(milliseconds), true);
+					builder2.addField("**Rosin Income**", ":white_check_mark:\n" + Utils.makeCooldownTime(milliseconds), true);
 				}
 			}
 			builder2.addBlankField(true);
@@ -114,9 +114,9 @@ public class Cooldowns {
 				builder2.addField("**Strings Income**", ":x:", true);
 			} else {
 				if(milliseconds < 86400000) {
-					builder2.addField("**Strings Income**", ":warning:\n" + Numbers.makeCooldownTime(milliseconds), true);
+					builder2.addField("**Strings Income**", ":warning:\n" + Utils.makeCooldownTime(milliseconds), true);
 				} else {
-					builder2.addField("**Strings Income**", ":white_check_mark:\n" + Numbers.makeCooldownTime(milliseconds), true);
+					builder2.addField("**Strings Income**", ":white_check_mark:\n" + Utils.makeCooldownTime(milliseconds), true);
 				}
 			}
 
@@ -126,9 +126,9 @@ public class Cooldowns {
 				builder2.addField("**Bow Hair Income**", ":x:", true);
 			} else {
 				if(milliseconds < 86400000) {
-					builder2.addField("**Bow Hair Income**", ":warning:\n" + Numbers.makeCooldownTime(milliseconds), true);
+					builder2.addField("**Bow Hair Income**", ":warning:\n" + Utils.makeCooldownTime(milliseconds), true);
 				} else {
-					builder2.addField("**Bow Hair Income**", ":white_check_mark:\n" + Numbers.makeCooldownTime(milliseconds), true);
+					builder2.addField("**Bow Hair Income**", ":white_check_mark:\n" + Utils.makeCooldownTime(milliseconds), true);
 				}
 			}
 			builder2.addBlankField(true);
@@ -139,9 +139,9 @@ public class Cooldowns {
 				builder2.addField("**Violin Service Income**", ":x:", true);
 			} else {
 				if(milliseconds < 86400000) {
-					builder2.addField("**Violin Service Income**", ":warning:\n" + Numbers.makeCooldownTime(milliseconds), true);
+					builder2.addField("**Violin Service Income**", ":warning:\n" + Utils.makeCooldownTime(milliseconds), true);
 				} else {
-					builder2.addField("**Violin Service Income**", ":white_check_mark:\n" + Numbers.makeCooldownTime(milliseconds), true);
+					builder2.addField("**Violin Service Income**", ":white_check_mark:\n" + Utils.makeCooldownTime(milliseconds), true);
 				}
 			}
 

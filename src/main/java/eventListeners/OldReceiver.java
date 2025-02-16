@@ -27,19 +27,6 @@ class CreateThreadMessage implements Runnable {
 		message = message1;
 	}
 
-	public static long CheckPermLevel(GenericDiscordEvent e) {
-		if(e.getAuthor().getId().equals("619989388109152256") || e.getAuthor().getId().equals("488487157372157962")) {
-			return 3;
-		} else {
-			JSONObject data = DatabaseManager.getDataForUser(e, "Economy Data", e.getAuthor().getId());
-			if(data == null) {
-				return 0;
-			} else {
-				return (long) data.get("perms");
-			}
-		}
-	}
-
 	public void run() {
 		System.out.println("[DEBUG] New Thread: " + Thread.currentThread().threadId() + "\n        Command: " + Arrays.toString(message));
 		if(message[0].equals("<@733409243222507670>") || message[0].equals("<@772582345944334356>")) {

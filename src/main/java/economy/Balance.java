@@ -4,7 +4,7 @@ import eventListeners.GenericDiscordEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.json.simple.JSONObject;
 import processes.DatabaseManager;
-import processes.Numbers;
+import processes.Utils;
 
 import java.awt.*;
 
@@ -37,13 +37,13 @@ public class Balance {
 				.setColor(Color.decode((String) data.get("color")))
 				.setFooter("Ling Ling", e.getJDA().getSelfUser().getAvatarUrl())
 				.setTitle(user + "'s Profile");
-		builder.addField("General Stats", "Balance: " + Numbers.formatNumber(data.get("violins")) + Emoji.VIOLINS +
-				"\nBank Balance: " + Numbers.formatNumber(data.get("bank")) + "/" + Numbers.formatNumber(Numbers.maxBank((long) data.get("storage"), (long) data.get("benevolentBankers"))) + Emoji.VIOLINS +
-				"\nLing Ling Medals: " + Numbers.formatNumber(data.get("medals")) + Emoji.MEDALS +
-				"\nHourly Income: " + Numbers.formatNumber(data.get("income")) + Emoji.VIOLINS + "/hour", false);
-		builder.addField("Medals", Emoji.FIRST_PLACE + Numbers.formatNumber(data.get("firstPlace")) +
-				"\n" + Emoji.SECOND_PLACE + Numbers.formatNumber(data.get("secondPlace")) +
-				"\n" + Emoji.THIRD_PLACE + Numbers.formatNumber(data.get("thirdPlace")), false);
+		builder.addField("General Stats", "Balance: " + Utils.formatNumber(data.get("violins")) + Emoji.VIOLINS +
+				"\nBank Balance: " + Utils.formatNumber(data.get("bank")) + "/" + Utils.formatNumber(Utils.maxBank((long) data.get("storage"), (long) data.get("benevolentBankers"))) + Emoji.VIOLINS +
+				"\nLing Ling Medals: " + Utils.formatNumber(data.get("medals")) + Emoji.MEDALS +
+				"\nHourly Income: " + Utils.formatNumber(data.get("income")) + Emoji.VIOLINS + "/hour", false);
+		builder.addField("Medals", Emoji.FIRST_PLACE + Utils.formatNumber(data.get("firstPlace")) +
+				"\n" + Emoji.SECOND_PLACE + Utils.formatNumber(data.get("secondPlace")) +
+				"\n" + Emoji.THIRD_PLACE + Utils.formatNumber(data.get("thirdPlace")), false);
 		e.replyEmbeds(builder.build());
 	}
 }
