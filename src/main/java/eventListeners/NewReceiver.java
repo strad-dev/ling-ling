@@ -16,6 +16,8 @@ import regular.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static processes.Utils.CheckPermLevel;
+
 class CreateThreadSlash implements Runnable {
 	private static GenericDiscordEvent e;
 	private static SlashCommandInteractionEvent e1;
@@ -26,19 +28,6 @@ class CreateThreadSlash implements Runnable {
 
 	public static void setSlashEvent(SlashCommandInteractionEvent e2) {
 		e1 = e2;
-	}
-
-	public static long CheckPermLevel(@NotNull GenericDiscordEvent e) {
-		if(e.getAuthor().getId().equals("619989388109152256") || e.getAuthor().getId().equals("488487157372157962")) {
-			return 3;
-		} else {
-			JSONObject data = DatabaseManager.getDataForUser(e, "Economy Data", e.getAuthor().getId());
-			if(data == null) {
-				return 0;
-			} else {
-				return (long) data.get("perms");
-			}
-		}
 	}
 
 	@Override
@@ -477,7 +466,7 @@ class CreateThreadSlash implements Runnable {
 
 			// DEV COMMANDS
 			case "give" -> {
-				if(CheckPermLevel(e) >= 1) {
+				if(CheckPermLevel(e.getAuthor().getId()) >= 1) {
 					String receiver;
 					long add;
 					String item;
@@ -504,7 +493,7 @@ class CreateThreadSlash implements Runnable {
 				}
 			}
 			case "warn" -> {
-				if(CheckPermLevel(e) >= 1) {
+				if(CheckPermLevel(e.getAuthor().getId()) >= 1) {
 					String idToModerate;
 					String reason;
 					try {
@@ -523,7 +512,7 @@ class CreateThreadSlash implements Runnable {
 				}
 			}
 			case "resetsave" -> {
-				if(CheckPermLevel(e) >= 1) {
+				if(CheckPermLevel(e.getAuthor().getId()) >= 1) {
 					String idToModerate;
 					String reason;
 					try {
@@ -542,7 +531,7 @@ class CreateThreadSlash implements Runnable {
 				}
 			}
 			case "ban" -> {
-				if(CheckPermLevel(e) >= 2) {
+				if(CheckPermLevel(e.getAuthor().getId()) >= 2) {
 					String idToModerate;
 					String reason;
 					try {
@@ -561,7 +550,7 @@ class CreateThreadSlash implements Runnable {
 				}
 			}
 			case "unban" -> {
-				if(CheckPermLevel(e) >= 2) {
+				if(CheckPermLevel(e.getAuthor().getId()) >= 2) {
 					String idToModerate;
 					String reason;
 					Boolean reset;
@@ -607,21 +596,21 @@ class CreateThreadSlash implements Runnable {
 				LuthierConfig.luthierConfig(e, actionType, editOption, newValue);
 			}
 			case "resetincomes" -> {
-				if(CheckPermLevel(e) >= 2) {
+				if(CheckPermLevel(e.getAuthor().getId()) >= 2) {
 					e.reply(ResetIncomes.resetIncomes());
 				} else {
 					e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command.");
 				}
 			}
 			case "updateluthierchance" -> {
-				if(CheckPermLevel(e) >= 2) {
+				if(CheckPermLevel(e.getAuthor().getId()) >= 2) {
 					UpdateLuthierChance.updateLuthierChance(e, true);
 				} else {
 					e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command.");
 				}
 			}
 			case "updateusers" -> {
-				if(CheckPermLevel(e) == 3) {
+				if(CheckPermLevel(e.getAuthor().getId()) == 3) {
 					String dataType;
 					String name;
 					String value;
@@ -646,7 +635,7 @@ class CreateThreadSlash implements Runnable {
 				}
 			}
 			case "forcestop" -> {
-				if(CheckPermLevel(e) == 3 && Objects.requireNonNull(e1.getOption("PASSWORD")).getAsString().equals("@#$%FUCK")) {
+				if(CheckPermLevel(e.getAuthor().getId()) == 3 && Objects.requireNonNull(e1.getOption("PASSWORD")).getAsString().equals("@#$%FUCK")) {
 					e.reply("Forcing bot to stop...");
 					System.exit(0);
 				} else {
@@ -654,14 +643,14 @@ class CreateThreadSlash implements Runnable {
 				}
 			}
 			case "updateroles" -> {
-				if(CheckPermLevel(e) == 3) {
+				if(CheckPermLevel(e.getAuthor().getId()) == 3) {
 					UpdateRoles.updateRoles(e);
 				} else {
 					e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command.");
 				}
 			}
 			case "setpermlevel" -> {
-				if(CheckPermLevel(e) == 3) {
+				if(CheckPermLevel(e.getAuthor().getId()) == 3) {
 					String target;
 					int newRank;
 					try {
@@ -680,14 +669,14 @@ class CreateThreadSlash implements Runnable {
 				}
 			}
 			case "globalstats" -> {
-				if(CheckPermLevel(e) == 3) {
+				if(CheckPermLevel(e.getAuthor().getId()) == 3) {
 					GlobalStats.gobalStats(e);
 				} else {
 					e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not nave permission to run this command.");
 				}
 			}
 			case "resetdaily" -> {
-				if(CheckPermLevel(e) == 3) {
+				if(CheckPermLevel(e.getAuthor().getId()) == 3) {
 					MoreDailyTime.moreDailyTime(e);
 				} else {
 					e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not nave permission to run this command.");

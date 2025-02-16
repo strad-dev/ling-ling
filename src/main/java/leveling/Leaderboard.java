@@ -63,7 +63,7 @@ public class Leaderboard {
 		StringBuilder board = new StringBuilder();
 		for(int i = 0; i < 10; i++) {
 			String id = entry[i].split(" ")[0];
-			JSONObject temp = DatabaseManager.getDataForUser(e, "Leveling Data", id);
+			JSONObject temp = DatabaseManager.getDataForUser("Leveling Data", id);
 			assert temp != null;
 			board.append("**").append(i + 1).append("\\. ").append(Objects.requireNonNull(e.getGuild().getMemberById(id)).getNickname())
 					.append("** `").append(id).append("`: Level ").append(Utils.formatNumber(Long.parseLong(entry[i].split(" ")[1])))

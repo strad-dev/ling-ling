@@ -102,32 +102,7 @@ public class DatabaseManager {
 		}
 	}
 
-	public static JSONObject getDataForUser(GuildMemberRoleAddEvent e, String collection1, String target) {
-		MongoCollection<Document> collection = database.getCollection(collection1);
-		Document document = collection.find(eq("discordID", target)).first();
-		try {
-			JSONParser parser = new JSONParser();
-			assert document != null;
-			return (JSONObject) parser.parse(document.toJson());
-		} catch(Exception exception) {
-			return null;
-		}
-	}
-
-	public static JSONObject getDataForUser(GuildMemberRoleRemoveEvent e, String collection1, String target) {
-		MongoCollection<Document> collection = database.getCollection(collection1);
-		Document document = collection.find(eq("discordID", target)).first();
-		try {
-			JSONParser parser = new JSONParser();
-			assert document != null;
-			return (JSONObject) parser.parse(document.toJson());
-		} catch(Exception exception) {
-			return null;
-		}
-	}
-
-
-	public static JSONObject getDataForUser(GenericDiscordEvent e, String collection1, String target) {
+	public static JSONObject getDataForUser(String collection1, String target) {
 		MongoCollection<Document> collection = database.getCollection(collection1);
 		Document document = collection.find(eq("discordID", target)).first();
 		try {
@@ -182,17 +157,7 @@ public class DatabaseManager {
 		collection.replaceOne(eq("discordID", e.getAuthor().getId()), Document.parse(newData.toJSONString()));
 	}
 
-	public static void saveDataForUser(GuildMemberRoleAddEvent e, String collection1, String target, JSONObject newData) {
-		MongoCollection<Document> collection = database.getCollection(collection1);
-		collection.replaceOne(eq("discordID", target), Document.parse(newData.toJSONString()));
-	}
-
-	public static void saveDataForUser(GuildMemberRoleRemoveEvent e, String collection1, String target, JSONObject newData) {
-		MongoCollection<Document> collection = database.getCollection(collection1);
-		collection.replaceOne(eq("discordID", target), Document.parse(newData.toJSONString()));
-	}
-
-	public static void saveDataForUser(GenericDiscordEvent e, String collection1, String target, JSONObject newData) {
+	public static void saveDataForUser(String collection1, String target, JSONObject newData) {
 		MongoCollection<Document> collection = database.getCollection(collection1);
 		collection.replaceOne(eq("discordID", target), Document.parse(newData.toJSONString()));
 	}
@@ -234,18 +199,7 @@ public class DatabaseManager {
 		return databasePunishments.getCollection(target);
 	}*/
 
-	public static void connectToDatabase(boolean beta) {
-		// establish connection to database
-		String connectionString;
-		try {
-			Scanner scanner = new Scanner(new BufferedReader(new FileReader("databasetoken.txt")));
-			connectionString = scanner.nextLine();
-		} catch(Exception exception) {
-			System.out.println("Could not connect to database.  Exiting...");
-			System.exit(-1);
-			return;
-		}
-
+	public static void connectToDatabase(boolean beta, String connectionString) {
 		// Create a new client and connect to the server
 		try {
 			ServerApi serverApi = ServerApi.builder()

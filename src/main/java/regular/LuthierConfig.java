@@ -30,7 +30,7 @@ public class LuthierConfig {
 		}
 		switch(mainAction) {
 			case "setup" -> {
-				if()
+
 				MongoDatabase database = DatabaseManager.getDatabase();
 				MongoCollection<Document> collection = database.getCollection("Luthier Data");
 				Document document = collection.find(eq("discordID", id)).first();

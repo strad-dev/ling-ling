@@ -15,7 +15,7 @@ public class SetLevel {
 			String field = message[3];
 			String id = message[2];
 			JSONParser parser = new JSONParser();
-			JSONObject data = DatabaseManager.getDataForUser(e, "Leveling Data", id);
+			JSONObject data = DatabaseManager.getDataForUser("Leveling Data", id);
 			if(data == null) {
 				e.getMessage().reply("This save doesn't exist!").queue();
 				return;
@@ -26,7 +26,7 @@ public class SetLevel {
 				e.reply("You did not provide a valid field!  Valid fields: `level` `xp` `messages`");
 				return;
 			}
-			DatabaseManager.saveDataForUser(e, "Leveling Data", id, data);
+			DatabaseManager.saveDataForUser("Leveling Data", id, data);
 			e.reply("Successfully set `" + Objects.requireNonNull(e.getGuild().getMemberById(id)).getNickname() + "`'s " + field + " to `" + message[4] + "`.");
 		} else {
 			e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command!");

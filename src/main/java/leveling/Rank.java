@@ -17,7 +17,7 @@ public class Rank {
 			data = Leveling.loadData(e);
 		} else {
 			user = message[2];
-			data = DatabaseManager.getDataForUser(e, "Leveling Data", user);
+			data = DatabaseManager.getDataForUser("Leveling Data", user);
 			if(data == null) {
 				e.reply("This save file does not exist!");
 				return;

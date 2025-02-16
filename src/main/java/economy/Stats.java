@@ -10,7 +10,7 @@ import java.awt.*;
 
 public class Stats {
 	public static void stats(GenericDiscordEvent e, String user) {
-		JSONObject data = DatabaseManager.getDataForUser(e, "Economy Data", user);
+		JSONObject data = DatabaseManager.getDataForUser("Economy Data", user);
 		if(data == null) {
 			e.reply("This save file does not exist!");
 			return;

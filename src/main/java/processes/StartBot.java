@@ -1,12 +1,12 @@
 package processes;
 
 import eventListeners.*;
+import io.github.cdimascio.dotenv.Dotenv;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -21,33 +21,27 @@ public class StartBot {
 	}
 
 	public static void startBot() {
-		/* File file = new File("Ling Ling Bot Data\\loadedservers.txt");
-		try {
-			file.delete();
-			file.createNewFile();
-		} catch(Exception exception1) {
-			//nothing here lol
-		} */
-		DatabaseManager.connectToDatabase(BETA);
-		HypixelManager.connectToHypixel(BETA);
+		Dotenv env = Dotenv.load();
+
+		DatabaseManager.connectToDatabase(BETA, env.get("DATABASE_TOKEN"));
+		HypixelManager.connectToHypixel(BETA, env.get("HYPIXEL_KEY"));
 		JSONObject data = DatabaseManager.getMiscData();
 
 		String token;
 		String beethoventoken;
 		if(BETA) {
-			token = "betatoken";
-			beethoventoken = "betatoken";
+			token = env.get("BETA_TOKEN");
+			beethoventoken = env.get("BETA_TOKEN");
 		} else {
-			token = "token";
-			beethoventoken = "beethoventoken";
+			token = env.get("MAIN_TOKEN");
+			beethoventoken = env.get("BEETHOVEN_TOKEN");
 		}
 
 		// Start BeethovenBot
 		JDA jda;
 		assert data != null;
-		jda = JDABuilder.create(data.get(beethoventoken).toString(), GatewayIntent.GUILD_INVITES,
-						GatewayIntent.GUILD_EMOJIS_AND_STICKERS, GatewayIntent.MESSAGE_CONTENT,
-						GatewayIntent.GUILD_PRESENCES, GatewayIntent.GUILD_MESSAGES,
+		jda = JDABuilder.create(beethoventoken, GatewayIntent.GUILD_INVITES,
+						GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MESSAGES,
 						GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGE_REACTIONS)
 				.disableCache(CacheFlag.ACTIVITY, CacheFlag.VOICE_STATE, CacheFlag.CLIENT_STATUS, CacheFlag.SCHEDULED_EVENTS)
 				.addEventListeners(new Autoroles())
@@ -66,9 +60,8 @@ public class StartBot {
 
 		// Start LingLing Bot
 		Message.suppressContentIntentWarning();
-		jda = JDABuilder.createDefault(data.get(token).toString(), GatewayIntent.GUILD_MESSAGES,
-						GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGE_REACTIONS,
-						GatewayIntent.GUILD_EMOJIS_AND_STICKERS)
+		jda = JDABuilder.createDefault(token, GatewayIntent.GUILD_MESSAGES,
+						GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGE_REACTIONS)
 				.disableCache(CacheFlag.ACTIVITY, CacheFlag.VOICE_STATE, CacheFlag.EMOJI, CacheFlag.CLIENT_STATUS, CacheFlag.ONLINE_STATUS, CacheFlag.SCHEDULED_EVENTS)
 				.addEventListeners(new Disconnect())
 				.addEventListeners(new NewReceiver())

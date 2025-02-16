@@ -11,11 +11,11 @@ public class HypixelManager {
 	private static HypixelHttpClient client;
 	private static Mojang mojang;
 
-	public static void connectToHypixel(boolean beta) {
+	public static void connectToHypixel(boolean beta, String hypixelKey) {
 		JSONObject data = DatabaseManager.getMiscData();
 		try {
 			assert data != null;
-			client = new ApacheHttpClient(UUID.fromString((String) data.get("hypixelKey")));
+			client = new ApacheHttpClient(UUID.fromString(hypixelKey));
 		} catch(Exception exception) {
 			System.out.println("Unable to connect to Hypixel API.");
 			exception.printStackTrace();

@@ -22,7 +22,7 @@ public class StaffReport {
 				continue;
 			}
 			builder.append(member.getNickname()).append(" `").append(member.getId()).append("`: ");
-			currentData = DatabaseManager.getDataForUser(e, "Leveling Data", member.getId());
+			currentData = DatabaseManager.getDataForUser("Leveling Data", member.getId());
 			if(currentData == null) {
 				continue;
 			}
@@ -46,7 +46,7 @@ public class StaffReport {
 		addRole(e, builder, "734697396126351390", 150);
 		addRole(e, builder, "734697394893094934", 180);
 		addRole(e, builder, "734697390556184606", 240);
-		currentData = DatabaseManager.getDataForUser(e, "Leveling Data", "619989388109152256");
+		currentData = DatabaseManager.getDataForUser("Leveling Data", "619989388109152256");
 		if(currentData == null) {
 			e.getMessage().reply("I am bad.  This is an Error.  Aborting Process...").queue();
 			return;

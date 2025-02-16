@@ -39,7 +39,7 @@ public class Rob {
 				return;
 			}
 			JSONParser parser = new JSONParser();
-			JSONObject targetdata = DatabaseManager.getDataForUser(e, "Economy Data", user);
+			JSONObject targetdata = DatabaseManager.getDataForUser("Economy Data", user);
 			if(targetdata == null) {
 				e.reply("You did not provide a valid User ID.  Doesn't make sense to rob someone nonexistent, does it?");
 				return;
@@ -203,7 +203,7 @@ public class Rob {
 			}
 			targetdata.replace("violins", targetViolins);
 			targetdata.replace("lostToRob", targetLostToRob);
-			DatabaseManager.saveDataForUser(e, "Economy Data", user, targetdata);
+			DatabaseManager.saveDataForUser("Economy Data", user, targetdata);
 			data.replace("robCD", time + 57540000);
 			if(baseRob > 0) {
 				data.replace("robbed", (long) data.get("robbed") + baseRob);

@@ -1,5 +1,6 @@
 package processes;
 
+import eventListeners.GenericDiscordEvent;
 import org.json.simple.JSONObject;
 
 public class Utils {
@@ -164,6 +165,19 @@ public class Utils {
 			newString = "0" + string;
 		}
 		return newString;
+	}
+
+	public static long CheckPermLevel(String id) {
+		if(id.equals("619989388109152256") || id.equals("488487157372157962")) {
+			return 3;
+		} else {
+			JSONObject data = DatabaseManager.getDataForUser( "Economy Data", id);
+			if(data == null) {
+				return 0;
+			} else {
+				return (long) data.get("perms");
+			}
+		}
 	}
 
 	public static long skillLevel(long xp) {

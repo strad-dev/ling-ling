@@ -34,7 +34,7 @@ public class Gift {
 				return;
 			}
 
-			JSONObject targetdata = DatabaseManager.getDataForUser(e, "Economy Data", target);
+			JSONObject targetdata = DatabaseManager.getDataForUser("Economy Data", target);
 			if(targetdata == null) {
 				e.reply("You did not provide a valid User ID.  Doesn't make sense to gift someone nonexistant, does it?");
 				return;
@@ -46,7 +46,7 @@ public class Gift {
 			RNGesus.lootbox(e, data);
 			Achievement.calculateAchievement(e, data, "giftsGiven", "Generous");
 			SaveData.saveData(e, data);
-			DatabaseManager.saveDataForUser(e, "Economy Data", target, targetdata);
+			DatabaseManager.saveDataForUser("Economy Data", target, targetdata);
 			try {
 				e.reply("Successfully gifted `1`" + Emoji.GIFT_BOX + " to " + targetdata.get("discordName"));
 			} catch(Exception exception) {

@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
+import static processes.Utils.CheckPermLevel;
+
 class CreateThreadMessage implements Runnable {
 	private static GenericDiscordEvent e;
 
@@ -527,7 +529,7 @@ class CreateThreadMessage implements Runnable {
 
 				// DEV COMMANDS
 				case "give" -> {
-					if(CheckPermLevel(e) >= 1) {
+					if(CheckPermLevel(e.getAuthor().getId()) >= 1) {
 						String receiver;
 						long add;
 						String item;
@@ -558,7 +560,7 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "warn" -> {
-					if(CheckPermLevel(e) >= 1) {
+					if(CheckPermLevel(e.getAuthor().getId()) >= 1) {
 						String idToModerate;
 						String reason;
 						try {
@@ -577,7 +579,7 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "resetsave" -> {
-					if(CheckPermLevel(e) >= 1) {
+					if(CheckPermLevel(e.getAuthor().getId()) >= 1) {
 						String idToModerate;
 						String reason;
 						try {
@@ -596,7 +598,7 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "ban" -> {
-					if(CheckPermLevel(e) >= 2) {
+					if(CheckPermLevel(e.getAuthor().getId()) >= 2) {
 						String idToModerate;
 						String reason;
 						try {
@@ -615,7 +617,7 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "unban" -> {
-					if(CheckPermLevel(e) >= 2) {
+					if(CheckPermLevel(e.getAuthor().getId()) >= 2) {
 						String idToModerate;
 						String reason;
 						Boolean reset;
@@ -640,7 +642,7 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "luthier" -> {
-					if(CheckPermLevel(e) >= 2) {
+					if(CheckPermLevel(e.getAuthor().getId()) >= 2) {
 						String actionType;
 						String editOption;
 						StringBuilder newValue = new StringBuilder();
@@ -668,21 +670,21 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "resetincomes" -> {
-					if(CheckPermLevel(e) >= 2) {
+					if(CheckPermLevel(e.getAuthor().getId()) >= 2) {
 						e.reply(ResetIncomes.resetIncomes());
 					} else {
 						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command.");
 					}
 				}
 				case "updateluthierchance" -> {
-					if(CheckPermLevel(e) >= 2) {
+					if(CheckPermLevel(e.getAuthor().getId()) >= 2) {
 						UpdateLuthierChance.updateLuthierChance(e, true);
 					} else {
 						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command.");
 					}
 				}
 				case "updateusers" -> {
-					if(CheckPermLevel(e) == 3) {
+					if(CheckPermLevel(e.getAuthor().getId()) == 3) {
 						String dataType;
 						String name;
 						String value;
@@ -708,7 +710,7 @@ class CreateThreadMessage implements Runnable {
 				}
 				case "forcestop" -> {
 					e.getMessage().delete().queue();
-					if(CheckPermLevel(e) == 3 && e.getMessage().getContentRaw().split(" ")[2].equals("@#$%FUCK")) {
+					if(CheckPermLevel(e.getAuthor().getId()) == 3 && e.getMessage().getContentRaw().split(" ")[2].equals("@#$%FUCK")) {
 						e.reply("Forcing bot to stop...");
 						System.exit(0);
 					} else {
@@ -716,14 +718,14 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "updateroles" -> {
-					if(CheckPermLevel(e) == 3) {
+					if(CheckPermLevel(e.getAuthor().getId()) == 3) {
 						UpdateRoles.updateRoles(e);
 					} else {
 						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command.");
 					}
 				}
 				case "setpermlevel" -> {
-					if(CheckPermLevel(e) == 3) {
+					if(CheckPermLevel(e.getAuthor().getId()) == 3) {
 						String target;
 						int newRank;
 						try {
@@ -742,21 +744,21 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "globalstats" -> {
-					if(CheckPermLevel(e) == 3) {
+					if(CheckPermLevel(e.getAuthor().getId()) == 3) {
 						GlobalStats.gobalStats(e);
 					} else {
 						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not nave permission to run this command.");
 					}
 				}
 				case "resetdaily" -> {
-					if(CheckPermLevel(e) == 3) {
+					if(CheckPermLevel(e.getAuthor().getId()) == 3) {
 						MoreDailyTime.moreDailyTime(e);
 					} else {
 						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not nave permission to run this command.");
 					}
 				}
 				case "sudo" -> {
-					if(CheckPermLevel(e) == 3) {
+					if(CheckPermLevel(e.getAuthor().getId()) == 3) {
 						try {
 							e.setAuthor(e.getJDA().retrieveUserById(message[2]).complete());
 						} catch(Exception exception) {
@@ -826,10 +828,10 @@ public class OldReceiver extends ListenerAdapter {
 		if(e.getChannel().getId().equals("863135059712409632") && e.getJDA().getSelfUser().getId().equals("733409243222507670") && e.getMessage().getContentRaw().contains("<@733409243222507670>")) {
 			String[] message = e.getMessage().getContentRaw().toLowerCase().split(" ");
 			String id = message[1];
-			JSONObject data = DatabaseManager.getDataForUser(e1, "Economy Data", id);
+			JSONObject data = DatabaseManager.getDataForUser( "Economy Data", id);
 			String messageToSend = RNGesus.voteRewards(e1, data);
 			if(data != null) {
-				DatabaseManager.saveDataForUser(e1, "Economy Data", id, data);
+				DatabaseManager.saveDataForUser( "Economy Data", id, data);
 			}
 			Objects.requireNonNull(e.getJDA().getUserById(id)).openPrivateChannel().complete().sendMessage(messageToSend).queue();
 			return;

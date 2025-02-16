@@ -27,7 +27,7 @@ public class Unban {
 			return;
 		}
 
-		JSONObject data = DatabaseManager.getDataForUser(e, "Economy Data", idToModerate);
+		JSONObject data = DatabaseManager.getDataForUser("Economy Data", idToModerate);
 		if(data == null) {
 			e.reply("File doesn't exist!  Looks like they never used the bot to begin with...");
 			return;
@@ -45,7 +45,7 @@ public class Unban {
 				reason += "\nSave Reset: Yes";
 			} else {
 				data.replace("banned", false);
-				DatabaseManager.saveDataForUser(e, "Economy Data", idToModerate, data);
+				DatabaseManager.saveDataForUser("Economy Data", idToModerate, data);
 				reason += "\nSave Reset: No";
 			}
 			LogCase.logCase(e, "Unban", idToModerate, reason);

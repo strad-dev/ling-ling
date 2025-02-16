@@ -16,7 +16,7 @@ public class ResetMessages {
 			if(user.getUser().isBot()) {
 				continue;
 			}
-			JSONObject currentData = DatabaseManager.getDataForUser(e, "Leveling Data", user.getId());
+			JSONObject currentData = DatabaseManager.getDataForUser("Leveling Data", user.getId());
 			if(currentData == null) {
 				continue;
 			}
@@ -25,7 +25,7 @@ public class ResetMessages {
 			} catch(Exception exception) {
 				currentData.put("messages", 0L);
 			}
-			DatabaseManager.saveDataForUser(e, "Leveling Data", user.getId(), currentData);
+			DatabaseManager.saveDataForUser("Leveling Data", user.getId(), currentData);
 		}
 		e.reply("Message counts successfully reset!");
 	}

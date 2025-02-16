@@ -16,7 +16,7 @@ public class UpdateRoles {
 			List<Member> list = g.getMembers();
 			for(Member member : list) {
 				List<Role> list2 = member.getRoles();
-				JSONObject data = DatabaseManager.getDataForUser(e, "Economy Data", member.getId());
+				JSONObject data = DatabaseManager.getDataForUser("Economy Data", member.getId());
 				if(data == null) {
 					continue;
 				}
@@ -40,7 +40,7 @@ public class UpdateRoles {
 				} else {
 					data.replace("serverLevel", 1);
 				}
-				DatabaseManager.saveDataForUser(e, "Economy Data", member.getId(), data);
+				DatabaseManager.saveDataForUser("Economy Data", member.getId(), data);
 			}
 			e.reply("Successfully force-updated role multipliers!");
 		} else {

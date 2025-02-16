@@ -22,7 +22,7 @@ public class ResetSave {
 			return;
 		}
 
-		JSONObject data = DatabaseManager.getDataForUser(e, "Economy Data", idToModerate);
+		JSONObject data = DatabaseManager.getDataForUser("Economy Data", idToModerate);
 		if(data != null) {
 			if(idToModerate.equals(e.getAuthor().getId())) {
 				e.reply("Imagine trying to reset your own save, how dumb are you???");
