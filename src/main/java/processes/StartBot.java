@@ -43,7 +43,7 @@ public class StartBot {
 		jda = JDABuilder.create(beethoventoken, GatewayIntent.GUILD_INVITES,
 						GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MESSAGES,
 						GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGE_REACTIONS)
-				.disableCache(CacheFlag.ACTIVITY, CacheFlag.VOICE_STATE, CacheFlag.CLIENT_STATUS, CacheFlag.SCHEDULED_EVENTS)
+				.disableCache(CacheFlag.EMOJI, CacheFlag.STICKER, CacheFlag.ONLINE_STATUS, CacheFlag.ACTIVITY, CacheFlag.VOICE_STATE, CacheFlag.CLIENT_STATUS, CacheFlag.SCHEDULED_EVENTS)
 				.addEventListeners(new Autoroles())
 				.addEventListeners(new Autounrole())
 				.addEventListeners(new Disconnect())
@@ -52,7 +52,6 @@ public class StartBot {
 				.addEventListeners(new Receiver())
 				.addEventListeners(new RoleAdded())
 				.addEventListeners(new RoleRemoved())
-				// .addEventListeners(new ILoveJava())
 				.addEventListeners(new NoInviteLinks())
 				.build();
 		jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
@@ -62,7 +61,7 @@ public class StartBot {
 		Message.suppressContentIntentWarning();
 		jda = JDABuilder.createDefault(token, GatewayIntent.GUILD_MESSAGES,
 						GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGE_REACTIONS)
-				.disableCache(CacheFlag.ACTIVITY, CacheFlag.VOICE_STATE, CacheFlag.EMOJI, CacheFlag.CLIENT_STATUS, CacheFlag.ONLINE_STATUS, CacheFlag.SCHEDULED_EVENTS)
+				.disableCache(CacheFlag.ACTIVITY, CacheFlag.VOICE_STATE, CacheFlag.EMOJI, CacheFlag.STICKER, CacheFlag.CLIENT_STATUS, CacheFlag.ONLINE_STATUS, CacheFlag.SCHEDULED_EVENTS)
 				.addEventListeners(new Disconnect())
 				.addEventListeners(new NewReceiver())
 				.addEventListeners(new OldReceiver())

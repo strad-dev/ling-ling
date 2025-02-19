@@ -4,6 +4,16 @@ import eventListeners.GenericDiscordEvent;
 import org.json.simple.JSONObject;
 
 public class Utils {
+	public static void permissionDenied(GenericDiscordEvent e) {
+		e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command!");
+	}
+	
+	/**
+	 * Calculates the chance for a Luthier spawn based on the number of members
+	 * 
+	 * @param members Number of members
+	 * @return The chance for a Luthier to spawn<br><10 Members: 10%<br><100 Members: 10% - 0.1% per member<br><1000 Members: 1%<br><10000 Members: 1% - 0.0001% per member<br>>10000 Members: 0.1%
+	 */
 	public static double luthierChance(int members) {
 		if(members < 10) {
 			return 0.1;
@@ -18,6 +28,12 @@ public class Utils {
 		}
 	}
 
+	/**
+	 * Formats a given number to {@snippet lang="Markdown" : xx xxx xxx.xxxxx}
+	 *
+	 * @param number The number
+	 * @return A propery formatted number
+	 */
 	public static String formatNumber(Object number) {
 		long tempNum = (long) number;
 		String num = String.valueOf(tempNum);
@@ -38,6 +54,13 @@ public class Utils {
 		return "`" + result + "`";
 	}
 
+	/**
+	 * Calculates the number of violins that a command would earn
+	 *
+	 * @param data The data
+	 * @param base The base amount of violins
+	 * @return The number of violins that are earned
+	 */
 	public static long calculateAmount(JSONObject data, long base) {
 		long efficiency = (long) data.get("efficiency");
 		if(efficiency < 10) {
@@ -57,14 +80,34 @@ public class Utils {
 		return base;
 	}
 
+	/**
+	 * Calculates the cost of a given item
+	 *
+	 * @param level The level that is being bought
+	 * @param power The exponent of the item
+	 * @param base The base value of the item
+	 * @return The cost of the item
+	 */
 	public static long itemCost(long level, double power, long base) {
 		return (long) (base * Math.pow(power, level));
 	}
 
+	/**
+	 * Calculates the max amount of violins that can be loaned
+	 *
+	 * @param data The data
+	 * @return The max amount of violins
+	 */
 	public static long maxLoan(JSONObject data) {
 		return (long) Math.pow(100, Math.log10((long) data.get("income")) - 1);
 	}
 
+	/**
+	 * Calculates the number of violins to be removed from violins earned if a loan is outstanding
+	 *
+	 * @param data The data
+	 * @param earned The amount of violins earned
+	 */
 	public static void calculateLoan(JSONObject data, long earned) {
 		long loan = (long) data.get("loan");
 		long violins = (long) data.get("violins");
@@ -92,10 +135,23 @@ public class Utils {
 		data.replace("loan", loan);
 	}
 
+	/**
+	 * Determines if the input given contains "bad language"<br>Note: "Bad language" also includes things that can cause a mass-ping.
+	 *
+	 * @param input Potential bad phrase
+	 * @return If the input has bad language
+	 */
 	public static boolean containsBadLanguage(String input) {
 		return input.contains("@everyone") || input.contains("@here") || input.contains("<@&") || input.contains("nigg") || input.contains("nibba") || input.contains("cunt") || input.contains("chink");
 	}
 
+	/**
+	 * Calculates the maximum amount of violins that can be stored in a bank.
+	 *
+	 * @param level Level of Bank
+	 * @param benevolentBankers Level of Bonus Storage
+	 * @return The max amount that can be stored.
+	 */
 	public static long maxBank(long level, long benevolentBankers) {
 		long base;
 		if(level == 0) {
@@ -130,6 +186,12 @@ public class Utils {
 		return (long) (base * (1 + 0.01 * benevolentBankers));
 	}
 
+	/**
+	 * Converts a time into HH:MM:SS.MSM format
+	 *
+	 * @param milliseconds The number of milliseconds
+	 * @return A properly formatted time
+	 */
 	public static String makeCooldownTime(long milliseconds) {
 		long hours = milliseconds / 3600000;
 		milliseconds -= hours * 3600000;
@@ -149,6 +211,12 @@ public class Utils {
 		return answer;
 	}
 
+	/**
+	 * Reformats time to have the amount of proper left pad of zeros
+	 *
+	 * @param string The String
+	 * @return A reformatted string
+	 */
 	public static String reformat(long string) {
 		String newString = String.valueOf(string);
 		if(String.valueOf(string).length() == 1) {
@@ -157,6 +225,12 @@ public class Utils {
 		return newString;
 	}
 
+	/**
+	 * Reformats milliseconds to have the amount of proper left pad of zeros
+	 *
+	 * @param string The String
+	 * @return A reformatted string
+	 */
 	public static String reformatMilliseconds(long string) {
 		String newString = String.valueOf(string);
 		if(String.valueOf(string).length() == 1) {
@@ -167,6 +241,12 @@ public class Utils {
 		return newString;
 	}
 
+	/**
+	 * Checks the permission level for the given user
+	 *
+	 * @param id The ID of the user
+	 * @return The Permission Level of the user on the bot<br>0 = No Permissions<br>1 = Mod Permissions<br>2 = Admin Permissions<br>3 = Developer Permissions (hardcoded)
+	 */
 	public static long CheckPermLevel(String id) {
 		if(id.equals("619989388109152256") || id.equals("488487157372157962")) {
 			return 3;

@@ -4,6 +4,7 @@ import eventListeners.GenericDiscordEvent;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import processes.DatabaseManager;
+import processes.Utils;
 
 import java.util.Objects;
 // BEETHOVEN-ONLY CLASS
@@ -29,7 +30,7 @@ public class SetLevel {
 			DatabaseManager.saveDataForUser("Leveling Data", id, data);
 			e.reply("Successfully set `" + Objects.requireNonNull(e.getGuild().getMemberById(id)).getNickname() + "`'s " + field + " to `" + message[4] + "`.");
 		} else {
-			e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command!");
+			Utils.permissionDenied(e);
 		}
 	}
 }

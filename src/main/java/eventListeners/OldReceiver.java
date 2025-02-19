@@ -7,10 +7,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
-import processes.DatabaseManager;
-import processes.HourlyIncome;
-import processes.Luthier;
-import processes.StartBot;
+import processes.*;
 import regular.*;
 
 import java.util.ArrayList;
@@ -556,7 +553,7 @@ class CreateThreadMessage implements Runnable {
 						}
 						Give.give(e, receiver, add, item);
 					} else {
-						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command.");
+						Utils.permissionDenied(e);
 					}
 				}
 				case "warn" -> {
@@ -575,7 +572,7 @@ class CreateThreadMessage implements Runnable {
 						}
 						Warn.warn(e, idToModerate, reason);
 					} else {
-						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command.");
+						Utils.permissionDenied(e);
 					}
 				}
 				case "resetsave" -> {
@@ -594,7 +591,7 @@ class CreateThreadMessage implements Runnable {
 						}
 						ResetSave.resetSave(e, idToModerate, reason);
 					} else {
-						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command.");
+						Utils.permissionDenied(e);
 					}
 				}
 				case "ban" -> {
@@ -613,7 +610,7 @@ class CreateThreadMessage implements Runnable {
 						}
 						Ban.ban(e, idToModerate, reason);
 					} else {
-						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command.");
+						Utils.permissionDenied(e);
 					}
 				}
 				case "unban" -> {
@@ -638,7 +635,7 @@ class CreateThreadMessage implements Runnable {
 						}
 						Unban.unban(e, idToModerate, reason, reset);
 					} else {
-						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command.");
+						Utils.permissionDenied(e);
 					}
 				}
 				case "luthier" -> {
@@ -666,21 +663,21 @@ class CreateThreadMessage implements Runnable {
 						}
 						LuthierConfig.luthierConfig(e, actionType, editOption, newValue.toString());
 					} else {
-						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command.");
+						Utils.permissionDenied(e);
 					}
 				}
 				case "resetincomes" -> {
 					if(CheckPermLevel(e.getAuthor().getId()) >= 2) {
 						e.reply(ResetIncomes.resetIncomes());
 					} else {
-						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command.");
+						Utils.permissionDenied(e);
 					}
 				}
 				case "updateluthierchance" -> {
 					if(CheckPermLevel(e.getAuthor().getId()) >= 2) {
 						UpdateLuthierChance.updateLuthierChance(e, true);
 					} else {
-						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command.");
+						Utils.permissionDenied(e);
 					}
 				}
 				case "updateusers" -> {
@@ -705,7 +702,7 @@ class CreateThreadMessage implements Runnable {
 						}
 						UpdateUsers.updateUsers(e, dataType, name, value);
 					} else {
-						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command.");
+						Utils.permissionDenied(e);
 					}
 				}
 				case "forcestop" -> {
@@ -721,7 +718,7 @@ class CreateThreadMessage implements Runnable {
 					if(CheckPermLevel(e.getAuthor().getId()) == 3) {
 						UpdateRoles.updateRoles(e);
 					} else {
-						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command.");
+						Utils.permissionDenied(e);
 					}
 				}
 				case "setpermlevel" -> {
@@ -740,21 +737,21 @@ class CreateThreadMessage implements Runnable {
 						}
 						SetPermLevel.setPermLevel(e, target, newRank);
 					} else {
-						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not nave permission to run this command.");
+						Utils.permissionDenied(e);
 					}
 				}
 				case "globalstats" -> {
 					if(CheckPermLevel(e.getAuthor().getId()) == 3) {
 						GlobalStats.gobalStats(e);
 					} else {
-						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not nave permission to run this command.");
+						Utils.permissionDenied(e);
 					}
 				}
 				case "resetdaily" -> {
 					if(CheckPermLevel(e.getAuthor().getId()) == 3) {
 						MoreDailyTime.moreDailyTime(e);
 					} else {
-						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not nave permission to run this command.");
+						Utils.permissionDenied(e);
 					}
 				}
 				case "sudo" -> {
@@ -772,7 +769,7 @@ class CreateThreadMessage implements Runnable {
 						run();
 						return;
 					} else {
-						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not nave permission to run this command.");
+						Utils.permissionDenied(e);
 					}
 				}
 				case "custom" -> //noinspection RedundantLabeledSwitchRuleCodeBlock
