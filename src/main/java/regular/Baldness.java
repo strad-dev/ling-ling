@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import eventListeners.GenericDiscordEvent;
+import io.github.cdimascio.dotenv.Dotenv;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.hypixel.api.HypixelAPI;
 import net.hypixel.api.http.HypixelHttpClient;
@@ -63,8 +64,10 @@ public class Baldness {
 				return;
 			}
 
+			Dotenv env = Dotenv.load();
+
 			// noinspection deprecation
-			URL url = new URL("https://api.hypixel.net/v2/skyblock/museum?key=" + DatabaseManager.getMiscData().get("hypixelKey") + "&profile=" + profileUUID);
+			URL url = new URL("https://api.hypixel.net/v2/skyblock/museum?key=" + env.get("HYPIXEL_KEY") + "&profile=" + profileUUID);
 			URLConnection connection = url.openConnection();
 			BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			String inputLine;
@@ -78,7 +81,7 @@ public class Baldness {
 			JsonObject museum = JsonParser.parseString(String.valueOf(response)).getAsJsonObject().getAsJsonObject("members").getAsJsonObject(uuid);
 
 			// noinspection deprecation
-			url = new URL("https://api.hypixel.net/v2/skyblock/garden?key=" + DatabaseManager.getMiscData().get("hypixelKey") + "&profile=" + profileUUID);
+			url = new URL("https://api.hypixel.net/v2/skyblock/garden?key=" + env.get("HYPIXEL_KEY") + "&profile=" + profileUUID);
 			connection = url.openConnection();
 			in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			response = new StringBuilder();

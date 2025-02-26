@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
-import static processes.Utils.CheckPermLevel;
+import static processes.Utils.checkPermLevel;
 
 class CreateThreadMessage implements Runnable {
 	private static GenericDiscordEvent e;
@@ -526,7 +526,7 @@ class CreateThreadMessage implements Runnable {
 
 				// DEV COMMANDS
 				case "give" -> {
-					if(CheckPermLevel(e.getAuthor().getId()) >= 1) {
+					if(checkPermLevel(e.getAuthor().getId()) >= 1) {
 						String receiver;
 						long add;
 						String item;
@@ -557,7 +557,7 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "warn" -> {
-					if(CheckPermLevel(e.getAuthor().getId()) >= 1) {
+					if(checkPermLevel(e.getAuthor().getId()) >= 1) {
 						String idToModerate;
 						String reason;
 						try {
@@ -576,7 +576,7 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "resetsave" -> {
-					if(CheckPermLevel(e.getAuthor().getId()) >= 1) {
+					if(checkPermLevel(e.getAuthor().getId()) >= 1) {
 						String idToModerate;
 						String reason;
 						try {
@@ -595,7 +595,7 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "ban" -> {
-					if(CheckPermLevel(e.getAuthor().getId()) >= 2) {
+					if(checkPermLevel(e.getAuthor().getId()) >= 2) {
 						String idToModerate;
 						String reason;
 						try {
@@ -614,7 +614,7 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "unban" -> {
-					if(CheckPermLevel(e.getAuthor().getId()) >= 2) {
+					if(checkPermLevel(e.getAuthor().getId()) >= 2) {
 						String idToModerate;
 						String reason;
 						Boolean reset;
@@ -639,7 +639,7 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "luthier" -> {
-					if(CheckPermLevel(e.getAuthor().getId()) >= 2) {
+					if(checkPermLevel(e.getAuthor().getId()) >= 2) {
 						String actionType;
 						String editOption;
 						StringBuilder newValue = new StringBuilder();
@@ -667,21 +667,21 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "resetincomes" -> {
-					if(CheckPermLevel(e.getAuthor().getId()) >= 2) {
+					if(checkPermLevel(e.getAuthor().getId()) >= 2) {
 						e.reply(ResetIncomes.resetIncomes());
 					} else {
 						Utils.permissionDenied(e);
 					}
 				}
 				case "updateluthierchance" -> {
-					if(CheckPermLevel(e.getAuthor().getId()) >= 2) {
+					if(checkPermLevel(e.getAuthor().getId()) >= 2) {
 						UpdateLuthierChance.updateLuthierChance(e, true);
 					} else {
 						Utils.permissionDenied(e);
 					}
 				}
 				case "updateusers" -> {
-					if(CheckPermLevel(e.getAuthor().getId()) == 3) {
+					if(checkPermLevel(e.getAuthor().getId()) == 3) {
 						String dataType;
 						String name;
 						String value;
@@ -707,7 +707,7 @@ class CreateThreadMessage implements Runnable {
 				}
 				case "forcestop" -> {
 					e.getMessage().delete().queue();
-					if(CheckPermLevel(e.getAuthor().getId()) == 3 && e.getMessage().getContentRaw().split(" ")[2].equals("@#$%FUCK")) {
+					if(checkPermLevel(e.getAuthor().getId()) == 3 && e.getMessage().getContentRaw().split(" ")[2].equals("@#$%FUCK")) {
 						e.reply("Forcing bot to stop...");
 						System.exit(0);
 					} else {
@@ -715,14 +715,14 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "updateroles" -> {
-					if(CheckPermLevel(e.getAuthor().getId()) == 3) {
+					if(checkPermLevel(e.getAuthor().getId()) == 3) {
 						UpdateRoles.updateRoles(e);
 					} else {
 						Utils.permissionDenied(e);
 					}
 				}
 				case "setpermlevel" -> {
-					if(CheckPermLevel(e.getAuthor().getId()) == 3) {
+					if(checkPermLevel(e.getAuthor().getId()) == 3) {
 						String target;
 						int newRank;
 						try {
@@ -741,21 +741,21 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "globalstats" -> {
-					if(CheckPermLevel(e.getAuthor().getId()) == 3) {
+					if(checkPermLevel(e.getAuthor().getId()) == 3) {
 						GlobalStats.gobalStats(e);
 					} else {
 						Utils.permissionDenied(e);
 					}
 				}
 				case "resetdaily" -> {
-					if(CheckPermLevel(e.getAuthor().getId()) == 3) {
+					if(checkPermLevel(e.getAuthor().getId()) == 3) {
 						MoreDailyTime.moreDailyTime(e);
 					} else {
 						Utils.permissionDenied(e);
 					}
 				}
 				case "sudo" -> {
-					if(CheckPermLevel(e.getAuthor().getId()) == 3) {
+					if(checkPermLevel(e.getAuthor().getId()) == 3) {
 						try {
 							e.setAuthor(e.getJDA().retrieveUserById(message[2]).complete());
 						} catch(Exception exception) {

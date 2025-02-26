@@ -17,7 +17,7 @@ import regular.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static processes.Utils.CheckPermLevel;
+import static processes.Utils.checkPermLevel;
 
 class CreateThreadSlash implements Runnable {
 	private static GenericDiscordEvent e;
@@ -467,7 +467,7 @@ class CreateThreadSlash implements Runnable {
 
 			// DEV COMMANDS
 			case "give" -> {
-				if(CheckPermLevel(e.getAuthor().getId()) >= 1) {
+				if(checkPermLevel(e.getAuthor().getId()) >= 1) {
 					String receiver;
 					long add;
 					String item;
@@ -494,7 +494,7 @@ class CreateThreadSlash implements Runnable {
 				}
 			}
 			case "warn" -> {
-				if(CheckPermLevel(e.getAuthor().getId()) >= 1) {
+				if(checkPermLevel(e.getAuthor().getId()) >= 1) {
 					String idToModerate;
 					String reason;
 					try {
@@ -513,7 +513,7 @@ class CreateThreadSlash implements Runnable {
 				}
 			}
 			case "resetsave" -> {
-				if(CheckPermLevel(e.getAuthor().getId()) >= 1) {
+				if(checkPermLevel(e.getAuthor().getId()) >= 1) {
 					String idToModerate;
 					String reason;
 					try {
@@ -532,7 +532,7 @@ class CreateThreadSlash implements Runnable {
 				}
 			}
 			case "ban" -> {
-				if(CheckPermLevel(e.getAuthor().getId()) >= 2) {
+				if(checkPermLevel(e.getAuthor().getId()) >= 2) {
 					String idToModerate;
 					String reason;
 					try {
@@ -551,7 +551,7 @@ class CreateThreadSlash implements Runnable {
 				}
 			}
 			case "unban" -> {
-				if(CheckPermLevel(e.getAuthor().getId()) >= 2) {
+				if(checkPermLevel(e.getAuthor().getId()) >= 2) {
 					String idToModerate;
 					String reason;
 					Boolean reset;
@@ -597,21 +597,21 @@ class CreateThreadSlash implements Runnable {
 				LuthierConfig.luthierConfig(e, actionType, editOption, newValue);
 			}
 			case "resetincomes" -> {
-				if(CheckPermLevel(e.getAuthor().getId()) >= 2) {
+				if(checkPermLevel(e.getAuthor().getId()) >= 2) {
 					e.reply(ResetIncomes.resetIncomes());
 				} else {
 					Utils.permissionDenied(e);
 				}
 			}
 			case "updateluthierchance" -> {
-				if(CheckPermLevel(e.getAuthor().getId()) >= 2) {
+				if(checkPermLevel(e.getAuthor().getId()) >= 2) {
 					UpdateLuthierChance.updateLuthierChance(e, true);
 				} else {
 					Utils.permissionDenied(e);
 				}
 			}
 			case "updateusers" -> {
-				if(CheckPermLevel(e.getAuthor().getId()) == 3) {
+				if(checkPermLevel(e.getAuthor().getId()) == 3) {
 					String dataType;
 					String name;
 					String value;
@@ -636,7 +636,7 @@ class CreateThreadSlash implements Runnable {
 				}
 			}
 			case "forcestop" -> {
-				if(CheckPermLevel(e.getAuthor().getId()) == 3 && Objects.requireNonNull(e1.getOption("PASSWORD")).getAsString().equals("@#$%FUCK")) {
+				if(checkPermLevel(e.getAuthor().getId()) == 3 && Objects.requireNonNull(e1.getOption("PASSWORD")).getAsString().equals("@#$%FUCK")) {
 					e.reply("Forcing bot to stop...");
 					System.exit(0);
 				} else {
@@ -644,14 +644,14 @@ class CreateThreadSlash implements Runnable {
 				}
 			}
 			case "updateroles" -> {
-				if(CheckPermLevel(e.getAuthor().getId()) == 3) {
+				if(checkPermLevel(e.getAuthor().getId()) == 3) {
 					UpdateRoles.updateRoles(e);
 				} else {
 					Utils.permissionDenied(e);
 				}
 			}
 			case "setpermlevel" -> {
-				if(CheckPermLevel(e.getAuthor().getId()) == 3) {
+				if(checkPermLevel(e.getAuthor().getId()) == 3) {
 					String target;
 					int newRank;
 					try {
@@ -670,14 +670,14 @@ class CreateThreadSlash implements Runnable {
 				}
 			}
 			case "globalstats" -> {
-				if(CheckPermLevel(e.getAuthor().getId()) == 3) {
+				if(checkPermLevel(e.getAuthor().getId()) == 3) {
 					GlobalStats.gobalStats(e);
 				} else {
 					Utils.permissionDenied(e);
 				}
 			}
 			case "resetdaily" -> {
-				if(CheckPermLevel(e.getAuthor().getId()) == 3) {
+				if(checkPermLevel(e.getAuthor().getId()) == 3) {
 					MoreDailyTime.moreDailyTime(e);
 				} else {
 					Utils.permissionDenied(e);

@@ -247,7 +247,7 @@ public class Utils {
 	 * @param id The ID of the user
 	 * @return The Permission Level of the user on the bot<br>0 = No Permissions<br>1 = Mod Permissions<br>2 = Admin Permissions<br>3 = Developer Permissions (hardcoded)
 	 */
-	public static long CheckPermLevel(String id) {
+	public static long checkPermLevel(String id) {
 		if(id.equals("619989388109152256") || id.equals("488487157372157962")) {
 			return 3;
 		} else {
