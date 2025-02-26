@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.json.simple.JSONObject;
 
 public class StartBot {
-	private static final boolean BETA = true; // TODO UPDATE THIS BEFORE DOING BETAS OR FULL RELEASES
+	private static final boolean BETA = false; // TODO UPDATE THIS BEFORE DOING BETAS OR FULL RELEASES
 
 	public static boolean isBeta() {
 		return BETA;
@@ -43,7 +43,7 @@ public class StartBot {
 		jda = JDABuilder.create(beethoventoken, GatewayIntent.GUILD_INVITES,
 						GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MESSAGES,
 						GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGE_REACTIONS)
-				.disableCache(CacheFlag.ACTIVITY, CacheFlag.VOICE_STATE, CacheFlag.CLIENT_STATUS, CacheFlag.SCHEDULED_EVENTS)
+				.disableCache(CacheFlag.ACTIVITY, CacheFlag.VOICE_STATE, CacheFlag.CLIENT_STATUS, CacheFlag.SCHEDULED_EVENTS, CacheFlag.EMOJI, CacheFlag.STICKER, CacheFlag.ONLINE_STATUS)
 				.addEventListeners(new Autoroles())
 				.addEventListeners(new Autounrole())
 				.addEventListeners(new Disconnect())
@@ -62,7 +62,7 @@ public class StartBot {
 		Message.suppressContentIntentWarning();
 		jda = JDABuilder.createDefault(token, GatewayIntent.GUILD_MESSAGES,
 						GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGE_REACTIONS)
-				.disableCache(CacheFlag.ACTIVITY, CacheFlag.VOICE_STATE, CacheFlag.EMOJI, CacheFlag.CLIENT_STATUS, CacheFlag.ONLINE_STATUS, CacheFlag.SCHEDULED_EVENTS)
+				.disableCache(CacheFlag.ACTIVITY, CacheFlag.VOICE_STATE, CacheFlag.EMOJI, CacheFlag.STICKER, CacheFlag.CLIENT_STATUS, CacheFlag.ONLINE_STATUS, CacheFlag.SCHEDULED_EVENTS)
 				.addEventListeners(new Disconnect())
 				.addEventListeners(new NewReceiver())
 				.addEventListeners(new OldReceiver())
