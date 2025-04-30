@@ -7,17 +7,12 @@ import com.mongodb.ServerApiVersion;
 import com.mongodb.client.*;
 import economy.MarketComparator;
 import eventListeners.GenericDiscordEvent;
-import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
-import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
 import org.bson.Document;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Scanner;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -102,7 +97,7 @@ public class DatabaseManager {
 		}
 	}
 
-	public static JSONObject getDataForUser(String collection1, String target) {
+	public static JSONObject getDataById(String collection1, String target) {
 		MongoCollection<Document> collection = database.getCollection(collection1);
 		Document document = collection.find(eq("discordID", target)).first();
 		try {

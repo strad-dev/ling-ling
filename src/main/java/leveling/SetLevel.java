@@ -16,7 +16,7 @@ public class SetLevel {
 			String field = message[3];
 			String id = message[2];
 			JSONParser parser = new JSONParser();
-			JSONObject data = DatabaseManager.getDataForUser("Leveling Data", id);
+			JSONObject data = DatabaseManager.getDataById("Leveling Data", id);
 			if(data == null) {
 				e.getMessage().reply("This save doesn't exist!").queue();
 				return;

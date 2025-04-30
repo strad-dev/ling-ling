@@ -27,7 +27,7 @@ public class Give {
 			e.reply("You have to give out something, idiot, I can't give out nothing.");
 			return;
 		}
-		JSONObject data = DatabaseManager.getDataForUser("Economy Data", receiver);
+		JSONObject data = DatabaseManager.getDataById("Economy Data", receiver);
 		if(data == null) {
 			e.reply("This save file doesn't exist!");
 			return;

@@ -34,7 +34,7 @@ public class Gift {
 				return;
 			}
 
-			JSONObject targetdata = DatabaseManager.getDataForUser("Economy Data", target);
+			JSONObject targetdata = DatabaseManager.getDataById("Economy Data", target);
 			if(targetdata == null) {
 				e.reply("You did not provide a valid User ID.  Doesn't make sense to gift someone nonexistant, does it?");
 				return;

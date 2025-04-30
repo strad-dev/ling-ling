@@ -18,7 +18,7 @@ public class CheckMessages {
 		} else {
 			user = message[2];
 			JSONParser parser = new JSONParser();
-				data = DatabaseManager.getDataForUser("Leveling Data", user);
+				data = DatabaseManager.getDataById("Leveling Data", user);
 			if(data == null) {
 				e.reply("This save file does not exist!");
 				return;

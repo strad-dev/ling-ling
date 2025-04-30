@@ -16,7 +16,7 @@ public class ResetMessages {
 			if(user.getUser().isBot()) {
 				continue;
 			}
-			JSONObject currentData = DatabaseManager.getDataForUser("Leveling Data", user.getId());
+			JSONObject currentData = DatabaseManager.getDataById("Leveling Data", user.getId());
 			if(currentData == null) {
 				continue;
 			}

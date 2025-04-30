@@ -825,7 +825,7 @@ public class OldReceiver extends ListenerAdapter {
 		if(e.getChannel().getId().equals("863135059712409632") && e.getJDA().getSelfUser().getId().equals("733409243222507670") && e.getMessage().getContentRaw().contains("<@733409243222507670>")) {
 			String[] message = e.getMessage().getContentRaw().toLowerCase().split(" ");
 			String id = message[1];
-			JSONObject data = DatabaseManager.getDataForUser( "Economy Data", id);
+			JSONObject data = DatabaseManager.getDataById( "Economy Data", id);
 			String messageToSend = RNGesus.voteRewards(e1, data);
 			if(data != null) {
 				DatabaseManager.saveDataForUser( "Economy Data", id, data);

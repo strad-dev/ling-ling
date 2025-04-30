@@ -141,7 +141,7 @@ public class Market {
 			if(offererID.equals(e.getAuthor().getId())) {
 				continue;
 			}
-			JSONObject tempData = DatabaseManager.getDataForUser("Economy Data", offererID);
+			JSONObject tempData = DatabaseManager.getDataById("Economy Data", offererID);
 			if(tempData == null) {
 				continue;
 			}

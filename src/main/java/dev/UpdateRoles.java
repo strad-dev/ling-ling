@@ -16,7 +16,7 @@ public class UpdateRoles {
 			List<Member> list = g.getMembers();
 			for(Member member : list) {
 				List<Role> list2 = member.getRoles();
-				JSONObject data = DatabaseManager.getDataForUser("Economy Data", member.getId());
+				JSONObject data = DatabaseManager.getDataById("Economy Data", member.getId());
 				if(data == null) {
 					continue;
 				}

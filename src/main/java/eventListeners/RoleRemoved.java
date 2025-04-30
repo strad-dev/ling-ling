@@ -9,7 +9,7 @@ import processes.DatabaseManager;
 public class RoleRemoved extends ListenerAdapter {
 	public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent e) {
 		if(e.getGuild().getId().equals("670725611207262219") && e.getRoles().contains(e.getGuild().getRoleById("852752096733429781"))) {
-			JSONObject data = DatabaseManager.getDataForUser("Economy Data", e.getMember().getId());
+			JSONObject data = DatabaseManager.getDataById("Economy Data", e.getMember().getId());
 			if(data == null) {
 				return;
 			}

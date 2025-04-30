@@ -9,7 +9,7 @@ import processes.DatabaseManager;
 public class RoleAdded extends ListenerAdapter {
 	public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent e) {
 		if(e.getGuild().getId().equals("670725611207262219") && !e.getMember().getUser().isBot()) {
-			JSONObject data = DatabaseManager.getDataForUser("Economy Data", e.getMember().getId());
+			JSONObject data = DatabaseManager.getDataById("Economy Data", e.getMember().getId());
 			if(data == null) {
 				return;
 			}

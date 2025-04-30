@@ -39,7 +39,7 @@ public class Rob {
 				return;
 			}
 			JSONParser parser = new JSONParser();
-			JSONObject targetdata = DatabaseManager.getDataForUser("Economy Data", user);
+			JSONObject targetdata = DatabaseManager.getDataById("Economy Data", user);
 			if(targetdata == null) {
 				e.reply("You did not provide a valid User ID.  Doesn't make sense to rob someone nonexistent, does it?");
 				return;

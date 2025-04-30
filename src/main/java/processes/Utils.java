@@ -251,7 +251,7 @@ public class Utils {
 		if(id.equals("619989388109152256") || id.equals("488487157372157962")) {
 			return 3;
 		} else {
-			JSONObject data = DatabaseManager.getDataForUser( "Economy Data", id);
+			JSONObject data = DatabaseManager.getDataById( "Economy Data", id);
 			if(data == null) {
 				return 0;
 			} else {

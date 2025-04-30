@@ -27,7 +27,7 @@ public class Unban {
 			return;
 		}
 
-		JSONObject data = DatabaseManager.getDataForUser("Economy Data", idToModerate);
+		JSONObject data = DatabaseManager.getDataById("Economy Data", idToModerate);
 		if(data == null) {
 			e.reply("File doesn't exist!  Looks like they never used the bot to begin with...");
 			return;
