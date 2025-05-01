@@ -49,7 +49,7 @@ public class Give {
 		EmbedBuilder builder = new EmbedBuilder().setColor(Color.BLUE).setFooter("Ling Ling", e.getJDA().getSelfUser().getAvatarUrl())
 				.addField("Moderator: " + e.getAuthor().getName(), "User: <@" + receiver + ">\nItem type: " + item +
 						"\nAmount given: " + Utils.formatNumber(amount), false).setTitle("__**Currency Alteration Info**__");
-		Objects.requireNonNull(Objects.requireNonNull(e.getJDA().getGuildById("670725611207262219")).getTextChannelById("863135059712409632")).sendMessageEmbeds(builder.build()).queue();
+		Objects.requireNonNull(Objects.requireNonNull(e.getJDA().getGuildById("670725611207262219")).getTextChannelById("1029498872441077860")).sendMessageEmbeds(builder.build()).queue();
 		DatabaseManager.saveDataById("Economy Data", receiver, data);
 		Objects.requireNonNull(e.getJDA().getUserById(receiver)).openPrivateChannel().queue((channel) -> channel.sendMessage("**SPAWNED BY AN ADMIN LOL**\nA Mod/Admin has given you " +
 				Utils.formatNumber(amount) + " " + item).queue());
