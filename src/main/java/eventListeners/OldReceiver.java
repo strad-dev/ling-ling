@@ -47,13 +47,16 @@ class CreateThreadMessage implements Runnable {
 				}
 				// NON-ECON COMMANDS
 				case "help" -> {
-					String page;
+					StringBuilder page = new StringBuilder();
 					try {
-						page = message[2];
+						for(int i = 2; i < message.length; i++) {
+							page.append(message[i]).append(" ");
+						}
+						page.deleteCharAt(page.length() - 1);
 					} catch(Exception exception) {
-						page = "";
+						page = new StringBuilder();
 					}
-					Help.help(e, page);
+					Help.help(e, page.toString());
 				}
 				case "faq" -> {
 					String page;
@@ -276,7 +279,6 @@ class CreateThreadMessage implements Runnable {
 				case "teach", "t" -> Teach.teach(e);
 				case "hourly", "h" -> HourlyIncome.hourlyIncome(e);
 				case "cheat" -> {
-					System.out.println(StartBot.isBeta());
 					if(StartBot.isBeta()) {
 						JSONObject data = LoadData.loadData(e);
 						data.replace("violins", 1000000000000000L);
@@ -287,6 +289,16 @@ class CreateThreadMessage implements Runnable {
 						data.replace("linglingBox", 1000L);
 						data.replace("crazyBox", 1000L);
 						data.replace("RNGesusBox", 1000L);
+						data.replace("betCD", 0L);
+						data.replace("scaleCD", 0L);
+						data.replace("practiceCD", 0L);
+						data.replace("teachCD", 0L);
+						data.replace("rehearseCD", 0L);
+						data.replace("performCD", 0L);
+						data.replace("robCD", 0L);
+						data.replace("voteCD", 0L);
+						data.replace("dailyCD", 0L);
+						data.replace("giftCD", 0L);
 						SaveData.saveData(e, data);
 						e.reply("Here you go!");
 					} else {

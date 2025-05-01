@@ -136,9 +136,10 @@ public class RNGesus {
 				sendLog(e, data, "Crazy Person Box", false);
 			} else { // 0.005 (1 in 200)
 				data.replace("RNGesusBox", ((long) data.get("RNGesusBox")) + 1);
-				localMessage += "\n\n**BONUS** You found an extra " + Emoji.RNGESUS_BOX + "!\nhttps://imgur.com/a/SSjcgz3";
+				localMessage += "\n\n# INSANE DROP\nYou found an extra " + Emoji.RNGESUS_BOX + "!\nhttps://imgur.com/a/SSjcgz3";
 				sendLog(e, data, "RNGesus Box", false);
 			}
+			localMessage += "\n\nYou also earned `180`:sparkles:";
 			if((boolean) data.get("banned")) {
 				localMessage += "\n\nUnfortunately, you are currently banned from using the economy, but I am nice and have rewarded you anyway in the unlikely case you do get unbanned.";
 			}

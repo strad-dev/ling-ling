@@ -43,14 +43,15 @@ public class Gift {
 			data.replace("giftCD", time + 85500000); // 23.75 hours cooldown
 			targetdata.replace("giftsReceived", (long) targetdata.get("giftsReceived") + 1);
 			targetdata.replace("giftBox", (long) targetdata.get("giftBox") + 1);
+			data.replace("essence", (long) data.get("essence") + 150);
 			RNGesus.lootbox(e, data);
 			Achievement.calculateAchievement(e, data, "giftsGiven", "Generous");
 			SaveData.saveData(e, data);
 			DatabaseManager.saveDataById("Economy Data", target, targetdata);
 			try {
-				e.reply("Successfully gifted `1`" + Emoji.GIFT_BOX + " to " + targetdata.get("discordName"));
+				e.reply("Successfully gifted `1`" + Emoji.GIFT_BOX + " to " + targetdata.get("discordName") + "\n\nYou also earned `150`:sparkles:");
 			} catch(Exception exception) {
-				e.reply("Successfully gifted `1`" + Emoji.GIFT_BOX + " to Someone");
+				e.reply("Successfully gifted `1`" + Emoji.GIFT_BOX + " to Someone\n\nYou also earned `150`:sparkles:");
 			}
 			if((boolean) targetdata.get("DMs")) {
 				try {

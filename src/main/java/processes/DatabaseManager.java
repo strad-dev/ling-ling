@@ -154,7 +154,6 @@ public class DatabaseManager {
 
 	public static void saveDataById(String collection1, String target, JSONObject newData) {
 		MongoCollection<Document> collection = database.getCollection(collection1);
-		System.out.println(newData.toJSONString());
 		collection.replaceOne(eq("discordID", target), Document.parse(newData.toJSONString()));
 	}
 

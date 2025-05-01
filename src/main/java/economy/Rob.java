@@ -204,14 +204,16 @@ public class Rob {
 			targetdata.replace("violins", targetViolins);
 			targetdata.replace("lostToRob", targetLostToRob);
 			DatabaseManager.saveDataById("Economy Data", user, targetdata);
+			message += "\n\nYou also earned `160`:sparkles:";
+			e.reply(message);
 			data.replace("robCD", time + 57540000);
 			if(baseRob > 0) {
 				data.replace("robbed", (long) data.get("robbed") + baseRob);
 			}
+			data.replace("essence", (long) data.get("essence") + 160);
 			RNGesus.lootbox(e, data);
 			Achievement.calculateAchievement(e, data, "robbed", "Heartless");
 			SaveData.saveData(e, data);
-			e.reply(message);
 		}
 	}
 }

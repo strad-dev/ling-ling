@@ -27,7 +27,11 @@ public class LuthierConfig {
 				.addField("User: " + e.getAuthor().getName() + " `" + e.getAuthor().getId() + "`", "Action: " + action, false).setTitle("__**Luthier Log**__")
 				.setColor(Color.BLUE);
 		e.getJDA().getGuildById("670725611207262219").getTextChannelById("1341876485782372432").sendMessageEmbeds(builder.build()).queue();
-		e.getJDA().getGuildById((String) data.get("discordID")).getTextChannelById((String) data.get("logChannel")).sendMessageEmbeds(builder.build()).queue();
+		try {
+			e.getJDA().getGuildById((String) data.get("discordID")).getTextChannelById((String) data.get("logChannel")).sendMessageEmbeds(builder.build()).queue();
+		} catch(Exception exception) {
+			// nothing here
+		}
 	}
 
 	public static void luthierConfig(GenericDiscordEvent e, String mainAction, String editAction, String newValue) {
@@ -48,7 +52,16 @@ public class LuthierConfig {
 					} else {
 						int serverMembers = e.getGuild().getMemberCount();
 						try {
-							InsertOneResult result = collection.insertOne(new Document().append("channel", e.getChannel().getId()).append("logChannel", e.getChannel().getId()).append("multiplier", 0).append("cheatCD", 0).append("contributors", new JSONArray()).append("chance", Utils.luthierChance(serverMembers)).append("hasWord", false).append("word", "blank").append("amount", 0).append("discordID", e.getGuild().getId()));
+							InsertOneResult result = collection.insertOne(new Document()
+									.append("channel", e.getChannel().getId())
+									.append("logChannel", e.getChannel().getId())
+									.append("multiplier", 0)
+									.append("cheatCD", 0)
+									.append("contributors", new JSONArray())
+									.append("chance", Utils.luthierChance(serverMembers))
+									.append("hasWord", false)
+									.append("word", "blank").append("amount", 0)
+									.append("discordID", e.getGuild().getId()));
 							e.reply("Successfully set up Luthier for " + e.getGuild().getName() + " in " + e.getChannel().getAsMention() + "\nLuthier Multipliers can be crafted using `!craft`\nIf you have existing multipliers, you can apply them using `!luthier add`\n\nBy default, unscrambles and logs are both sent into this channel.  If you would like to change them, use `!luthier settings`");
 						} catch(Exception exception2) {
 							e.reply("Something went horribly wrong!");
@@ -78,7 +91,7 @@ public class LuthierConfig {
 					}
 					case "logchannel" -> {
 						if(isAdmin(e)) {
-							serverData.replace("logchannel", newValue);
+							serverData.replace("logChannel", newValue);
 							DatabaseManager.saveDataByGuild(e, "Luthier Data", serverData);
 							e.reply("Successfully changed the logging channel for " + e.getGuild().getName() + " to <#" + newValue + ">");
 						} else {
@@ -130,7 +143,7 @@ public class LuthierConfig {
 				} else {
 					e.reply("# `" + e.getAuthor().getEffectiveName() + "` IS A DIRTY CHEATER!!!\nThe Word is: ||`" + serverData.get("word") + "`||");
 					if(Utils.checkPermLevel(e.getAuthor().getId()) < 1) {
-						serverData.replace("cheatCD", time + 86340000);
+						serverData.replace("cheatCD", time + 43140000);
 					}
 					sendLog(e, serverData, "CHEATER");
 				}
@@ -311,7 +324,7 @@ public class LuthierConfig {
 						JSONObject contributor = (JSONObject) o;
 						if(contributor.get("discordID").equals(e.getAuthor().getId())) {
 							long amount = (long) contributor.get("amount");
-							guildData.replace("amount", (long) guildData.get("amount") - amount);
+							guildData.replace("multiplier", (long) guildData.get("multiplier") - amount);
 							contributors.remove(contributor);
 							totalRemoved += amount;
 							sendLog(e, guildData, "**Force Remove Luthier**\nGuild: " + e.getJDA().getGuildById((String) guildData.get("discordID")).getName() + " `" + guildData.get("discordID") + "`\nAmount: `" + amount + "x`");
@@ -329,7 +342,7 @@ public class LuthierConfig {
 				e.reply("Removed a total of `" + totalRemoved + "x` multipliers from all servers");
 			}
 			default ->
-					e.reply("You need to provide an option.  Valid options: `setup` `stats` `settings` `cheat` `servers` `balance` `contributors` `add` `remove` `forceremove`");
+					e.reply("You need to provide a valid option.  Valid options: `setup` `stats` `settings` `cheat` `servers` `balance` `contributors` `add` `remove` `forceremove`");
 		}
 	}
 }
