@@ -14,7 +14,7 @@ public class RoleRemoved extends ListenerAdapter {
 				return;
 			}
 			data.replace("isBooster", false);
-			DatabaseManager.saveDataForUser("Economy Data", e.getMember().getId(), data);
+			DatabaseManager.saveDataById("Economy Data", e.getMember().getId(), data);
 		}
 	}
 }

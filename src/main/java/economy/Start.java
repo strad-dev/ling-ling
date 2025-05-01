@@ -6,6 +6,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.result.InsertOneResult;
 import eventListeners.GenericDiscordEvent;
 import org.bson.Document;
+import org.json.simple.JSONArray;
 import processes.DatabaseManager;
 
 import java.util.ArrayList;
@@ -217,7 +218,7 @@ public class Start {
 
 						// Luthier
 						.append("luthierBalance", 0L)
-						.append("luthierServers", new ArrayList<>())
+						.append("luthierServers", new JSONArray())
 
 						// Misc Data
 						.append("banned", ban)

@@ -458,7 +458,7 @@ class CreateThreadMessage implements Runnable {
 									Leaderboard.leaderboard(e, ":scales:", "Most in Need of Touching Grass", "scaleStreakRecord", (long) data.get("scaleStreakRecord"), (String) data.get("color"));
 							default -> e.reply("""
 									You must provide a valid leaderboard type.  Valid types...
-
+									
 									`violins`: Richest Users
 									`income`: Highest Hourly Incomes
 									`streak`: Longest Daily Streaks
@@ -484,7 +484,7 @@ class CreateThreadMessage implements Runnable {
 					} catch(Exception exception) {
 						e.reply("""
 								**__Leaderboard Types__**
-
+								
 								`violins`: Richest Users
 								`income`: Highest Hourly Incomes
 								`streak`: Longest Daily Streaks
@@ -646,7 +646,7 @@ class CreateThreadMessage implements Runnable {
 						try {
 							actionType = message[2];
 						} catch(Exception exception) {
-							actionType = "";
+							actionType = "stats";
 						}
 						try {
 							editOption = message[3];
@@ -762,7 +762,7 @@ class CreateThreadMessage implements Runnable {
 							e.reply("Invalid user provided!");
 							return;
 						}
-						for(int i = 3; i < message.length; i ++) {
+						for(int i = 3; i < message.length; i++) {
 							message[i - 2] = message[i];
 						}
 						message = Arrays.copyOfRange(message, 0, message.length - 2);
@@ -773,40 +773,45 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "custom" -> {
-					if(checkPermLevel(e.getAuthor().getId()) == 3) {
-						ArrayList<Document> economyDocs = DatabaseManager.getAllEconomyData();
-						for(Document document : economyDocs) {
-							JSONObject data = new JSONObject(document);
-							if(!data.containsKey("luthierBalance")) {
-								data.put("luthierBalance", 0L);
-							}
-							if(!data.containsKey("luthierServers")) {
-								data.put("luthierServers", new ArrayList<String>());
-							}
-							if(!data.containsKey("essence")) {
-								data.put("essence", 0L);
-							}
-							DatabaseManager.saveDataForUser("Economy Data", (String) data.get("discordID"), data);
-						}
-
-						ArrayList<Document> luthierDocs = DatabaseManager.getAllData("Luthier Data");
-						for(Document document : luthierDocs) {
-							JSONObject data = new JSONObject(document);
-							if(!data.containsKey("logChannel")) {
-								data.put("logChannel", data.get("channel"));
-							}
-							if(!data.containsKey("cheatCD")) {
-								data.put("cheatCD", 0L);
-							}
-							if(!data.containsKey("contributors")) {
-								data.put("contributors", new ArrayList<String>());
-							}
-							DatabaseManager.saveDataForUser("Luthier Data", (String) data.get("discordID"), data);
-						}
-						e.reply("Database update complete!");
-					} else {
-						Utils.permissionDenied(e);
-					}
+//					if(checkPermLevel(e.getAuthor().getId()) == 3) {
+//						e.getChannel().sendMessage("Working...").queue();
+//						ArrayList<Document> documents = DatabaseManager.getAllEconomyData();
+//						MongoCollection<Document> collection = DatabaseManager.prepareStoreAllEconomyData();
+//						JSONParser parser = new JSONParser();
+//						for(Document file : documents) {
+//							JSONObject data;
+//							try {
+//								data = (JSONObject) parser.parse(file.toJson());
+//							} catch(Exception exception) {
+//								System.out.println("Failed!");
+//								continue;
+//							}
+//							data.put("luthierBalance", 0L);
+//							data.put("luthierServers", new JSONArray());
+//							data.put("essence", 0L);
+//							collection.replaceOne(eq("discordID", data.get("discordID")), Document.parse(data.toJSONString()));
+//						}
+//
+//						documents = DatabaseManager.getAllData("Luthier Data");
+//						collection = DatabaseManager.prepareStoreAllData("Luthier Data");
+//						for(Document file : documents) {
+//							JSONObject data;
+//							try {
+//								data = (JSONObject) parser.parse(file.toJson());
+//							} catch(Exception exception) {
+//								System.out.println("Failed!");
+//								continue;
+//							}
+//							data.put("logChannel", data.get("channel"));
+//							data.put("cheatCD", 0L);
+//							data.put("contributors", new JSONArray());
+//							collection.replaceOne(eq("discordID", data.get("discordID")), Document.parse(data.toJSONString()));
+//						}
+//						e.reply("Database update complete!");
+//					} else {
+//						Utils.permissionDenied(e);
+//					}
+					e.reply("No Update Here!");
 				}
 			}
 		}
@@ -823,10 +828,10 @@ public class OldReceiver extends ListenerAdapter {
 		if(e.getChannel().getId().equals("863135059712409632") && e.getJDA().getSelfUser().getId().equals("733409243222507670") && e.getMessage().getContentRaw().contains("<@733409243222507670>")) {
 			String[] message = e.getMessage().getContentRaw().toLowerCase().split(" ");
 			String id = message[1];
-			JSONObject data = DatabaseManager.getDataById( "Economy Data", id);
+			JSONObject data = DatabaseManager.getDataById("Economy Data", id);
 			String messageToSend = RNGesus.voteRewards(e1, data);
 			if(data != null) {
-				DatabaseManager.saveDataForUser( "Economy Data", id, data);
+				DatabaseManager.saveDataById("Economy Data", id, data);
 			}
 			Objects.requireNonNull(e.getJDA().getUserById(id)).openPrivateChannel().complete().sendMessage(messageToSend).queue();
 			return;
@@ -843,7 +848,7 @@ public class OldReceiver extends ListenerAdapter {
 
 		// IF NOT BETA TESTING AND IN BETA CHANNEL, IGNORE
 		if(!e.getAuthor().isBot() && !e.getMessage().getContentRaw().isEmpty()) {
-			if(StartBot.isBeta() || !e.getChannel().getId().equals("867617298918670366")) {
+			if(StartBot.isBeta() && Utils.isBetaChannel(e.getChannel().getId()) || !StartBot.isBeta() && !Utils.isBetaChannel(e.getChannel().getId())) {
 				if(e1.getMessage().getContentRaw().toLowerCase().contains("bad bot")) {
 					e1.reply("sowwy strad :(");
 				} else if(e1.getMessage().getContentRaw().toLowerCase().contains("good bot")) {

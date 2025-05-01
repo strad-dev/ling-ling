@@ -582,7 +582,7 @@ class CreateThreadSlash implements Runnable {
 				try {
 					actionType = Objects.requireNonNull(e1.getOption("actiontype")).getAsString();
 				} catch(Exception exception) {
-					actionType = "";
+					actionType = "stats";
 				}
 				try {
 					editOption = Objects.requireNonNull(e1.getOption("editOption")).getAsString();

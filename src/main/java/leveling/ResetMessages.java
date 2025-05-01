@@ -25,7 +25,7 @@ public class ResetMessages {
 			} catch(Exception exception) {
 				currentData.put("messages", 0L);
 			}
-			DatabaseManager.saveDataForUser("Leveling Data", user.getId(), currentData);
+			DatabaseManager.saveDataById("Leveling Data", user.getId(), currentData);
 		}
 		e.reply("Message counts successfully reset!");
 	}

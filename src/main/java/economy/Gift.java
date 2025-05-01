@@ -46,7 +46,7 @@ public class Gift {
 			RNGesus.lootbox(e, data);
 			Achievement.calculateAchievement(e, data, "giftsGiven", "Generous");
 			SaveData.saveData(e, data);
-			DatabaseManager.saveDataForUser("Economy Data", target, targetdata);
+			DatabaseManager.saveDataById("Economy Data", target, targetdata);
 			try {
 				e.reply("Successfully gifted `1`" + Emoji.GIFT_BOX + " to " + targetdata.get("discordName"));
 			} catch(Exception exception) {

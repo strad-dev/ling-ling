@@ -30,7 +30,7 @@ public class RoleAdded extends ListenerAdapter {
 			} else if(e.getRoles().contains(e.getGuild().getRoleById("734697410273607751"))) {
 				data.replace("serverLevel", 1.25);
 			}
-			DatabaseManager.saveDataForUser("Economy Data", e.getMember().getId(), data);
+			DatabaseManager.saveDataById("Economy Data", e.getMember().getId(), data);
 		}
 	}
 }

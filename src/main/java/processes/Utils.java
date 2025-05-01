@@ -260,6 +260,10 @@ public class Utils {
 		}
 	}
 
+	public static boolean isBetaChannel(String channel) {
+		return channel.equals("733437327225127074") || channel.equals("867617298918670366");
+	}
+
 	public static long skillLevel(long xp) {
 		if(xp < 50) {
 			return 0;

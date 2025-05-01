@@ -27,7 +27,7 @@ public class SetLevel {
 				e.reply("You did not provide a valid field!  Valid fields: `level` `xp` `messages`");
 				return;
 			}
-			DatabaseManager.saveDataForUser("Leveling Data", id, data);
+			DatabaseManager.saveDataById("Leveling Data", id, data);
 			e.reply("Successfully set `" + Objects.requireNonNull(e.getGuild().getMemberById(id)).getNickname() + "`'s " + field + " to `" + message[4] + "`.");
 		} else {
 			Utils.permissionDenied(e);

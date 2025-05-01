@@ -40,7 +40,7 @@ public class UpdateRoles {
 				} else {
 					data.replace("serverLevel", 1);
 				}
-				DatabaseManager.saveDataForUser("Economy Data", member.getId(), data);
+				DatabaseManager.saveDataById("Economy Data", member.getId(), data);
 			}
 			e.reply("Successfully force-updated role multipliers!");
 		} else {

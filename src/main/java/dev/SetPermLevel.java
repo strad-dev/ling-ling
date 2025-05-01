@@ -23,7 +23,7 @@ public class SetPermLevel {
 				return;
 			}
 			data.replace("perms", newRank);
-			DatabaseManager.saveDataForUser("Economy Data", target, data);
+			DatabaseManager.saveDataById("Economy Data", target, data);
 			String user;
 			try {
 				user = Objects.requireNonNull(e.getJDA().getUserById(target)).getName();

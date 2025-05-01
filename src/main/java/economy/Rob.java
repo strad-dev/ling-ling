@@ -203,7 +203,7 @@ public class Rob {
 			}
 			targetdata.replace("violins", targetViolins);
 			targetdata.replace("lostToRob", targetLostToRob);
-			DatabaseManager.saveDataForUser("Economy Data", user, targetdata);
+			DatabaseManager.saveDataById("Economy Data", user, targetdata);
 			data.replace("robCD", time + 57540000);
 			if(baseRob > 0) {
 				data.replace("robbed", (long) data.get("robbed") + baseRob);

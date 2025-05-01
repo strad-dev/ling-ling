@@ -29,7 +29,7 @@ public class Ban {
 				Start.start(e, idToModerate, true);
 			} else {
 				data.replace("banned", true);
-				DatabaseManager.saveDataForUser("Economy Data", idToModerate, data);
+				DatabaseManager.saveDataById("Economy Data", idToModerate, data);
 			}
 			String name;
 			try {

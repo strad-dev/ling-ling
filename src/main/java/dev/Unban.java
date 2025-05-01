@@ -45,7 +45,7 @@ public class Unban {
 				reason += "\nSave Reset: Yes";
 			} else {
 				data.replace("banned", false);
-				DatabaseManager.saveDataForUser("Economy Data", idToModerate, data);
+				DatabaseManager.saveDataById("Economy Data", idToModerate, data);
 				reason += "\nSave Reset: No";
 			}
 			LogCase.logCase(e, "Unban", idToModerate, reason);
