@@ -229,6 +229,7 @@ public class DatabaseManager {
 			databasePunishments.runCommand(new Document("ping", 1));
 			System.out.println("Connected to punisment database.");*/
 		} catch(Exception e) {
+			e.printStackTrace();
 			System.out.println("Failure connecting to database!  Maybe the IP isn't whitelisted?");
 			System.exit(-1);
 		}

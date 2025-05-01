@@ -23,7 +23,13 @@ public class StartBot {
 	public static void startBot() {
 		Dotenv env = Dotenv.load();
 
-		DatabaseManager.connectToDatabase(BETA, env.get("DATABASE_TOKEN"));
+		if(isBeta()) {
+			//noinspection ConstantValue
+			DatabaseManager.connectToDatabase(BETA, env.get("DATABASE_TOKEN_BETA"));
+		} else {
+			//noinspection ConstantValue
+			DatabaseManager.connectToDatabase(BETA, env.get("DATABASE_TOKEN"));
+		}
 		HypixelManager.connectToHypixel(BETA, env.get("HYPIXEL_KEY"));
 		JSONObject data = DatabaseManager.getMiscData();
 
