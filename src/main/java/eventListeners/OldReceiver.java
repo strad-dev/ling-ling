@@ -772,43 +772,41 @@ class CreateThreadMessage implements Runnable {
 						Utils.permissionDenied(e);
 					}
 				}
-				case "custom" -> //noinspection RedundantLabeledSwitchRuleCodeBlock
-				{
-					/*File[] files = new File("Ling Ling Bot Data\\Economy Data").listFiles();
-					assert files != null;
-					for(File file : files) {
-						JSONObject data;
-						try(FileReader reader = new FileReader(file)) {
-							data = (JSONObject) parser.parse(reader);
-						} catch(Exception exception) {
-							continue;
-						}
-						data.put("itemsSold", 0L);
-						data.put("itemsBought", 0L);
-						data.put("moneySpent", 0L);
-						data.put("moneyEarned", 0L);
-						data.put("taxPaid", 0L);
-						try(FileWriter writer = new FileWriter(file)) {
-							writer.write(data.toJSONString());
-						} catch(Exception exception) {
-							// nothing here lol
-						}
-					}
-					/*List<Guild> list = e.getJDA().getGuilds();
-					for(Guild g : list) {
-						List<TextChannel> channels = g.getTextChannels();
-						for(TextChannel channel : channels) {
-							try {
-								channel.sendMessage("""
-										""");
-								break;
-							} catch(Exception exception) {
-								exception.printStackTrace();
-								//oof
+				case "custom" -> {
+					if(checkPermLevel(e.getAuthor().getId()) == 3) {
+						ArrayList<Document> economyDocs = DatabaseManager.getAllEconomyData();
+						for(Document document : economyDocs) {
+							JSONObject data = new JSONObject(document);
+							if(!data.containsKey("luthierBalance")) {
+								data.put("luthierBalance", 0L);
 							}
+							if(!data.containsKey("luthierServers")) {
+								data.put("luthierServers", new ArrayList<String>());
+							}
+							if(!data.containsKey("essence")) {
+								data.put("essence", 0L);
+							}
+							DatabaseManager.saveDataForUser("Economy Data", (String) data.get("discordID"), data);
 						}
-					}*/
-					e.reply("No Update Here!");
+
+						ArrayList<Document> luthierDocs = DatabaseManager.getAllData("Luthier Data");
+						for(Document document : luthierDocs) {
+							JSONObject data = new JSONObject(document);
+							if(!data.containsKey("logChannel")) {
+								data.put("logChannel", data.get("channel"));
+							}
+							if(!data.containsKey("cheatCD")) {
+								data.put("cheatCD", 0L);
+							}
+							if(!data.containsKey("contributors")) {
+								data.put("contributors", new ArrayList<String>());
+							}
+							DatabaseManager.saveDataForUser("Luthier Data", (String) data.get("discordID"), data);
+						}
+						e.reply("Database update complete!");
+					} else {
+						Utils.permissionDenied(e);
+					}
 				}
 			}
 		}

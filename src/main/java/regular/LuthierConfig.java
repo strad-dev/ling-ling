@@ -26,8 +26,8 @@ public class LuthierConfig {
 				.setFooter("Ling Ling", e.getJDA().getSelfUser().getAvatarUrl())
 				.addField("User: " + e.getAuthor().getName() + "`" + e.getAuthor().getId() + "`", "Action: " + action, false)
 				.setTitle("__**Luthier Change**__");
-		e.getJDA().getGuildById(e.getGuild().getId()).getTextChannelById((String) data.get("logchannel")).sendMessageEmbeds(builder.build()).queue();
 		e.getJDA().getGuildById("670725611207262219").getTextChannelById("1341876485782372432").sendMessageEmbeds(builder.build()).queue();
+		e.getJDA().getGuildById(e.getGuild().getId()).getTextChannelById((String) data.get("logchannel")).sendMessageEmbeds(builder.build()).queue();
 	}
 
 	public static void luthierConfig(GenericDiscordEvent e, String mainAction, String editAction, String newValue) {
@@ -50,16 +50,17 @@ public class LuthierConfig {
 						try {
 							InsertOneResult result = collection.insertOne(new Document()
 									.append("channel", e.getChannel().getId())
-									.append("logchannel", 0)
+									.append("logChannel", e.getChannel().getId())
 									.append("multiplier", 0)
-									.append("contributers", new ArrayList<>())
+									.append("cheatCD", 0)
+									.append("contributors", new ArrayList<>())
 									.append("chance", Utils.luthierChance(serverMembers))
 									.append("hasWord", false)
 									.append("word", "blank")
 									.append("amount", 0)
 									.append("discordID", e.getGuild().getId()));
 							e.reply("Successfully set up Luthier for " + e.getGuild().getName() + " in "
-									+ e.getChannel().getAsMention() + "\nLuthier Multipliers can be crafted using `!craft`\nIf you have existing multipliers, you can apply them using `!luthier add`");
+									+ e.getChannel().getAsMention() + "\nLuthier Multipliers can be crafted using `!craft`\nIf you have existing multipliers, you can apply them using `!luthier add`\n\nBy default, unscrambles and logs are sent into this channel.  If you would like to change them, use `!luthier settings`");
 						} catch(Exception exception2) {
 							e.reply("Something went horribly wrong!");
 						}
@@ -73,7 +74,8 @@ public class LuthierConfig {
 						"Channel: <#" + serverData.get("channel") + ">\n" +
 						"Chance: " + serverData.get("chance") + "\n" +
 						"Multiplier: " + serverData.get("multiplier") + "\n" +
-						"Amount: " + serverData.get("amount") + "\n");
+						"Amount: " + serverData.get("amount") + "\n" +
+						"Active Puzzle? " + serverData.get("hasWord"));
 			}
 			case "settings" -> {
 				if(editAction.isEmpty()) {
