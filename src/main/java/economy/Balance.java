@@ -14,7 +14,7 @@ public class Balance {
 			user = e.getAuthor().getId();
 		}
 
-		JSONObject data = DatabaseManager.getDataForUser("Economy Data", user);
+		JSONObject data = DatabaseManager.getDataById("Economy Data", user);
 		if(data == null) {
 			e.reply("This save file does not exist!");
 			return;

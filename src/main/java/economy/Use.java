@@ -11,29 +11,21 @@ import java.util.Random;
 public class Use {
 
 	public static void generateArray(Map<String, Long> addItems, long rolls, long range, long min) {
-		long[] temp = {0, 0, 0, 0, 0, 0, 0, 0}; //Grains, Plastic, Water, TeaBase, Wood, PineSap, Steel, HorseHair
+		String[] ITEM_KEYS = {"grains", "plastic", "water", "teaBase", "wood", "pineSap", "steel", "horseHair"};
+		long[] temp = new long[ITEM_KEYS.length];
 		Random random = new Random();
+
 		for(int i = 0; i < rolls; i++) {
-			temp[random.nextInt(8)] += random.nextLong(range) + min;
+			temp[random.nextInt(ITEM_KEYS.length)] += random.nextLong(range) + min;
 		}
-		try {
-			addItems.replace("grains", addItems.get("grains") + temp[0]);
-			addItems.replace("plastic", addItems.get("plastic") + temp[1]);
-			addItems.replace("water", addItems.get("water") + temp[2]);
-			addItems.replace("teaBase", addItems.get("teaBase") + temp[3]);
-			addItems.replace("wood", addItems.get("wood") + temp[4]);
-			addItems.replace("pineSap", addItems.get("pineSap") + temp[5]);
-			addItems.replace("steel", addItems.get("steel") + temp[6]);
-			addItems.replace("horseHair", addItems.get("horseHair") + temp[7]);
-		} catch(Exception exception) {
-			addItems.put("grains", temp[0]);
-			addItems.put("plastic", temp[1]);
-			addItems.put("water", temp[2]);
-			addItems.put("teaBase", temp[3]);
-			addItems.put("wood", temp[4]);
-			addItems.put("pineSap", temp[5]);
-			addItems.put("steel", temp[6]);
-			addItems.put("horseHair", temp[7]);
+
+		for(int i = 0; i < ITEM_KEYS.length; i++) {
+			String key = ITEM_KEYS[i];
+			if(addItems.containsKey(key)) {
+				addItems.replace(key, addItems.get(key) + temp[i]);
+			} else {
+				addItems.put(key, temp[i]);
+			}
 		}
 	}
 
@@ -599,11 +591,15 @@ public class Use {
 					return;
 				} else {
 					addItems.put("RNGesusBox", -useAmount);
+					String[] ITEM_KEYS = {"grains", "plastic", "water", "teaBase", "wood", "pineSap", "steel", "horseHair"};
+					for(String itemKey : ITEM_KEYS) {
+						addItems.put(itemKey, random.nextLong(7) + 24 + extraItems);
+					}
 					long bonusHours = 0;
 					for(int i = 0; i < useAmount; i++) {
-						generateArray(addItems, 8 + extraRolls, 4, 12 + extraItems); // initial: 12-15 x 8
-						if(random.nextDouble() < 0.2 * magicFindBonus) {
-							long thisBonusHours = random.nextInt(5) + 4;
+						generateArray(addItems, 8 + extraRolls, 7, 24 + extraItems); // initial: 24-30 x 8 + 1 roll for each item
+						if(random.nextDouble() < 0.25 * magicFindBonus) {
+							long thisBonusHours = random.nextInt(5) + 12;
 							bonusHours += thisBonusHours;
 							if(addItems.containsKey("violins")) {
 								addItems.replace("violins", addItems.get("violins") + income * thisBonusHours);
@@ -611,33 +607,33 @@ public class Use {
 								addItems.put("violins", income * bonusHours);
 							}
 						}
-						if(random.nextDouble() < 0.25 * magicFindBonus) {
+						if(random.nextDouble() < 0.33 * magicFindBonus) {
 							if(addItems.containsKey("rice")) {
-								addItems.replace("rice", addItems.get("rice") + 6);
+								addItems.replace("rice", addItems.get("rice") + 12);
 							} else {
-								addItems.put("rice", 6L);
+								addItems.put("rice", 12L);
+							}
+						}
+						if(random.nextDouble() < 0.15 * magicFindBonus) {
+							if(addItems.containsKey("tea")) {
+								addItems.replace("tea", addItems.get("tea") + 12);
+							} else {
+								addItems.put("tea", 12L);
 							}
 						}
 						if(random.nextDouble() < 0.1 * magicFindBonus) {
-							if(addItems.containsKey("tea")) {
-								addItems.replace("tea", addItems.get("tea") + 6);
-							} else {
-								addItems.put("tea", 6L);
-							}
-						}
-						if(random.nextDouble() < 0.05 * magicFindBonus) {
-							long medals = random.nextInt(4) + 1;
+							long medals = random.nextInt(4) + 3;
 							if(addItems.containsKey("medals")) {
 								addItems.replace("medals", addItems.get("medals") + medals);
 							} else {
 								addItems.put("medals", medals);
 							}
 						}
-						if(random.nextDouble() < 0.02 * magicFindBonus) {
+						if(random.nextDouble() < 0.05 * magicFindBonus) {
 							if(addItems.containsKey("blessings")) {
-								addItems.replace("blessings", addItems.get("blessings") + 6);
+								addItems.replace("blessings", addItems.get("blessings") + 12);
 							} else {
-								addItems.put("blessings", 6L);
+								addItems.put("blessings", 12L);
 							}
 						}
 						if(random.nextDouble() < 0.002 * magicFindBonus) {

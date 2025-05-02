@@ -27,7 +27,7 @@ public class Give {
 			e.reply("You have to give out something, idiot, I can't give out nothing.");
 			return;
 		}
-		JSONObject data = DatabaseManager.getDataForUser("Economy Data", receiver);
+		JSONObject data = DatabaseManager.getDataById("Economy Data", receiver);
 		if(data == null) {
 			e.reply("This save file doesn't exist!");
 			return;
@@ -49,8 +49,8 @@ public class Give {
 		EmbedBuilder builder = new EmbedBuilder().setColor(Color.BLUE).setFooter("Ling Ling", e.getJDA().getSelfUser().getAvatarUrl())
 				.addField("Moderator: " + e.getAuthor().getName(), "User: <@" + receiver + ">\nItem type: " + item +
 						"\nAmount given: " + Utils.formatNumber(amount), false).setTitle("__**Currency Alteration Info**__");
-		Objects.requireNonNull(Objects.requireNonNull(e.getJDA().getGuildById("670725611207262219")).getTextChannelById("863135059712409632")).sendMessageEmbeds(builder.build()).queue();
-		DatabaseManager.saveDataForUser("Economy Data", receiver, data);
+		Objects.requireNonNull(Objects.requireNonNull(e.getJDA().getGuildById("670725611207262219")).getTextChannelById("1029498872441077860")).sendMessageEmbeds(builder.build()).queue();
+		DatabaseManager.saveDataById("Economy Data", receiver, data);
 		Objects.requireNonNull(e.getJDA().getUserById(receiver)).openPrivateChannel().queue((channel) -> channel.sendMessage("**SPAWNED BY AN ADMIN LOL**\nA Mod/Admin has given you " +
 				Utils.formatNumber(amount) + " " + item).queue());
 		e.reply("Successfully gave " + Utils.formatNumber(amount) + " " + item + " to " + user);

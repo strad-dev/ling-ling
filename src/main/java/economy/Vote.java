@@ -28,6 +28,7 @@ public class Vote {
 			double increase = 1.0 + (long) data.get("magicFind") * 0.01;
 			boolean extraInfo = (boolean) data.get("extraInfo");
 			data.replace("voteBox", ((long) data.get("voteBox")) + 2);
+			data.replace("essence", (long) data.get("essence") + 75);
 			String message = "You have received `2`" + Emoji.FREE_BOX;
 			if(chance > 0.225 * increase) {
 				message += "";
@@ -51,10 +52,10 @@ public class Vote {
 				RNGesus.sendLog(e, data, "Crazy Person Box", false);
 			} else { // 0.005 (1 in 200)
 				data.replace("RNGesusBox", ((long) data.get("RNGesusBox")) + 1);
-				message += "\n\n**BONUS** You found an extra " + Emoji.RNGESUS_BOX + "! https://imgur.com/a/SSjcgz3";
+				message += "\n\n# INSANE DROP\nYou found an extra " + Emoji.RNGESUS_BOX + "! https://imgur.com/a/SSjcgz3";
 				RNGesus.sendLog(e, data, "RNGesus Box", false);
 			}
-			message += "\n\nRemember to vote for Ling Ling at <https://top.gg/bot/733409243222507670/vote>!";
+			message += "\n\nYou also earned `75`:sparkles:\n\nRemember to vote for Ling Ling at <https://top.gg/bot/733409243222507670/vote>!";
 			if((long) data.get("votes") % 40 == 0) {
 				data.replace("medals", (long) data.get("medals") + 1);
 				message += "\n\nYou have claimed Free Boxes `" + data.get("votes") + "` times!  Enjoy your Ling Ling Medal!";

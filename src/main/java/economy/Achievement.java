@@ -77,7 +77,7 @@ public class Achievement {
 
 	public static void achievement(GenericDiscordEvent e, int page) {
 		String user = e.getAuthor().getId();
-		data = DatabaseManager.getDataForUser("Economy Data", user);
+		data = DatabaseManager.getDataById("Economy Data", user);
 		if(data == null) {
 			return;
 		}

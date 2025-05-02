@@ -141,7 +141,7 @@ public class Market {
 			if(offererID.equals(e.getAuthor().getId())) {
 				continue;
 			}
-			JSONObject tempData = DatabaseManager.getDataForUser("Economy Data", offererID);
+			JSONObject tempData = DatabaseManager.getDataById("Economy Data", offererID);
 			if(tempData == null) {
 				continue;
 			}
@@ -207,7 +207,7 @@ public class Market {
 						.addField("Buyer: " + data.get("discordName") + " " + e.getAuthor().getId(), "Seller: " + tempData.get("discordName") + " `" + tempData.get("discordID") + "`\nItem: " + item + "\n# Purchased: " + purchased + "\nPrice: " + price, false);
 				Objects.requireNonNull(Objects.requireNonNull(e.getJDA().getGuildById("670725611207262219")).getTextChannelById("1028934753270894592")).sendMessageEmbeds(builder.build()).queue();
 			}
-			DatabaseManager.saveDataForUser("Economy Data", offererID, tempData);
+			DatabaseManager.saveDataById("Economy Data", offererID, tempData);
 		}
 		data.replace("violins", (long) data.get("violins") - paid);
 		data.replace("itemsBought", (long) data.get("itemsBought") + gained);

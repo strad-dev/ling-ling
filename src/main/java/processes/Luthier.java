@@ -65,7 +65,12 @@ public class Luthier {
 						}
 					}
 					assert channel != null;
-					channel.sendMessage("Olaf is giving away violins!  Unscramble `" + send + "` to get " + Utils.formatNumber(money) + Emoji.VIOLINS).queue();
+					if(money == 0) {
+						money = 1;
+						channel.sendMessage("Olaf needs your help!  Unscramble `" + send + "` to get `1` " + Emoji.VIOLINS).queue();
+					} else {
+						channel.sendMessage("Olaf is giving away violins!  Unscramble `" + send + "` to get " + Utils.formatNumber(money) + Emoji.VIOLINS).queue();
+					}
 					data.replace("hasWord", true);
 					data.replace("amount", money);
 					data.replace("word", original);
