@@ -219,13 +219,9 @@ public class DatabaseManager {
 			}
 			database.runCommand(new Document("ping", 1));
 			System.out.println("Connected to main database.");
-
-			/*databasePunishments = mongoClient.getDatabase("Punishment_Logs");
-			databasePunishments.runCommand(new Document("ping", 1));
-			System.out.println("Connected to punisment database.");*/
 		} catch(Exception e) {
 			System.out.println("Failure connecting to database!  Maybe the IP isn't whitelisted?");
-			System.exit(-1);
+			throw new RuntimeException(e);
 		}
 	}
 }

@@ -719,7 +719,7 @@ class CreateThreadMessage implements Runnable {
 				}
 				case "forcestop" -> {
 					e.getMessage().delete().queue();
-					if(checkPermLevel(e.getAuthor().getId()) == 3 && e.getMessage().getContentRaw().split(" ")[2].equals("@#$%FUCK")) {
+					if(checkPermLevel(e.getAuthor().getId()) == 3 && e.getMessage().getContentRaw().split(" ")[2].equals("password")) {
 						e.reply("Forcing bot to stop...");
 						System.exit(0);
 					} else {

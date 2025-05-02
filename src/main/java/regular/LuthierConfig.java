@@ -193,9 +193,14 @@ public class LuthierConfig {
 				try {
 					amount = Long.parseLong(editAction);
 				} catch(Exception exception) {
-					e.reply("Invalid or no amount provided!");
-					return;
+					try {
+						amount = Long.parseLong(newValue);
+					} catch(Exception exception2) {
+						e.reply("Invalid or no amount provided!");
+						return;
+					}
 				}
+
 				if(amount < 0) {
 					e.reply("You cannot add a negative amount!");
 				}

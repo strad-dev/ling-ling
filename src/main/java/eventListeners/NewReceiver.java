@@ -585,12 +585,12 @@ class CreateThreadSlash implements Runnable {
 					actionType = "stats";
 				}
 				try {
-					editOption = Objects.requireNonNull(e1.getOption("editOption")).getAsString();
+					editOption = Objects.requireNonNull(e1.getOption("editoption")).getAsString();
 				} catch(Exception exception) {
 					editOption = "";
 				}
 				try {
-					newValue = Objects.requireNonNull(e1.getOption("newValue")).getAsString();
+					newValue = Objects.requireNonNull(e1.getOption("amountorvalue")).getAsString();
 				} catch(Exception exception) {
 					newValue = "";
 				}
@@ -636,7 +636,7 @@ class CreateThreadSlash implements Runnable {
 				}
 			}
 			case "forcestop" -> {
-				if(checkPermLevel(e.getAuthor().getId()) == 3 && Objects.requireNonNull(e1.getOption("PASSWORD")).getAsString().equals("@#$%FUCK")) {
+				if(checkPermLevel(e.getAuthor().getId()) == 3 && Objects.requireNonNull(e1.getOption("PASSWORD")).getAsString().equals("password")) {
 					e.reply("Forcing bot to stop...");
 					System.exit(0);
 				} else {
