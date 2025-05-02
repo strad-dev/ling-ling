@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 public class StartBot {
-	private static final boolean BETA = true; // TODO UPDATE THIS BEFORE DOING BETAS OR FULL RELEASES
+	private static final boolean BETA = false; // TODO UPDATE THIS BEFORE DOING BETAS OR FULL RELEASES
 
 	public static boolean isBeta() {
 		return BETA;
@@ -22,7 +22,6 @@ public class StartBot {
 
 	public static void startBot() {
 		Dotenv env = Dotenv.load();
-
 
 		String token;
 		String beethoventoken;

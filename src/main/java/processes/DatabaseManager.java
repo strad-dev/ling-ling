@@ -220,6 +220,7 @@ public class DatabaseManager {
 			database.runCommand(new Document("ping", 1));
 			System.out.println("Connected to main database.");
 		} catch(Exception e) {
+			e.printStackTrace();
 			System.out.println("Failure connecting to database!  Maybe the IP isn't whitelisted?");
 			throw new RuntimeException(e);
 		}
