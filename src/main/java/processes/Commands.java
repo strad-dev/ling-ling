@@ -1,7 +1,6 @@
 package processes;
 
 import eventListeners.GenericDiscordEvent;
-import eventListeners.ILoveJava;
 import leveling.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import regular.*;
@@ -68,7 +67,7 @@ class CreateThreadBeethoven implements Runnable {
 						channel.getManager().setSlowmode(Integer.parseInt(message[2])).queue();
 						e.reply("Successfully set the slowmode to `" + message[2] + "` second(s)");
 					} else {
-						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command!");
+						Utils.permissionDenied(e);
 					}
 				}
 				case "checkmessages", "checkmsgs" -> CheckMessages.checkMessages(e);
@@ -78,7 +77,7 @@ class CreateThreadBeethoven implements Runnable {
 					if(e.getAuthor().getId().equals("619989388109152256")) {
 						ResetMessages.resetMessages(e);
 					} else {
-						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command!");
+						Utils.permissionDenied(e);
 					}
 				}
 				case "rank" -> Rank.rank(e);
@@ -86,10 +85,9 @@ class CreateThreadBeethoven implements Runnable {
 				case "setlevelingdata" -> SetLevel.setLevelingData(e);
 				case "forcerestartlingling" -> {
 					if(e.getAuthor().getId().equals("619989388109152256") || e.getAuthor().getId().equals("488487157372157962")) {
-						e.reply("Forcing Ling Ling to restart...");
-						ILoveJava.forceRestart();
+						e.reply("This command is disabled and will return in 3-5 business days!");
 					} else {
-						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command!");
+						Utils.permissionDenied(e);
 					}
 				}
 				case "checkdm" -> CheckDM.checkDM(e);
@@ -99,14 +97,14 @@ class CreateThreadBeethoven implements Runnable {
 					if(e.getAuthor().getId().equals("619989388109152256") || e.getAuthor().getId().equals("488487157372157962")) {
 						UpdateHypixel.updateHypixel(e);
 					} else {
-						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command!");
+						Utils.permissionDenied(e);
 					}
 				}
 				case "levelsettings" -> {
 					if(e.getAuthor().getId().equals("619989388109152256") || e.getAuthor().getId().equals("488487157372157962")) {
 						Settings.settings(e);
 					} else {
-						e.reply(":no_entry: **403 FORBIDDEN** :no_entry:\nYou do not have permission to run this command!");
+						Utils.permissionDenied(e);
 					}
 				}
 				default ->

@@ -24,12 +24,12 @@ public class Ban {
 		} else if(idToModerate.equals("619989388109152256") || idToModerate.equals("488487157372157962")) {
 			e.reply("Imagine trying to ban a developer smh");
 		} else {
-			JSONObject data = DatabaseManager.getDataForUser("Economy Data", idToModerate);
+			JSONObject data = DatabaseManager.getDataById("Economy Data", idToModerate);
 			if(data == null) {
 				Start.start(e, idToModerate, true);
 			} else {
 				data.replace("banned", true);
-				DatabaseManager.saveDataForUser("Economy Data", idToModerate, data);
+				DatabaseManager.saveDataById("Economy Data", idToModerate, data);
 			}
 			String name;
 			try {

@@ -166,7 +166,7 @@ public class Help {
 				case "claim" -> builder.addField("Claim Command", """
 						Syntax: `!claim`
 						Usage: Claims a Free Box.
-						Cooldown: 12h""", false);
+						Cooldown: 6h""", false);
 				case "gift" -> builder.addField("Gift Command", """
 						Syntax: `!gift <user>`
 						Usage: Gifts the user a Gift Box.
@@ -244,16 +244,60 @@ public class Help {
 						Syntax: `!warn <user> [reason]`
 						Usage: Gives a user a bot warning.
 						Restrictions: Usable only by Bot Moderators and above.
-						Example: `!warn 488487157372157962 not practising forty hours a day`""", false);
+						Example: `!warn 488487157372157962 not practising fourty hours a day`""", false);
 				case "resetsave" -> builder.addField("ResetSave Command", """
 						Syntax: `!resetsave <user> [reason]`
 						Usage: Resets the save of a user.
 						Restrictions: Usable only by Bot Moderators and above.
 						Example: `!resetsave 488487157372157962 abusing bugs`""", false);
 				case "luthier" -> builder.addField("Luthier Command", """
-						Syntax: `!luthier <setup | edit> <(edit) channel | multiplier | word> <(edit) newValue>`
-						Usage: Sets up and edits a server's Luthier.
-						Restrictions: Usable only by Bot Admins and above.""", false);
+						Syntax: `!luthier <subcommand>`
+						Usage: View a server's luthier configuration, and add or remove your multipliers in a server.  Supplying no subcommand defaults to `!luthier stats`.
+						**Note: This command has multiple subcommands.  Run `!help luthier [subcommand]` to view a subcommand's help page.**
+						Valid subcommands: `setup` `stats` `settings` `cheat` `servers` `balance` `contributors` `add` `remove` `forceremove`
+						""", false);
+				case "luthier setup" -> builder.addField("Luthier Setup Command", """
+						Syntax: `!luthier setup`
+						Usage: Sets up luthier for your server in the current channel.
+						Restrictions: Usable only by Bot Moderators or server members with the `ADMINISTRATOR` permission.
+						""", false);
+				case "luthier stats" -> builder.addField("Luthier Stats Command", """
+						Syntax: `!luthier stats`
+						Usage: Views publicly available statistics of the Luthier configuration in this server.
+						""", false);
+				case "luthier settings" -> builder.addField("Luthier Settings Command", """
+						Syntax: `!luthier settings <option> <newValue>`
+						Usage: Changes the settings of the Luthier configuration in this server.  Server Administrators may change the channel and logging channel while Bot Moderators may also change the word and the amount of violins.
+						Restrictions: Usable only by Bot Moderators or server members with the `ADMINISTRATOR` permission.
+						""", false);
+				case "luthier cheat" -> builder.addField("Luthier Cheat Command", """
+						Syntax: `!luthier cheat`
+						Usage: Gives you the answer to the current Luthier unscramble.
+						Cooldown: 12h (per server)
+						""", false);
+				case "luthier servers", "luthier balance" -> builder.addField("Luthier Balance Command", """
+						Syntax: `!luthier servers` `!luthier balance`
+						Usage: Shows your total balance of Luthier multipliers as well as any servers you may have used them in.
+						""", false);
+				case "luthier contributors" -> builder.addField("Luthier Contributors Command", """
+						Syntax: `!luthier contributors`
+						Usage: Shows which users have generously contributed to this Luthier's multiplier.
+						""", false);
+				case "luthier add" -> builder.addField("Luthier Add Command", """
+						Syntax: `!luthier add <multiplier>`
+						Usage: Adds a number of multipliers to this server.
+						Example: `!luthier add 1`
+						""", false);
+				case "luthier remove" -> builder.addField("Luthier Remove Command", """
+						Syntax: `!luthier remove <multiplier>`
+						Usage: Removes a number of multipliers from this server.
+						Example: `!luthier remove 1`
+						""", false);
+				case "luthier forceremove" -> builder.addField("Luthier ForceRemove Command", """
+						Syntax: `!luthier forceremove`
+						Usage: Forcibly removes EVERY multiplier you have contributed.  **This action is irreversible and affects ALL servers!**
+						Dev Note: This is intended to be used if a server Admin is being rogue and banned you to keep their server's multipliers.
+						""", false);
 				case "resetincomes" -> builder.addField("ResetIncomes Command", """
 						Syntax: `!resetincomes`
 						Usage: Manually resets all incomes.
@@ -271,7 +315,7 @@ public class Help {
 				case "updateluthierchance" -> builder.addField("UpdateLuthierChance Command", """
 						Syntax: `!updateluthierchance`
 						Usage: Updates the luthier spawn chance manually
-						Restrictions: Usable only by Admins and above.""", false);
+						Restrictions: Usable only by Bot Admins and above.""", false);
 				
 				// PAGE 6
 				case "resetdaily" -> builder.addField("ResetDaily Command", """

@@ -23,12 +23,13 @@ public class Scales {
 		} else {
 			long base = Utils.calculateAmount(data, random.nextInt(11) + 15);
 			Utils.calculateLoan(data, base);
+			data.replace("essence", (long) data.get("essence") + 1);
 			if((boolean) data.get("timeCrunch")) {
 				data.replace("scaleCD", time + 59500);
 			} else {
 				data.replace("scaleCD", time + 89500);
 			}
-			String message = "You played your scales and earned " + Utils.formatNumber(base) + Emoji.VIOLINS + "\n";
+			String message = "You played your scales and earned " + Utils.formatNumber(base) + Emoji.VIOLINS + " and `1`:sparkles:\n";
 			data.replace("scalesPlayed", (long) data.get("scalesPlayed") + 1);
 			data.replace("earnings", (long) data.get("earnings") + base);
 

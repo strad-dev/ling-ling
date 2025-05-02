@@ -39,7 +39,7 @@ public class Rob {
 				return;
 			}
 			JSONParser parser = new JSONParser();
-			JSONObject targetdata = DatabaseManager.getDataForUser("Economy Data", user);
+			JSONObject targetdata = DatabaseManager.getDataById("Economy Data", user);
 			if(targetdata == null) {
 				e.reply("You did not provide a valid User ID.  Doesn't make sense to rob someone nonexistent, does it?");
 				return;
@@ -203,15 +203,17 @@ public class Rob {
 			}
 			targetdata.replace("violins", targetViolins);
 			targetdata.replace("lostToRob", targetLostToRob);
-			DatabaseManager.saveDataForUser("Economy Data", user, targetdata);
+			DatabaseManager.saveDataById("Economy Data", user, targetdata);
+			message += "\n\nYou also earned `160`:sparkles:";
+			e.reply(message);
 			data.replace("robCD", time + 57540000);
 			if(baseRob > 0) {
 				data.replace("robbed", (long) data.get("robbed") + baseRob);
 			}
+			data.replace("essence", (long) data.get("essence") + 160);
 			RNGesus.lootbox(e, data);
 			Achievement.calculateAchievement(e, data, "robbed", "Heartless");
 			SaveData.saveData(e, data);
-			e.reply(message);
 		}
 	}
 }

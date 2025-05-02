@@ -7,11 +7,11 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import org.json.simple.JSONObject;
 
 public class StartBot {
 	private static final boolean BETA = false; // TODO UPDATE THIS BEFORE DOING BETAS OR FULL RELEASES
@@ -22,16 +22,6 @@ public class StartBot {
 
 	public static void startBot() {
 		Dotenv env = Dotenv.load();
-
-		if(isBeta()) {
-			//noinspection ConstantValue
-			DatabaseManager.connectToDatabase(BETA, env.get("DATABASE_TOKEN_BETA"));
-		} else {
-			//noinspection ConstantValue
-			DatabaseManager.connectToDatabase(BETA, env.get("DATABASE_TOKEN"));
-		}
-		HypixelManager.connectToHypixel(BETA, env.get("HYPIXEL_KEY"));
-		JSONObject data = DatabaseManager.getMiscData();
 
 		String token;
 		String beethoventoken;
@@ -44,12 +34,10 @@ public class StartBot {
 		}
 
 		// Start BeethovenBot
-		JDA jda;
-		assert data != null;
-		jda = JDABuilder.create(beethoventoken, GatewayIntent.GUILD_INVITES,
+		JDA jda = JDABuilder.create(beethoventoken, GatewayIntent.GUILD_INVITES,
 						GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MESSAGES,
 						GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGE_REACTIONS)
-				.disableCache(CacheFlag.ACTIVITY, CacheFlag.VOICE_STATE, CacheFlag.CLIENT_STATUS, CacheFlag.SCHEDULED_EVENTS, CacheFlag.EMOJI, CacheFlag.STICKER, CacheFlag.ONLINE_STATUS)
+				.disableCache(CacheFlag.EMOJI, CacheFlag.STICKER, CacheFlag.ONLINE_STATUS, CacheFlag.ACTIVITY, CacheFlag.VOICE_STATE, CacheFlag.CLIENT_STATUS, CacheFlag.SCHEDULED_EVENTS)
 				.addEventListeners(new Autoroles())
 				.addEventListeners(new Autounrole())
 				.addEventListeners(new Disconnect())
@@ -76,11 +64,42 @@ public class StartBot {
 		jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
 		jda.getPresence().setActivity(Activity.customStatus("Practising violin 40 hours a day.  Sometimes practises 72 hours a day!"));
 
+		/* OptionData data1 = new OptionData(OptionType.STRING, "actiontype", "Which Subcommand to Use")
+				.addChoice("Setup", "setup")
+				.addChoice("Stats", "stats")
+				.addChoice("Settings", "edit")
+				.addChoice("Cheat", "cheat")
+				.addChoice("Balance & Servers", "balance")
+				.addChoice("Contributors", "contributors")
+				.addChoice("Add", "add")
+				.addChoice("Remove", "remove")
+				.addChoice("Force Remove", "forceremove");
+		OptionData data2 = new OptionData(OptionType.STRING, "editoption", "Use this for Luthier Settings to pick which setting to change.")
+				.addChoice("Channel", "channel")
+				.addChoice("Log Channel", "logchannel")
+				.addChoice("Amount", "amount")
+				.addChoice("Word", "word");
+		jda.upsertCommand(
+				Commands.slash("luthier", "Changes the Luthier configuration for a server.")
+						.addOptions(data1, data2)
+						.addOption(OptionType.STRING, "amountorvalue", "Number of Multipliers to add or remove, or new Setting value.")).queue();
+		System.out.println("Done upserting commands.  Exiting.");
+		System.exit(-1); */
+
+		if(isBeta()) {
+			//noinspection ConstantValue
+			DatabaseManager.connectToDatabase(BETA, env.get("DATABASE_TOKEN_BETA"));
+		} else {
+			//noinspection ConstantValue
+			DatabaseManager.connectToDatabase(BETA, env.get("DATABASE_TOKEN"));
+		}
+
+		HypixelManager.connectToHypixel(BETA, env.get("HYPIXEL_KEY"));
 			/*
 			// ONE TIEM UPSERT OF SLASH COMMANDS
-		jda.upsertCommand(Commands.slash("h", "Collect all pending hourly income!")).queue();
-		OptionData optionData;
 
+			OptionData optionData;
+			jda.upsertCommand(Commands.slash("h", "Collect all pending hourly income!")).queue();
 
 			// help page 1
 			jda.upsertCommand(
@@ -335,18 +354,6 @@ public class StartBot {
 				Commands.slash("resetsave", "Resets the save of a user.")
 						.addOption(OptionType.STRING, "user", "The misbehaver")
 						.addOption(OptionType.STRING, "reason", "Why are you resetting their save?????")
-		).queue();
-		data = new OptionData(OptionType.STRING, "actiontype", "Setup or Edit")
-				.addChoice("Setup", "setup")
-				.addChoice("Edit", "edit");
-		data2 = new OptionData(OptionType.STRING, "editoption", "Which Edit option")
-				.addChoice("Channel", "channel")
-				.addChoice("Multiplier", "multiplier")
-				.addChoice("Word", "word");
-		jda.upsertCommand(
-				Commands.slash("luthier", "Changes the Luthier configuration for a server.")
-						.addOptions(data, data2)
-						.addOption(OptionType.STRING, "newvalue", "See Name")
 		).queue();
 		jda.upsertCommand(
 				Commands.slash("resetincomes", "Adjusts all users' incomes to correct values.")

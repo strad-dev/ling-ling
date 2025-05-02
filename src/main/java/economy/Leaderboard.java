@@ -55,7 +55,7 @@ public class Leaderboard {
 		StringBuilder board = new StringBuilder();
 		for(int i = 0; i < 10; ++i) {
 			String id = entry[i].split(" ")[0];
-			JSONObject temp = DatabaseManager.getDataForUser("Economy Data", id);
+			JSONObject temp = DatabaseManager.getDataById("Economy Data", id);
 			assert temp != null;
 			board.append("**").append(i + 1).append("\\. ").append(temp.get("discordName")).append("** `").append(id).append("`: ")
 					.append(Utils.formatNumber(Long.parseLong(entry[i].split(" ")[1]))).append(" ").append(emoji).append("\n");

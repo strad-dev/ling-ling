@@ -6,8 +6,10 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.result.InsertOneResult;
 import eventListeners.GenericDiscordEvent;
 import org.bson.Document;
+import org.json.simple.JSONArray;
 import processes.DatabaseManager;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -55,6 +57,7 @@ public class Start {
 						.append("pineSap", 0L)
 						.append("steel", 0L)
 						.append("horseHair", 0L)
+						.append("essence", 0L)
 
 						// AFK Income Items
 						.append("rosin", 0L)
@@ -166,8 +169,8 @@ public class Start {
 						.append("percussion", 0L)
 
 						// Strings
-						.append("violin1", 1)
-						.append("violin2", 1)
+						.append("violin1", 1L)
+						.append("violin2", 1L)
 						.append("cello", 0L)
 						.append("doubleBass", 0L)
 						.append("piano", 0L)
@@ -212,6 +215,10 @@ public class Start {
 						.append("color", "#0000FF")
 						.append("DMs", true)
 						.append("extraInfo", false)
+
+						// Luthier
+						.append("luthierBalance", 0L)
+						.append("luthierServers", new JSONArray())
 
 						// Misc Data
 						.append("banned", ban)

@@ -164,8 +164,10 @@ public class Perform {
 					data.replace("performCD", time + 215940000);
 				}
 			}
+			builder.append("\n\nYou also earned `300`:sparkles:");
 			e.reply(builder.toString());
 			Utils.calculateLoan(data, base);
+			data.replace("essence", (long) data.get("essence") + 300);
 			data.replace("earnings", violinsEarned + base);
 			data.replace("performances", (long) data.get("performances") + 1);
 			RNGesus.lootbox(e, data);

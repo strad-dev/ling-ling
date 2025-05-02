@@ -17,13 +17,13 @@ public class SetPermLevel {
 			return;
 		}
 		if(newRank >= 0 && newRank <= 2) {
-			JSONObject data = DatabaseManager.getDataForUser("Economy Data", target);
+			JSONObject data = DatabaseManager.getDataById("Economy Data", target);
 			if(data == null) {
 				e.reply("This user does not exist.");
 				return;
 			}
 			data.replace("perms", newRank);
-			DatabaseManager.saveDataForUser("Economy Data", target, data);
+			DatabaseManager.saveDataById("Economy Data", target, data);
 			String user;
 			try {
 				user = Objects.requireNonNull(e.getJDA().getUserById(target)).getName();

@@ -14,7 +14,7 @@ public class Inventory {
 			user = e.getAuthor().getId();
 		}
 
-		JSONObject data = DatabaseManager.getDataForUser("Economy Data", user);
+		JSONObject data = DatabaseManager.getDataById("Economy Data", user);
 		if(data == null) {
 			e.reply("This save file does not exist!");
 			return;
@@ -39,31 +39,32 @@ public class Inventory {
 						.addField("Plastic " + Emoji.PLASTIC, "Count: " + Utils.formatNumber(data.get("plastic")) + "\nCrafting Ingredient", true)
 						.addField("Water " + Emoji.WATER, "Count: " + Utils.formatNumber(data.get("water")) + "\nCrafting Ingredient", true)
 						.addField("Tea Base " + Emoji.TEABAG, "Count: " + Utils.formatNumber(data.get("teaBase")) + "\nCrafting Ingredient", true)
-						.addBlankField(true)
 						.addField("Wood " + Emoji.WOOD, "Count: " + Utils.formatNumber(data.get("wood")) + "\nCrafting Ingredient", true)
 						.addField("Pine Sap " + Emoji.SAP, "Count: " + Utils.formatNumber(data.get("pineSap")) + "\nCrafting Ingredient", true)
 						.addField("Steel " + Emoji.STEEL, "Count: " + Utils.formatNumber(data.get("steel")) + "\nCrafting Ingredient", true)
-						.addField("Horse Hair " + Emoji.HORSE_HAIR, "Count: " + Utils.formatNumber(data.get("horseHair")) + "\nCrafting Ingredient", true);
+						.addField("Horse Hair " + Emoji.HORSE_HAIR, "Count: " + Utils.formatNumber(data.get("horseHair")) + "\nCrafting Ingredient", true)
+						.addField("Ling Ling Essence :sparkles:", "Count: " + Utils.formatNumber(data.get("essence")) + "\nCrafting Ingredient", true);
 				case 2 -> builder.setTitle(user + "'s Inventory - Page 2\nConsumables")
 						.addField("Rice " + Emoji.RICE, "Count: " + Utils.formatNumber(data.get("rice")) +
-								"\nUsage: Gives you 2 hours of income\nID: `rice`", true)
+								"\nUsage: Gives you `2` hours of income\nID: `rice`", true)
 						.addField("Bubble Tea " + Emoji.TEA, "Count: " + Utils.formatNumber(data.get("tea")) +
-								"\nUsage: Gives you 6 hours of income\nID: `tea`", true)
+								"\nUsage: Gives you `6` hours of income\nID: `tea`", true)
 						.addField("Ling Ling Blessing " + Emoji.BLESSING, "Count: " + Utils.formatNumber(data.get("blessings")) +
-								"\nUsage: Gives you 24 hours of income and 1-3 Ling Ling Medals\n`blessings` `blessing`", true)
+								"\nUsage: Gives you `24` hours of income and `1-3` Ling Ling Medals\nID: `blessings` `blessing`", true)
 						.addField("Rosin " + Emoji.ROSIN, "Count: " + Utils.formatNumber(data.get("rosin")) +
-								"\nUsage: Allows you to make 25% of your income for 50 hours.  Stackable\nID: `rosin`", true)
-						.addBlankField(true)
+								"\nUsage: Allows you to make `25%` of your income for `50` hours.  Stackable\nID: `rosin`", true)
 						.addField("New Strings " + Emoji.STRING, "Count: " + Utils.formatNumber(data.get("string")) +
-								"\nUsage: Allows you to make 25% of your income for 100 hours.  Stackable\nID: `string`", true)
+								"\nUsage: Allows you to make `25%` of your income for `100` hours.  Stackable\nID: `string`", true)
 						.addField("Bow Hair " + Emoji.BOW_HAIR, "Count: " + Utils.formatNumber(data.get("bowHair")) +
-								"\nUsage: Allows you to make 25% of your income for 150 hours.  Stackable\nID: `bowhair` `hair`", true)
-						.addBlankField(true)
+								"\nUsage: Allows you to make `25%` of your income for `150` hours.  Stackable\nID: `bowhair` `hair`", true)
 						.addField("Violin Service " + Emoji.SERVICE, "Count: " + Utils.formatNumber(data.get("violinService")) +
-								"\nUsage: Allows you to make 25% of your income for 250 hours.  Stackable\n`violinservice` `service`", true);
+								"\nUsage: Allows you to make `25%` of your income for `250` hours.  Stackable\nID: `violinservice` `service`", true)
+						.addBlankField(true)
+						.addField("Luthier Multipliers :hammer:", "Count: " + Utils.formatNumber(data.get("luthierBalance")) +
+								"\nUsage: Use `!luthier add` to add multipliers to a server's Luthier!\nID: None - Use Command", true);
 				case 3 -> builder.setTitle(user + "'s Inventory - Page 3\nLootboxes")
 						.addField("Free Box " + Emoji.FREE_BOX, "Count: " + Utils.formatNumber(data.get("voteBox")) +
-								"\nUsage: Gives you bad random items, as decided by RNGesus\nID: `freebox` `votebox` `free` `vote`", true)
+								"\nUsage: Gives you tolerable random items, as decided by RNGesus\nID: `freebox` `votebox` `free` `vote`", true)
 						.addField("Gift Box " + Emoji.GIFT_BOX, "Count: " + Utils.formatNumber(data.get("giftBox")) +
 								"\nUsage: Gives you miniscully valuable random items, as decided by RNGesus\nID: `giftbox` `gift`", true)
 						.addField("Musician Kit " + Emoji.MUSICIAN_KIT, "Count: " + Utils.formatNumber(data.get("kits")) +
