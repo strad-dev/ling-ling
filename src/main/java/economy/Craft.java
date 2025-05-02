@@ -21,8 +21,9 @@ public class Craft {
 		if(craftAmount == 0) {
 			result = new StringBuilder("You did not have enough materials to craft any ").append(getEmoji(what)).append("  Check that you have enough Raw Materials...\n");
 			for(String key : recipe.keySet()) {
-				result.append("\n").append(Utils.formatNumber(data.get(key))).deleteCharAt(result.length() - 1)
-						.append("/").append(recipe.get(key)).append("`").append(" ").append(getEmoji(key));
+				result.append("\n").append(Utils.formatNumber(data.get(key)))
+						.append("/").append(Utils.formatNumber(recipe.get(key)))
+						.append(" ").append(getEmoji(key));
 			}
 		} else {
 			result = new StringBuilder("You crafted ").append(Utils.formatNumber(craftAmount)).append(getEmoji(what)).append(" for...\n");
@@ -79,6 +80,12 @@ public class Craft {
 			case "violinService" -> {
 				return Emoji.SERVICE;
 			}
+			case "luthierBalance" -> {
+				return "Luthier Multipliers.";
+			}
+			case "essence" -> {
+				return ":sparkles:";
+			}
 			default -> {
 				return "Error 404 - Yell at the developer for being stupid.";
 			}
@@ -89,39 +96,40 @@ public class Craft {
 		JSONObject data = LoadData.loadData(e);
 		if(item.isEmpty()) {
 			EmbedBuilder builder = new EmbedBuilder().setTitle("**All Crafting Recipes**")
-					.addField("**Rice** " + Emoji.RICE, "`" + data.get("grains") + "/20`" + Emoji.GRAINS +
-							"\n`" + data.get("wood") + "/10`" + Emoji.WOOD +
-							"\n`" + data.get("water") + "/10`" + Emoji.WATER +
+					.addField("**Rice** " + Emoji.RICE, Utils.formatNumber(data.get("grains")) + "/`20`" + Emoji.GRAINS +
+							"\n" + Utils.formatNumber(data.get("wood")) + "/`10`" + Emoji.WOOD +
+							"\n" + Utils.formatNumber(data.get("water")) + "/`10`" + Emoji.WATER +
 							"\nID: `rice`", true)
-					.addField("**Bubble Tea** " + Emoji.TEA, "`" + data.get("plastic") + "/10`" + Emoji.PLASTIC +
-							"\n`" + data.get("teaBase") + "/10`" + Emoji.TEABAG +
-							"\n`" + data.get("water") + "/20`" + Emoji.WATER +
+					.addField("**Bubble Tea** " + Emoji.TEA, Utils.formatNumber(data.get("plastic")) + "/`10`" + Emoji.PLASTIC +
+							"\n" + Utils.formatNumber(data.get("teaBase")) + "/`10`" + Emoji.TEABAG +
+							"\n" + Utils.formatNumber(data.get("water")) + "/`20`" + Emoji.WATER +
 							"\nID: `tea`", true)
-					.addField("**Rosin** " + Emoji.ROSIN, "`" + data.get("pineSap") + "/20`" + Emoji.SAP +
+					.addField("**Rosin** " + Emoji.ROSIN, Utils.formatNumber(data.get("pineSap")) + "/`20`" + Emoji.SAP +
 							"\nID: `rosin`", true)
-					.addField("**New Strings** " + Emoji.STRING, "`" + data.get("steel") + "/40`" + Emoji.STEEL +
+					.addField("**New Strings** " + Emoji.STRING, Utils.formatNumber(data.get("steel")) + "/`40`" + Emoji.STEEL +
 							"\nID: `string`", true)
 					.addBlankField(true)
-					.addField("**Bow Hair** " + Emoji.BOW_HAIR, "`" + data.get("horseHair") + "/60`" + Emoji.HORSE_HAIR +
+					.addField("**Bow Hair** " + Emoji.BOW_HAIR, Utils.formatNumber(data.get("horseHair")) + "/`60`" + Emoji.HORSE_HAIR +
 							"\nID: `bowHair`", true)
-					.addField("**Violin Service** " + Emoji.SERVICE, "`" + data.get("grains") + "/20`" + Emoji.GRAINS +
-							"\n`" + data.get("plastic") + "/20`" + Emoji.PLASTIC +
-							"\n`" + data.get("water") + "/20`" + Emoji.WATER +
-							"\n`" + data.get("teaBase") + "/20`" + Emoji.TEABAG +
-							"\n`" + data.get("wood") + "/80`" + Emoji.WOOD +
-							"\n`" + data.get("pineSap") + "/20`" + Emoji.SAP +
-							"\n`" + data.get("steel") + "/20`" + Emoji.STEEL +
-							"\n`" + data.get("horseHair") + "/20`" + Emoji.HORSE_HAIR +
+					.addField("**Violin Service** " + Emoji.SERVICE, Utils.formatNumber(data.get("grains")) + "/`20`" + Emoji.GRAINS +
+							"\n" + Utils.formatNumber(data.get("plastic")) + "/`20`" + Emoji.PLASTIC +
+							"\n" + Utils.formatNumber(data.get("water")) + "/`20`" + Emoji.WATER +
+							"\n" + Utils.formatNumber(data.get("teaBase")) + "/`20`" + Emoji.TEABAG +
+							"\n" + Utils.formatNumber(data.get("wood")) + "/`80`" + Emoji.WOOD +
+							"\n" + Utils.formatNumber(data.get("pineSap")) + "/`20`" + Emoji.SAP +
+							"\n" + Utils.formatNumber(data.get("steel")) + "/`20`" + Emoji.STEEL +
+							"\n" + Utils.formatNumber(data.get("horseHair")) + "/`20`" + Emoji.HORSE_HAIR +
 							"\nID: `violinService`", true)
 					.addBlankField(true)
-					.addField("**~~1x Luthier~~**\n**Temporarily Disabled**", "`" + data.get("grains") + "/250`" + Emoji.GRAINS +
-							"\n`" + data.get("plastic") + "/250`" + Emoji.PLASTIC +
-							"\n`" + data.get("water") + "/250`" + Emoji.WATER +
-							"\n`" + data.get("teaBase") + "/250`" + Emoji.TEABAG +
-							"\n`" + data.get("wood") + "/250`" + Emoji.WOOD +
-							"\n`" + data.get("pineSap") + "/250`" + Emoji.SAP +
-							"\n`" + data.get("steel") + "/250`" + Emoji.STEEL +
-							"\n`" + data.get("horseHair") + "/250`" + Emoji.HORSE_HAIR +
+					.addField("**1x Luthier**", Utils.formatNumber(data.get("grains")) + "/`1000`" + Emoji.GRAINS +
+							"\n" + Utils.formatNumber(data.get("plastic")) + "/`1 000`" + Emoji.PLASTIC +
+							"\n" + Utils.formatNumber(data.get("water")) + "/`1 000`" + Emoji.WATER +
+							"\n" + Utils.formatNumber(data.get("teaBase")) + "/`1 000`" + Emoji.TEABAG +
+							"\n" + Utils.formatNumber(data.get("wood")) + "/`1 000`" + Emoji.WOOD +
+							"\n" + Utils.formatNumber(data.get("pineSap")) + "/`1 000`" + Emoji.SAP +
+							"\n" + Utils.formatNumber(data.get("steel")) + "/`1 000`" + Emoji.STEEL +
+							"\n" + Utils.formatNumber(data.get("horseHair")) + "/`1 000`" + Emoji.HORSE_HAIR +
+							"\n" + Utils.formatNumber(data.get("essence")) + "/`2 500`:sparkles:" +
 							"\nID: `luthier`", true);
 			e.replyEmbeds(builder.build());
 			return;
@@ -174,88 +182,17 @@ public class Craft {
 				recipe.put("steel", 20L);
 				recipe.put("horseHair", 20L);
 			}
-
-			// TODO finish refactoring when luthier is a consumable item
 			case "luthier" -> {
-				e.reply("This recipe has been disabled due to a revamp of the Luthier system in 3-5 business days.");
-				/*
-				if(Objects.requireNonNull(e.getGuild()).getId().equals("670725611207262219")) {
-					e.reply("Strad find you trying to sneakily mess with the only buffed Luthier around.  " +
-							"He kicks you out, and slaps you with a fine equal to 24x your hourly income." +
-							"\nDon't try to increase the Luthier of the support server.  It won't work or end well.");
-					data.replace("violins", (long) data.get("violins") - (long) data.get("income") * 24);
-					SaveData.saveData(e, data);
-					return;
-				}
-				JSONObject luthierData = DatabaseManager.getDataByGuild(e, "Luthier Data");
-				if(luthierData == null) {
-					e.reply("You look for a luthier shop to donate to, but cannot find any.  Try another server!" +
-							"\nAlternatively, ask a Bot Mod/Bot Admin to set up Luthier for you.");
-					return;
-				}
-				long grains = (long) data.get("grains");
-				long plastic = (long) data.get("plastic");
-				long water = (long) data.get("water");
-				long teaBase = (long) data.get("teaBase");
-				long wood = (long) data.get("wood");
-				long pineSap = (long) data.get("pineSap");
-				long steel = (long) data.get("steel");
-				long horseHairs = (long) data.get("horseHair");
-				long multiplier = (long) luthierData.get("multiplier");
-				long i = 0;
-				for(; i < craftAmount; i++) {
-					if(grains < 250 || plastic < 250 || water < 250 || teaBase < 250 || wood < 250 || pineSap < 250 || steel < 250 || horseHairs < 250) {
-						if(i == 0) {
-							e.reply("You were unable to craft any Luthiers!  Check that you have enough Raw Materials:" +
-									"\n`" + Numbers.formatNumber(grains) + "/250`" + Emoji.GRAINS +
-									"\n`" + Numbers.formatNumber(plastic) + "/250`" + Emoji.PLASTIC +
-									"\n`" + Numbers.formatNumber(water) + "/250`" + Emoji.WATER +
-									"\n`" + Numbers.formatNumber(teaBase) + "/250`" + Emoji.TEABAG +
-									"\n`" + Numbers.formatNumber(pineSap) + "/250`" + Emoji.SAP +
-									"\n`" + Numbers.formatNumber(wood) + "/250`" + Emoji.WOOD +
-									"\n`" + Numbers.formatNumber(steel) + "/250`" + Emoji.STEEL +
-									"\n`" + Numbers.formatNumber(horseHairs) + "/250`" + Emoji.HORSE_HAIR);
-							return;
-						}
-						break;
-					}
-					grains -= 250;
-					plastic -= 250;
-					water -= 250;
-					teaBase -= 250;
-					wood -= 250;
-					pineSap -= 250;
-					steel -= 250;
-					horseHairs -= 250;
-					multiplier++;
-				}
-				data.replace("grains", grains);
-				data.replace("plastic", plastic);
-				data.replace("water", water);
-				data.replace("teaBase", teaBase);
-				data.replace("wood", wood);
-				data.replace("pineSap", pineSap);
-				data.replace("steel", steel);
-				data.replace("horseHair", horseHairs);
-				luthierData.replace("multiplier", multiplier);
-				e.reply("You crafted and used `" + Numbers.formatNumber(i) + "`x Luthier for `" +
-						Numbers.formatNumber(i * 250) + "`" + Emoji.GRAINS + ", `" +
-						Numbers.formatNumber(i * 250) + "`" + Emoji.PLASTIC + ", `" +
-						Numbers.formatNumber(i * 250) + "`" + Emoji.WATER + ", `" +
-						Numbers.formatNumber(i * 250) + "`" + Emoji.TEABAG + ", `" +
-						Numbers.formatNumber(i * 250) + "`" + Emoji.WOOD + ", `" +
-						Numbers.formatNumber(i * 250) + "`" + Emoji.SAP + ", `" +
-						Numbers.formatNumber(i * 250) + "`" + Emoji.STEEL + ", `" +
-						Numbers.formatNumber(i * 250) + "`" + Emoji.HORSE_HAIR);
-				Objects.requireNonNull(e.getGuild().getTextChannelById((String) luthierData.get("channel")))
-						.sendMessage("**:tada: <@" + e.getAuthor().getId() + "> just buffed this server's luthier by " + Numbers.formatNumber(i) + "x!  New Multiplier: " + Numbers.formatNumber(multiplier) + "x** :tada:");
-				EmbedBuilder builder = new EmbedBuilder()
-						.setFooter("Ling Ling Bot", e.getJDA().getSelfUser().getAvatarUrl())
-						.setColor(Color.BLUE)
-						.setTitle("**__Luthier Crafted__**")
-						.addField("Crafter: " + data.get("discordName") + " `" + e.getAuthor().getId() + "`", "Server: " + e.getGuild().getName() + " `" + e.getGuild().getId() + "`" + "\nAmount Crafted: " + Numbers.formatNumber(i), false);
-				DatabaseManager.saveDataByGuild(e, "Luthier Data", luthierData);*/
-				return;
+				item = "luthierBalance";
+				recipe.put("grains", 1000L);
+				recipe.put("plastic", 1000L);
+				recipe.put("water", 1000L);
+				recipe.put("teaBase", 1000L);
+				recipe.put("wood", 1000L);
+				recipe.put("pineSap", 1000L);
+				recipe.put("steel", 1000L);
+				recipe.put("horseHair", 1000L);
+				recipe.put("essence", 2500L);
 			}
 			default -> {
 				e.reply("This crafting recipe does not exist!  Run `/craft` with no arguments to see all recipes.");

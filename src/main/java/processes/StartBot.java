@@ -58,7 +58,6 @@ public class StartBot {
 				.addEventListeners(new Receiver())
 				.addEventListeners(new RoleAdded())
 				.addEventListeners(new RoleRemoved())
-				// .addEventListeners(new ILoveJava())
 				.addEventListeners(new NoInviteLinks())
 				.build();
 		jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
@@ -76,11 +75,11 @@ public class StartBot {
 				.build();
 		jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
 		jda.getPresence().setActivity(Activity.customStatus("Practising violin 40 hours a day.  Sometimes practises 72 hours a day!"));
-		jda.upsertCommand(Commands.slash("h", "Collect all pending hourly income!")).queue();
 
-		OptionData optionData;
 			/*
 			// ONE TIEM UPSERT OF SLASH COMMANDS
+		jda.upsertCommand(Commands.slash("h", "Collect all pending hourly income!")).queue();
+		OptionData optionData;
 
 
 			// help page 1
