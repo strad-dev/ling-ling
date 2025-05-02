@@ -24,8 +24,18 @@ public class LuthierConfig {
 	private static void sendLog(GenericDiscordEvent e, JSONObject data, String action) {
 		EmbedBuilder builder = new EmbedBuilder()
 				.setFooter("Ling Ling", e.getJDA().getSelfUser().getAvatarUrl())
-				.addField("User: " + e.getAuthor().getName() + " `" + e.getAuthor().getId() + "`", "Action: " + action, false).setTitle("__**Luthier Log**__")
-				.setColor(Color.BLUE);
+				.addField("User: " + e.getAuthor().getName() + " `" + e.getAuthor().getId() + "`", "Action: " + action, false).setTitle("__**Luthier Log**__");
+		if(action.contains("Add")) {
+			builder.setColor(Color.GREEN);
+		} else if(action.contains("Force Remove")) {
+			builder.setColor(Color.RED);
+		} else if(action.contains("Remove")) {
+			builder.setColor(Color.ORANGE);
+		} else if(action.contains("CHEATER")) {
+			builder.setColor(Color.YELLOW);
+		} else {
+			builder.setColor(Color.BLUE);
+		}
 		e.getJDA().getGuildById("670725611207262219").getTextChannelById("1341876485782372432").sendMessageEmbeds(builder.build()).queue();
 		try {
 			e.getJDA().getGuildById((String) data.get("discordID")).getTextChannelById((String) data.get("logChannel")).sendMessageEmbeds(builder.build()).queue();

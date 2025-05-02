@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import org.json.simple.JSONObject;
 import processes.Utils;
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -81,7 +82,7 @@ public class Craft {
 				return Emoji.SERVICE;
 			}
 			case "luthierBalance" -> {
-				return "Luthier Multipliers.";
+				return " Luthier Multipliers.";
 			}
 			case "essence" -> {
 				return ":sparkles:";
@@ -96,6 +97,7 @@ public class Craft {
 		JSONObject data = LoadData.loadData(e);
 		if(item.isEmpty()) {
 			EmbedBuilder builder = new EmbedBuilder().setTitle("**All Crafting Recipes**")
+					.setColor(Color.decode((String) data.get("color")))
 					.addField("**Rice** " + Emoji.RICE, Utils.formatNumber(data.get("grains")) + "/`20`" + Emoji.GRAINS +
 							"\n" + Utils.formatNumber(data.get("wood")) + "/`10`" + Emoji.WOOD +
 							"\n" + Utils.formatNumber(data.get("water")) + "/`10`" + Emoji.WATER +
