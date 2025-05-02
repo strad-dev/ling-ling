@@ -76,40 +76,44 @@ public class Luthier {
 					data.replace("word", original);
 					DatabaseManager.saveDataByGuild(e, "Luthier Data", data);
 				}
-			} else if((boolean) data.get("hasWord") && !e.getAuthor().isBot() && e.getChannel().getId().equals(data.get("channel").toString()) && !answer.isEmpty()) {
-				if(answer.equals("none")) {
-					e.reply("You have to give an answer, stupid.");
-					return;
-				}
-				String target = data.get("word").toString();
-				long gain = (long) data.get("amount");
-				if(answer.equalsIgnoreCase(target)) {
-					JSONObject userData = DatabaseManager.getDataByUser(e, "Economy Data");
-					if(userData == null) {
-						e.reply("You don't even have a profile, where would you store your violins???  Run `/start` **in a bot command channel** to get one!");
+			} else if((boolean) data.get("hasWord") && !e.getAuthor().isBot() && !answer.isEmpty()) {
+				if(e.getChannel().getId().equals(data.get("channel").toString())) {
+					if(answer.equals("none")) {
+						e.reply("You have to give an answer, stupid.");
 						return;
 					}
-					String name = e.getAuthor().getEffectiveName();
-					if(name.contains("@everyone") || name.contains("@here") || name.contains("<@&") || name.contains("nigg")) {
-						name = "A user who thought they were trying to be funny";
+					String target = data.get("word").toString();
+					long gain = (long) data.get("amount");
+					if(answer.equalsIgnoreCase(target)) {
+						JSONObject userData = DatabaseManager.getDataByUser(e, "Economy Data");
+						if(userData == null) {
+							e.reply("You don't even have a profile, where would you store your violins???  Run `/start` **in a bot command channel** to get one!");
+							return;
+						}
+						String name = e.getAuthor().getEffectiveName();
+						if(name.contains("@everyone") || name.contains("@here") || name.contains("<@&") || name.contains("nigg")) {
+							name = "A user who thought they were trying to be funny";
+						}
+						userData.replace("violins", (long) userData.get("violins") + gain);
+						userData.replace("earnings", (long) userData.get("earnings") + gain);
+						userData.replace("luthiers", (long) userData.get("luthiers") + 1);
+						e.reply("**" + name + "** unscrambled `" + target + "` and gained " + Utils.formatNumber(gain) + Emoji.VIOLINS);
+						RNGesus.lootbox(e, userData);
+						Achievement.calculateAchievement(e, userData, "luthiers", "English Major");
+						DatabaseManager.saveDataByUser(e, "Economy Data", userData);
+						data.replace("hasWord", false);
+						data.replace("word", "blank");
+						DatabaseManager.saveDataByGuild(e, "Luthier Data", data);
+					} else {
+						try {
+							e.getMessage().addReaction(net.dv8tion.jda.api.entities.emoji.Emoji.fromUnicode("U+274C")).queue();
+						} catch(Exception exception) {
+							e.replyPrivate("Wrong answer!");
+							e.getChannel().sendMessage("**" + e.getAuthor().getEffectiveName() + "**: " + answer).complete().addReaction(net.dv8tion.jda.api.entities.emoji.Emoji.fromUnicode("U+274C")).queue();
+						}
 					}
-					userData.replace("violins", (long) userData.get("violins") + gain);
-					userData.replace("earnings", (long) userData.get("earnings") + gain);
-					userData.replace("luthiers", (long) userData.get("luthiers") + 1);
-					e.reply("**" + name + "** unscrambled `" + target + "` and gained " + Utils.formatNumber(gain) + Emoji.VIOLINS);
-					RNGesus.lootbox(e, userData);
-					Achievement.calculateAchievement(e, userData, "luthiers", "English Major");
-					DatabaseManager.saveDataByUser(e, "Economy Data", userData);
-					data.replace("hasWord", false);
-					data.replace("word", "blank");
-					DatabaseManager.saveDataByGuild(e, "Luthier Data", data);
 				} else {
-					try {
-						e.getMessage().addReaction(net.dv8tion.jda.api.entities.emoji.Emoji.fromUnicode("U+274C")).queue();
-					} catch(Exception exception) {
-						e.replyPrivate("Wrong answer!");
-						e.getChannel().sendMessage("**" + e.getAuthor().getEffectiveName() + "**: " + answer).complete().addReaction(net.dv8tion.jda.api.entities.emoji.Emoji.fromUnicode("U+274C")).queue();
-					}
+					e.reply("Please answer in the dedicated Luthier channel.  <#" + data.get("channel") + ">");
 				}
 			}
 		}
