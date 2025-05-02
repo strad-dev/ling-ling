@@ -46,7 +46,9 @@ public class Give {
 			user = "Someone";
 		}
 		data.replace(item, oldAmount + amount);
-		EmbedBuilder builder = new EmbedBuilder().setColor(Color.BLUE).setFooter("Ling Ling", e.getJDA().getSelfUser().getAvatarUrl())
+		EmbedBuilder builder = new EmbedBuilder()
+				.setColor(Color.YELLOW)
+				.setFooter("Ling Ling", e.getJDA().getSelfUser().getAvatarUrl())
 				.addField("Moderator: " + e.getAuthor().getName(), "User: <@" + receiver + ">\nItem type: " + item +
 						"\nAmount given: " + Utils.formatNumber(amount), false).setTitle("__**Currency Alteration Info**__");
 		Objects.requireNonNull(Objects.requireNonNull(e.getJDA().getGuildById("670725611207262219")).getTextChannelById("1029498872441077860")).sendMessageEmbeds(builder.build()).queue();

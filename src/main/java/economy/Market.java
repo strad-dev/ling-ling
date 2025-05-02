@@ -173,7 +173,7 @@ public class Market {
 				amount = 0;
 				builder = new EmbedBuilder()
 						.setFooter("Ling Ling Bot", e.getJDA().getSelfUser().getAvatarUrl())
-						.setColor(Color.GREEN)
+						.setColor(Color.BLUE)
 						.setTitle("**__Sell Offer Partially Filled__**")
 						.addField("Buyer: " + data.get("discordName") + " " + e.getAuthor().getId(), "Seller: " + tempData.get("discordName") + " `" + tempData.get("discordID") + "`\nItem: " + item + "\nPurchased: " + purchased + "\nPrice: " + price, false);
 				Objects.requireNonNull(Objects.requireNonNull(e.getJDA().getGuildById("670725611207262219")).getTextChannelById("1028934753270894592")).sendMessageEmbeds(builder.build()).queue();
@@ -202,7 +202,7 @@ public class Market {
 				tempData.replace("taxPaid", (long) tempData.get("taxPaid") + (long) (price * 0.01));
 				builder = new EmbedBuilder()
 						.setFooter("Ling Ling Bot", e.getJDA().getSelfUser().getAvatarUrl())
-						.setColor(Color.GREEN)
+						.setColor(Color.BLUE)
 						.setTitle("**__Sell Offer Filled__**")
 						.addField("Buyer: " + data.get("discordName") + " " + e.getAuthor().getId(), "Seller: " + tempData.get("discordName") + " `" + tempData.get("discordID") + "`\nItem: " + item + "\n# Purchased: " + purchased + "\nPrice: " + price, false);
 				Objects.requireNonNull(Objects.requireNonNull(e.getJDA().getGuildById("670725611207262219")).getTextChannelById("1028934753270894592")).sendMessageEmbeds(builder.build()).queue();
@@ -268,7 +268,7 @@ public class Market {
 		DatabaseManager.saveMarketData(item, orders);
 		builder = new EmbedBuilder()
 				.setFooter("Ling Ling Bot", e.getJDA().getSelfUser().getAvatarUrl())
-				.setColor(Color.BLUE)
+				.setColor(Color.GREEN)
 				.setTitle("**__Sell Offer Setup__**")
 				.addField("User: " + e.getAuthor().getGlobalName() + " " + e.getAuthor().getId(), "Item: " + item + "\nAmount: " + Utils.formatNumber(amount) + "\nPrice: " + Utils.formatNumber(price), false);
 		Objects.requireNonNull(Objects.requireNonNull(e.getJDA().getGuildById("670725611207262219")).getTextChannelById("1028934753270894592")).sendMessageEmbeds(builder.build()).queue();
