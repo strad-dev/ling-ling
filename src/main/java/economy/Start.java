@@ -9,7 +9,6 @@ import org.bson.Document;
 import org.json.simple.JSONArray;
 import processes.DatabaseManager;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -219,6 +218,7 @@ public class Start {
 						// Luthier
 						.append("luthierBalance", 0L)
 						.append("luthierServers", new JSONArray())
+						.append("cheater", 0L)
 
 						// Misc Data
 						.append("banned", ban)

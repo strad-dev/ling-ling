@@ -53,6 +53,7 @@ public class Stats {
 				.addField("**__Miscellaneous__**", "**Highest Daily Streak**: " + Utils.formatNumber(data.get("maxStreak")) +
 						"\n**Highest Scale Streak**: " + Utils.formatNumber(data.get("scaleStreakRecord")) +
 						"\n**Luthiers Unscrambled**: " + Utils.formatNumber(data.get("luthiers")) +
+						"\n**Cheats Used**: " + Utils.formatNumber(data.get("cheater")) +
 						"\n**Violins Earned**: " + Utils.formatNumber(data.get("earnings")) +
 						"\n**Interest Earned**: " + Utils.formatNumber(data.get("interestEarned")) +
 						"\n**Penalties Paid**: " + Utils.formatNumber(data.get("penaltiesIncurred")), true);

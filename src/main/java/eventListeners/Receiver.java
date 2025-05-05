@@ -104,7 +104,6 @@ public class Receiver extends ListenerAdapter {
 			if(!e.getAuthor().getId().equals("733409243222507670") || e.getAuthor().getId().equals("733409243222507670") && !e.getMessage().getContentRaw().toLowerCase().contains("poll")) {
 				try {
 					e.getChannel().addReactionById(e.getChannel().getLatestMessageId(), Emoji.fromUnicode("U+1F1FB")).queue();
-					e.getChannel().addReactionById(e.getChannel().getLatestMessageId(), Emoji.fromUnicode("U+1F1FB")).queue();
 					e.getChannel().addReactionById(e.getChannel().getLatestMessageId(), Emoji.fromUnicode("U+1F1EE")).queue();
 					e.getChannel().addReactionById(e.getChannel().getLatestMessageId(), Emoji.fromUnicode("U+1F1F4")).queue();
 					e.getChannel().addReactionById(e.getChannel().getLatestMessageId(), Emoji.fromUnicode("U+1F1F1")).queue();

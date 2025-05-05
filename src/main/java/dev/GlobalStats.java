@@ -26,6 +26,7 @@ public class GlobalStats {
 		long votes = 0;
 		long maxStreak = 0;
 		long luthiers = 0;
+		long cheaters = 0;
 		long earnings = 0;
 		long interest = 0;
 		long penalties = 0;
@@ -53,6 +54,7 @@ public class GlobalStats {
 			votes += (long) data.get("votes");
 			maxStreak = Math.max(maxStreak, (long) data.get("maxStreak"));
 			luthiers += (long) data.get("luthiers");
+			cheaters += (long) data.get("cheater");
 			earnings += (long) data.get("earnings");
 			interest += (long) data.get("interestEarned");
 			penalties += (long) data.get("penaltiesIncurred");
@@ -80,6 +82,7 @@ public class GlobalStats {
 		builder.addBlankField(true);
 		builder.addField("**__Miscellaneous__**", "**Highest Daily Streak**: " + Utils.formatNumber(maxStreak) +
 				"\n**Luthiers Unscrambled**: " + Utils.formatNumber(luthiers) +
+				"\n**Cheats Used**: " + Utils.formatNumber(cheaters) +
 				"\n**Violins Earned**: " + Utils.formatNumber(earnings) +
 				"\n**Interest Earned**: " + Utils.formatNumber(interest) +
 				"\n**Penalties Paid**: " + Utils.formatNumber(penalties), true);

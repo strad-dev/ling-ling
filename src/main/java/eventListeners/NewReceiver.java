@@ -394,6 +394,8 @@ class CreateThreadSlash implements Runnable {
 								Leaderboard.leaderboard(e, Emoji.VIOLINS, "Biggest Spenders", "moneySpent", (long) data.get("moneySpent"), (String) data.get("color"));
 						case "scalestreak" ->
 								Leaderboard.leaderboard(e, ":scales:", "Most In Need of Touching Grass", "scaleStreakRecord", (long) data.get("scaleStreakRecord"), (String) data.get("color"));
+						case "cheater" ->
+								Leaderboard.leaderboard(e, ":rage:", "Dirtiest Cheaters (NOTE: A high ranking on this leaderboard is a BAD thing!!!)", "cheater", (long) data.get("cheater"), (String) data.get("color"));
 						default -> e.reply("""
 								You must provide a valid leaderboard type.  Valid types...
 								
@@ -417,7 +419,8 @@ class CreateThreadSlash implements Runnable {
 								`magicfind`: Users with the most Magic Find
 								`moneyearned`: Users who have earned the most money from Market
 								`moneyspent`: Users who have spent the most money on Market
-								`scalestreak`: Users who have had the longest Scale Streaks""");
+								`scalestreak`: Users who have had the longest Scale Streaks
+								`cheater`: Users who cheat the most in Luthier""");
 					}
 				} catch(Exception exception) {
 					e.reply("""

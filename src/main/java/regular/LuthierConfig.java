@@ -3,6 +3,7 @@ package regular;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.result.InsertOneResult;
+import economy.SaveData;
 import eventListeners.GenericDiscordEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -18,7 +19,7 @@ import static com.mongodb.client.model.Filters.eq;
 
 public class LuthierConfig {
 	private static boolean isAdmin(GenericDiscordEvent e) {
-		return e.getGuild().getMember(e.getAuthor()).getPermissions().contains(Permission.ADMINISTRATOR) || Utils.checkPermLevel(e.getAuthor().getId()) >= 1;
+		return e.getGuild().retrieveMember(e.getAuthor()).complete().getPermissions().contains(Permission.ADMINISTRATOR) || Utils.checkPermLevel(e.getAuthor().getId()) >= 1;
 	}
 
 	private static void sendLog(GenericDiscordEvent e, JSONObject data, String action) {
@@ -38,7 +39,9 @@ public class LuthierConfig {
 		}
 		e.getJDA().getGuildById("670725611207262219").getTextChannelById("1341876485782372432").sendMessageEmbeds(builder.build()).queue();
 		try {
-			e.getJDA().getGuildById((String) data.get("discordID")).getTextChannelById((String) data.get("logChannel")).sendMessageEmbeds(builder.build()).queue();
+			if(!action.contains("Setup")) {
+				e.getJDA().getGuildById((String) data.get("discordID")).getTextChannelById((String) data.get("logChannel")).sendMessageEmbeds(builder.build()).queue();
+			}
 		} catch(Exception exception) {
 			// nothing here
 		}
@@ -73,6 +76,8 @@ public class LuthierConfig {
 									.append("word", "blank").append("amount", 0)
 									.append("discordID", e.getGuild().getId()));
 							e.reply("Successfully set up Luthier for " + e.getGuild().getName() + " in " + e.getChannel().getAsMention() + "\nLuthier Multipliers can be crafted using `!craft`\nIf you have existing multipliers, you can apply them using `!luthier add`\n\nBy default, unscrambles and logs are both sent into this channel.  If you would like to change them, use `!luthier settings`");
+							serverData = DatabaseManager.getDataById("Luthier Data", e.getGuild().getId());
+							sendLog(e, serverData,"**Luthier Setup**\nGuild: " + e.getJDA().getGuildById((String) serverData.get("discordID")).getName() + " `" + serverData.get("discordID") + "`");
 						} catch(Exception exception2) {
 							e.reply("Something went horribly wrong!");
 						}
@@ -155,6 +160,9 @@ public class LuthierConfig {
 					if(Utils.checkPermLevel(e.getAuthor().getId()) < 1) {
 						serverData.replace("cheatCD", time + 43140000);
 					}
+					JSONObject userData = DatabaseManager.getEconomyData(e);
+					userData.replace("cheater", (long) userData.get("cheater") + 1);
+					SaveData.saveData(e, userData);
 					sendLog(e, serverData, "CHEATER");
 				}
 			}
@@ -179,150 +187,172 @@ public class LuthierConfig {
 				e.reply(builder.toString());
 			}
 			case "contributors" -> {
-				JSONArray contributors = (JSONArray) serverData.get("contributors");
-				if(contributors.isEmpty()) {
-					e.reply("There are no contributors to this server's Luthier!");
-					return;
+				if(e.getGuild().getId().equals("670725611207262219")) {
+					e.reply("This server gets Luthier from Ling Ling himself (herself?).  It is derived from Divine Power, and thus cannot be modified by mere mortals.");
+				} else {
+					JSONArray contributors = (JSONArray) serverData.get("contributors");
+					if(contributors.isEmpty()) {
+						e.reply("There are no contributors to this server's Luthier!");
+						return;
+					}
+					StringBuilder builder = new StringBuilder("Contributors to this server's Luthier:\n");
+					long multiplier = 0;
+					for(Object o : contributors) {
+						JSONObject contributor = (JSONObject) o;
+						String user = (String) contributor.get("discordID");
+						long contribution = (long) contributor.get("amount");
+						multiplier += contribution;
+						builder.append(e.getJDA().retrieveUserById(user).complete().getEffectiveName()).append(" `").append(user).append("` - `").append(contribution).append("x`\n");
+					}
+					builder.append("\nTotal Multiplier: `").append(multiplier).append("x`\n");
+					e.reply(builder.toString());
 				}
-				StringBuilder builder = new StringBuilder("Contributors to this server's Luthier:\n");
-				long multiplier = 0;
-				for(Object o : contributors) {
-					JSONObject contributor = (JSONObject) o;
-					String user = (String) contributor.get("discordID");
-					long contribution = (long) contributor.get("amount");
-					multiplier += contribution;
-					builder.append(e.getJDA().retrieveUserById(user).complete().getEffectiveName()).append(" `").append(user).append("` - `").append(contribution).append("x`\n");
-				}
-				builder.append("\nTotal Multiplier: `").append(multiplier).append("x`\n");
-				e.reply(builder.toString());
 			}
 			case "add" -> {
 				JSONObject userData = DatabaseManager.getEconomyData(e);
-				long balance = (long) userData.get("luthierBalance");
-				long amount;
-				try {
-					amount = Long.parseLong(editAction);
-				} catch(Exception exception) {
+				if(e.getGuild().getId().equals("670725611207262219") && Utils.checkPermLevel(e.getAuthor().getId()) < 3) {
+					e.reply("""
+							Strad find you trying to sneakily mess with the only buffed Luthier around.  He kicks you out, and slaps you with a fine equal to your hourly income.
+							
+							Don't try to increase the Luthier of the support server.  It won't work or end well.""");
+					userData.replace("violins", (long) userData.get("violins") - (long) userData.get("income"));
+					SaveData.saveData(e, userData);
+				} else {
+					long balance = (long) userData.get("luthierBalance");
+					long amount;
 					try {
-						amount = Long.parseLong(newValue);
-					} catch(Exception exception2) {
-						e.reply("Invalid or no amount provided!");
-						return;
+						amount = Long.parseLong(editAction);
+					} catch(Exception exception) {
+						try {
+							amount = Long.parseLong(newValue);
+						} catch(Exception exception2) {
+							e.reply("Invalid or no amount provided!");
+							return;
+						}
 					}
-				}
 
-				if(amount < 0) {
-					e.reply("You cannot add a negative amount!");
-				}
-				if(amount > balance) {
-					amount = balance;
-				}
-
-				serverData.replace("multiplier", (long) serverData.get("multiplier") + amount);
-				JSONArray contributors = (JSONArray) serverData.get("contributors");
-				JSONArray userServers = (JSONArray) userData.get("luthierServers");
-
-				boolean found = false;
-				for(Object o : contributors) {
-					JSONObject contributor = (JSONObject) o;
-					if(contributor.get("discordID").equals(e.getAuthor().getId())) {
-						contributor.replace("amount", (long) contributor.get("amount") + amount);
-						found = true;
-						break;
+					if(amount < 0) {
+						e.reply("You cannot add a negative amount!");
 					}
-				}
-				if(!found) {
-					JSONObject contributor = new JSONObject();
-					contributor.put("discordID", e.getAuthor().getId());
-					contributor.put("amount", amount);
-					contributors.add(contributor);
-				}
-
-				boolean serverFound = false;
-				for(Object s : userServers) {
-					JSONObject server = (JSONObject) s;
-					if(server.get("discordID").equals(e.getGuild().getId())) {
-						server.replace("amount", (long) server.get("amount") + amount);
-						serverFound = true;
-						break;
+					if(amount > balance) {
+						amount = balance;
 					}
+
+					serverData.replace("multiplier", (long) serverData.get("multiplier") + amount);
+					JSONArray contributors = (JSONArray) serverData.get("contributors");
+					JSONArray userServers = (JSONArray) userData.get("luthierServers");
+
+					boolean found = false;
+					for(Object o : contributors) {
+						JSONObject contributor = (JSONObject) o;
+						if(contributor.get("discordID").equals(e.getAuthor().getId())) {
+							contributor.replace("amount", (long) contributor.get("amount") + amount);
+							found = true;
+							break;
+						}
+					}
+					if(!found) {
+						JSONObject contributor = new JSONObject();
+						contributor.put("discordID", e.getAuthor().getId());
+						contributor.put("amount", amount);
+						contributors.add(contributor);
+					}
+
+					boolean serverFound = false;
+					for(Object s : userServers) {
+						JSONObject server = (JSONObject) s;
+						if(server.get("discordID").equals(e.getGuild().getId())) {
+							server.replace("amount", (long) server.get("amount") + amount);
+							serverFound = true;
+							break;
+						}
+					}
+					if(!serverFound) {
+						JSONObject server = new JSONObject();
+						server.put("discordID", e.getGuild().getId());
+						server.put("amount", amount);
+						userServers.add(server);
+					}
+					userData.replace("luthierBalance", (long) userData.get("luthierBalance") - amount);
+					SaveData.saveData(e, userData);
+					serverData.put("contributors", contributors);
+					DatabaseManager.saveDataByGuild(e, "Luthier Data", serverData);
+					e.reply("Added `" + amount + "x` multiplier to " + e.getGuild().getName());
+					sendLog(e, serverData, "**Add Luthier**\nGuild: " + e.getGuild().getName() + " `" + e.getGuild().getId() + "`\nAmount: `" + amount + "x`");
 				}
-				if(!serverFound) {
-					JSONObject server = new JSONObject();
-					server.put("discordID", e.getGuild().getId());
-					server.put("amount", amount);
-					userServers.add(server);
-				}
-				userData.replace("luthierBalance", (long) userData.get("luthierBalance") - amount);
-				DatabaseManager.saveDataByUser(e, "Economy Data", userData);
-				serverData.put("contributors", contributors);
-				DatabaseManager.saveDataByGuild(e, "Luthier Data", serverData);
-				e.reply("Added `" + amount + "x` multiplier to " + e.getGuild().getName());
-				sendLog(e, serverData, "**Add Luthier**\nGuild: " + e.getGuild().getName() + " `" + e.getGuild().getId() + "`\nAmount: `" + amount + "x`");
 			}
 			case "remove" -> {
 				JSONObject userData = DatabaseManager.getEconomyData(e);
-				long balance = (long) userData.get("luthierBalance");
-				long amount;
-				try {
-					amount = Long.parseLong(editAction);
-				} catch(Exception exception) {
+				if(e.getGuild().getId().equals("670725611207262219") && Utils.checkPermLevel(e.getAuthor().getId()) < 3) {
+					e.reply("""
+							Strad find you trying to sneakily mess with the only buffed Luthier around.  He kicks you out, and slaps you with a fine equal to your hourly income.
+							
+							Don't try to increase the Luthier of the support server.  It won't work or end well.""");
+					userData.replace("violins", (long) userData.get("violins") - (long) userData.get("income"));
+					SaveData.saveData(e, userData);
+				} else {
+					long balance = (long) userData.get("luthierBalance");
+					long amount;
 					try {
-						amount = Long.parseLong(newValue);
-					} catch(Exception exception2) {
-						e.reply("Invalid or no amount provided!");
-						return;
-					}
-				}
-
-				if(amount < 0) {
-					e.reply("You cannot remove a negative amount!");
-					return;
-				}
-
-				serverData.replace("multiplier", (long) serverData.get("multiplier") - amount);
-				JSONArray contributors = (JSONArray) serverData.get("contributors");
-				JSONArray userServers = (JSONArray) userData.get("luthierServers");
-
-				boolean found = false;
-				for(Object o : contributors) {
-					JSONObject contributor = (JSONObject) o;
-					if(contributor.get("discordID").equals(e.getAuthor().getId())) {
-						long currentAmount = (long) contributor.get("amount");
-						if(currentAmount < amount) {
-							e.reply("You cannot remove more than you contributed!");
+						amount = Long.parseLong(editAction);
+					} catch(Exception exception) {
+						try {
+							amount = Long.parseLong(newValue);
+						} catch(Exception exception2) {
+							e.reply("Invalid or no amount provided!");
 							return;
 						}
-						contributor.replace("amount", currentAmount - amount);
-						if((long) contributor.get("amount") == 0) {
-							contributors.remove(contributor);
-						}
-						found = true;
-						break;
 					}
-				}
-				if(!found) {
-					e.reply("You haven't contributed any multipliers to this server!");
-					return;
-				}
-				for(Object s : userServers) {
-					JSONObject server = (JSONObject) s;
-					if(server.get("discordID").equals(e.getGuild().getId())) {
-						long currentAmount = (long) server.get("amount");
-						if(currentAmount <= amount) {
-							userServers.remove(server);
-						} else {
-							server.replace("amount", currentAmount - amount);
-						}
-						break;
+
+					if(amount < 0) {
+						e.reply("You cannot remove a negative amount!");
+						return;
 					}
+
+					serverData.replace("multiplier", (long) serverData.get("multiplier") - amount);
+					JSONArray contributors = (JSONArray) serverData.get("contributors");
+					JSONArray userServers = (JSONArray) userData.get("luthierServers");
+
+					boolean found = false;
+					for(Object o : contributors) {
+						JSONObject contributor = (JSONObject) o;
+						if(contributor.get("discordID").equals(e.getAuthor().getId())) {
+							long currentAmount = (long) contributor.get("amount");
+							if(currentAmount < amount) {
+								e.reply("You cannot remove more than you contributed!");
+								return;
+							}
+							contributor.replace("amount", currentAmount - amount);
+							if((long) contributor.get("amount") == 0) {
+								contributors.remove(contributor);
+							}
+							found = true;
+							break;
+						}
+					}
+					if(!found) {
+						e.reply("You haven't contributed any multipliers to this server!");
+						return;
+					}
+					for(Object s : userServers) {
+						JSONObject server = (JSONObject) s;
+						if(server.get("discordID").equals(e.getGuild().getId())) {
+							long currentAmount = (long) server.get("amount");
+							if(currentAmount <= amount) {
+								userServers.remove(server);
+							} else {
+								server.replace("amount", currentAmount - amount);
+							}
+							break;
+						}
+					}
+					userData.replace("luthierBalance", balance + amount);
+					DatabaseManager.saveDataByUser(e, "Economy Data", userData);
+					serverData.put("contributors", contributors);
+					DatabaseManager.saveDataByGuild(e, "Luthier Data", serverData);
+					e.reply("Removed `" + amount + "x` multiplier from " + e.getGuild().getName());
+					sendLog(e, serverData, "**Remove Luthier**\nGuild: " + e.getGuild().getName() + " `" + e.getGuild().getId() + "`\nAmount: `" + amount + "x`");
 				}
-				userData.replace("luthierBalance", balance + amount);
-				DatabaseManager.saveDataByUser(e, "Economy Data", userData);
-				serverData.put("contributors", contributors);
-				DatabaseManager.saveDataByGuild(e, "Luthier Data", serverData);
-				e.reply("Removed `" + amount + "x` multiplier from " + e.getGuild().getName());
-				sendLog(e, serverData, "**Remove Luthier**\nGuild: " + e.getGuild().getName() + " `" + e.getGuild().getId() + "`\nAmount: `" + amount + "x`");
 			}
 			case "forceremove" -> {
 				MongoDatabase database = DatabaseManager.getDatabase();

@@ -20,20 +20,20 @@ public class Daily {
 			e.reply("I can't give out violins that fast, wait " + hours + " hours " + minutes + " minutes " + seconds + " seconds " + milliseconds + " milliseconds!");
 		} else {
 			long streak = (long) data.get("streak") + 1;
-			long income = (long) data.get("income") + 1000;
+			long income = ((long) data.get("income") + 1000) * 10;
 			long bonusMedals = (long) data.get("bonusMedals");
 			String message = "";
 			if(time > dailyCD + 86400000 && streak != 0) {
 				message += "Oh no!  Your streak was reset!\n";
 				streak = 0;
 			}
-			long base = income + (streak * (income / 100));
+			long base = income + (streak * (income / 50));
 			Utils.calculateLoan(data, base);
-			data.replace("essence", (long) data.get("essence") + (income / 500));
+			data.replace("essence", (long) data.get("essence") + (income / 5000));
 			data.replace("earnings", (long) data.get("earnings") + base);
 			data.replace("dailyCD", time + 85500000); // 23.75 hours cooldown
 			message += "You received a total of " + Utils.formatNumber(base) + Emoji.VIOLINS + " and " + Utils.formatNumber((income / 500)) + ":sparkles:, with " +
-					Utils.formatNumber(streak * (income / 100)) + Emoji.VIOLINS + " coming from your " + Utils.formatNumber(streak) + "-day streak!";
+					Utils.formatNumber(streak * (income / 50)) + Emoji.VIOLINS + " coming from your " + Utils.formatNumber(streak) + "-day streak!";
 			if(bonusMedals > 0) {
 				message += "\nLing Ling's favor grants you an additional " + Utils.formatNumber(bonusMedals) + Emoji.MEDALS;
 				data.replace("medals", (long) data.get("medals") + bonusMedals);

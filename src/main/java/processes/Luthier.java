@@ -77,14 +77,14 @@ public class Luthier {
 					DatabaseManager.saveDataByGuild(e, "Luthier Data", data);
 				}
 			} else if((boolean) data.get("hasWord") && !e.getAuthor().isBot() && !answer.isEmpty()) {
-				if(e.getChannel().getId().equals(data.get("channel").toString())) {
-					if(answer.equals("none")) {
-						e.reply("You have to give an answer, stupid.");
-						return;
-					}
-					String target = data.get("word").toString();
-					long gain = (long) data.get("amount");
-					if(answer.equalsIgnoreCase(target)) {
+				if(answer.equals("none")) {
+					e.reply("You have to give an answer, stupid.");
+					return;
+				}
+				String target = data.get("word").toString();
+				long gain = (long) data.get("amount");
+				if(answer.equalsIgnoreCase(target)) {
+					if(e.getChannel().getId().equals(data.get("channel").toString())) {
 						JSONObject userData = DatabaseManager.getDataByUser(e, "Economy Data");
 						if(userData == null) {
 							e.reply("You don't even have a profile, where would you store your violins???  Run `/start` **in a bot command channel** to get one!");
@@ -105,15 +105,15 @@ public class Luthier {
 						data.replace("word", "blank");
 						DatabaseManager.saveDataByGuild(e, "Luthier Data", data);
 					} else {
-						try {
-							e.getMessage().addReaction(net.dv8tion.jda.api.entities.emoji.Emoji.fromUnicode("U+274C")).queue();
-						} catch(Exception exception) {
-							e.replyPrivate("Wrong answer!");
-							e.getChannel().sendMessage("**" + e.getAuthor().getEffectiveName() + "**: " + answer).complete().addReaction(net.dv8tion.jda.api.entities.emoji.Emoji.fromUnicode("U+274C")).queue();
-						}
+						e.reply("Please answer in the dedicated Luthier channel.  <#" + data.get("channel") + ">");
 					}
 				} else {
-					e.reply("Please answer in the dedicated Luthier channel.  <#" + data.get("channel") + ">");
+					try {
+						e.getMessage().addReaction(net.dv8tion.jda.api.entities.emoji.Emoji.fromUnicode("U+274C")).queue();
+					} catch(Exception exception) {
+						e.replyPrivate("Wrong answer!");
+						e.getChannel().sendMessage("**" + e.getAuthor().getEffectiveName() + "**: " + answer).complete().addReaction(net.dv8tion.jda.api.entities.emoji.Emoji.fromUnicode("U+274C")).queue();
+					}
 				}
 			}
 		}

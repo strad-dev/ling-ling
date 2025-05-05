@@ -468,6 +468,8 @@ class CreateThreadMessage implements Runnable {
 									Leaderboard.leaderboard(e, Emoji.VIOLINS, "Baldest Bozos", "penaltiesIncurred", (long) data.get("penaltiesIncurred"), (String) data.get("color"));
 							case "scalestreak" ->
 									Leaderboard.leaderboard(e, ":scales:", "Most in Need of Touching Grass", "scaleStreakRecord", (long) data.get("scaleStreakRecord"), (String) data.get("color"));
+							case "cheater" ->
+									Leaderboard.leaderboard(e, ":rage:", "Dirtiest Cheaters (NOTE: A high ranking on this leaderboard is a BAD thing!!!)", "cheater", (long) data.get("cheater"), (String) data.get("color"));
 							default -> e.reply("""
 									You must provide a valid leaderboard type.  Valid types...
 									
@@ -491,7 +493,8 @@ class CreateThreadMessage implements Runnable {
 									`magicfind`: Users with the most Magic Find
 									`moneyearned`: Users who have earned the most money from Market
 									`moneyspent`: Users who have spent the most money on Market
-									`scalestreak`: Users who have had the longest Scale Streaks""");
+									`scalestreak`: Users who have had the longest Scale Streaks
+									`cheater`: Users who cheat the most in Luthier""");
 						}
 					} catch(Exception exception) {
 						e.reply("""
@@ -651,32 +654,28 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "luthier" -> {
-					if(checkPermLevel(e.getAuthor().getId()) >= 2) {
-						String actionType;
-						String editOption;
-						StringBuilder newValue = new StringBuilder();
-						try {
-							actionType = message[2];
-						} catch(Exception exception) {
-							actionType = "stats";
-						}
-						try {
-							editOption = message[3];
-						} catch(Exception exception) {
-							editOption = "";
-						}
-						try {
-							for(int i = 4; i < message.length; i++) {
-								newValue.append(message[i]).append(" ");
-							}
-							newValue.deleteCharAt(newValue.length() - 1);
-						} catch(Exception exception) {
-							newValue = new StringBuilder();
-						}
-						LuthierConfig.luthierConfig(e, actionType, editOption, newValue.toString());
-					} else {
-						Utils.permissionDenied(e);
+					String actionType;
+					String editOption;
+					StringBuilder newValue = new StringBuilder();
+					try {
+						actionType = message[2];
+					} catch(Exception exception) {
+						actionType = "stats";
 					}
+					try {
+						editOption = message[3];
+					} catch(Exception exception) {
+						editOption = "";
+					}
+					try {
+						for(int i = 4; i < message.length; i++) {
+							newValue.append(message[i]).append(" ");
+						}
+						newValue.deleteCharAt(newValue.length() - 1);
+					} catch(Exception exception) {
+						newValue = new StringBuilder();
+					}
+					LuthierConfig.luthierConfig(e, actionType, editOption, newValue.toString());
 				}
 				case "resetincomes" -> {
 					if(checkPermLevel(e.getAuthor().getId()) >= 2) {
@@ -785,44 +784,45 @@ class CreateThreadMessage implements Runnable {
 					}
 				}
 				case "custom" -> {
-//					if(checkPermLevel(e.getAuthor().getId()) == 3) {
-//						e.getChannel().sendMessage("Working...").queue();
-//						ArrayList<Document> documents = DatabaseManager.getAllEconomyData();
-//						MongoCollection<Document> collection = DatabaseManager.prepareStoreAllEconomyData();
-//						JSONParser parser = new JSONParser();
-//						for(Document file : documents) {
-//							JSONObject data;
-//							try {
-//								data = (JSONObject) parser.parse(file.toJson());
-//							} catch(Exception exception) {
-//								System.out.println("Failed!");
-//								continue;
-//							}
-//							data.put("luthierBalance", 0L);
-//							data.put("luthierServers", new JSONArray());
-//							data.put("essence", 0L);
-//							collection.replaceOne(eq("discordID", data.get("discordID")), Document.parse(data.toJSONString()));
-//						}
-//
-//						documents = DatabaseManager.getAllData("Luthier Data");
-//						collection = DatabaseManager.prepareStoreAllData("Luthier Data");
-//						for(Document file : documents) {
-//							JSONObject data;
-//							try {
-//								data = (JSONObject) parser.parse(file.toJson());
-//							} catch(Exception exception) {
-//								System.out.println("Failed!");
-//								continue;
-//							}
-//							data.put("logChannel", data.get("channel"));
-//							data.put("cheatCD", 0L);
-//							data.put("contributors", new JSONArray());
-//							collection.replaceOne(eq("discordID", data.get("discordID")), Document.parse(data.toJSONString()));
-//						}
-//						e.reply("Database update complete!");
-//					} else {
-//						Utils.permissionDenied(e);
-//					}
+					/*if(checkPermLevel(e.getAuthor().getId()) == 3) {
+						e.getChannel().sendMessage("Working...").queue();
+						ArrayList<Document> documents = DatabaseManager.getAllEconomyData();
+						MongoCollection<Document> collection = DatabaseManager.prepareStoreAllEconomyData();
+						JSONParser parser = new JSONParser();
+						for(Document file : documents) {
+							JSONObject data;
+							try {
+								data = (JSONObject) parser.parse(file.toJson());
+							} catch(Exception exception) {
+								System.out.println("Failed!");
+								continue;
+							}
+							data.put("luthierBalance", 0L);
+							data.put("luthierServers", new JSONArray());
+							data.put("essence", 0L);
+							data.put("cheater", 0L);
+							collection.replaceOne(eq("discordID", data.get("discordID")), Document.parse(data.toJSONString()));
+						}
+
+						documents = DatabaseManager.getAllData("Luthier Data");
+						collection = DatabaseManager.prepareStoreAllData("Luthier Data");
+						for(Document file : documents) {
+							JSONObject data;
+							try {
+								data = (JSONObject) parser.parse(file.toJson());
+							} catch(Exception exception) {
+								System.out.println("Failed!");
+								continue;
+							}
+							data.put("logChannel", data.get("channel"));
+							data.put("cheatCD", 0L);
+							data.put("contributors", new JSONArray());
+							collection.replaceOne(eq("discordID", data.get("discordID")), Document.parse(data.toJSONString()));
+						}
+						e.reply("Database update complete!");
+					} else {
+						Utils.permissionDenied(e);
+					} */
 					e.reply("No Update Here!");
 				}
 			}

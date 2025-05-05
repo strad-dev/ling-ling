@@ -260,6 +260,12 @@ public class Utils {
 		}
 	}
 
+	/**
+	 * Determines if the current channel is a channel dedicated to Beta Testing.
+	 *
+	 * @param channel Channel
+	 * @return If the channel is dedicated to Beta Testing.
+	 */
 	public static boolean isBetaChannel(String channel) {
 		return channel.equals("733437327225127074") || channel.equals("867617298918670366") || channel.equals("763196633545441291");
 	}
