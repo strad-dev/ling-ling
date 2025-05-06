@@ -32,7 +32,7 @@ public class Daily {
 			data.replace("essence", (long) data.get("essence") + (income / 5000));
 			data.replace("earnings", (long) data.get("earnings") + base);
 			data.replace("dailyCD", time + 85500000); // 23.75 hours cooldown
-			message += "You received a total of " + Utils.formatNumber(base) + Emoji.VIOLINS + " and " + Utils.formatNumber((income / 500)) + ":sparkles:, with " +
+			message += "You received a total of " + Utils.formatNumber(base) + Emoji.VIOLINS + " and " + Utils.formatNumber((income / 5000)) + ":sparkles:, with " +
 					Utils.formatNumber(streak * (income / 50)) + Emoji.VIOLINS + " coming from your " + Utils.formatNumber(streak) + "-day streak!";
 			if(bonusMedals > 0) {
 				message += "\nLing Ling's favor grants you an additional " + Utils.formatNumber(bonusMedals) + Emoji.MEDALS;
