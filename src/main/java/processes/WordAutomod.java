@@ -40,26 +40,26 @@ public class WordAutomod {
 	public static void wordAutomod(GenericDiscordEvent e) {
 		List<String> messageArray = Arrays.stream(e.getMessage().getContentRaw().toLowerCase().split(" ")).toList();
 		String message = EmojiParser.parseToAliases(e.getMessage().getContentRaw()).toLowerCase();
-		if(messageArray.contains("kys")) {
-			moderate(e, "kys", true);
+		if(message.contains("kys")) {
+			moderate(e, "wishing harm upon another server member", true);
 		}
-		if(messageArray.contains("retard")) {
+		if(message.contains("retard")) {
 			moderate(e, "r-word", true);
 		}
-		if(messageArray.contains("cunt")) {
+		if(message.contains("cunt")) {
 			moderate(e, "c-word", true);
 		}
-		if(messageArray.contains("chink")) {
+		if(message.contains("chink")) {
 			moderate(e, "other c-word", true);
 		}
-		if(messageArray.contains("nigg") || messageArray.contains("nibba")) {
+		if(message.contains("nigg") || message.contains("nibba")) {
 			moderate(e, "n-word", true);
 		}
-		if(messageArray.contains("discord.gg/")) {
+		if(message.contains("discord.gg/") || message.contains("discord.com/invite/") || message.contains("discordapp.com/invite/")) {
 			moderate(e, "advertising", true);
 		}
-		if(message.contains("foraging")) {
-			moderate(e, "f\\*raging", false);
+		if(message.contains("dae sword") || message.contains("dae blade") || message.contains("daedalus sword") || message.contains("daedalus blade")) {
+			moderate(e, "dae axe slander", false);
 		}
 		int caps = 0;
 		int zalgos = 0;

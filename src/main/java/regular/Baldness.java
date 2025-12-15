@@ -9,1818 +9,990 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.hypixel.api.HypixelAPI;
 import net.hypixel.api.http.HypixelHttpClient;
 import net.hypixel.api.reply.skyblock.SkyBlockProfilesReply;
-import processes.DatabaseManager;
 import processes.HypixelManager;
 import processes.Utils;
 
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.concurrent.ExecutionException;
+import java.util.*;
 
 public class Baldness {
+
+	// Configuration class for easy value updates
+	private static class BaldnessConfig {
+		// Thresholds and multipliers
+		static final long SKYBLOCK_LEVEL_THRESHOLD = 517;
+		static final double SKYBLOCK_LEVEL_MULTIPLIER = 0.002;
+
+		static final long CATA_LEVEL_THRESHOLD = 50;
+		static final double CATA_LEVEL_MULTIPLIER = 0.03;
+
+		static final long CLASS_LEVEL_THRESHOLD = 50;
+		static final double CLASS_LEVEL_MULTIPLIER = 0.004;
+
+		static final long M7_PB_THRESHOLD = 360;
+		static final double M7_PB_MULTIPLIER = 0.005;
+		static final double M7_PB_MAX = 1.2;
+
+		static final long SLAYER_LEVEL_THRESHOLD = 9;
+		static final double SLAYER_LEVEL_MULTIPLIER = 0.02;
+
+		static final long VAMP_SLAYER_THRESHOLD = 5;
+		static final double VAMP_SLAYER_MULTIPLIER = 0.02;
+
+		static final long BESTIARY_THRESHOLD = 375;
+		static final double BESTIARY_MULTIPLIER = 0.0025;
+
+		static final double COLLECTION_THRESHOLD_MULTIPLIER = 0.015;
+		static final double GOLD_COLLECTION_MULTIPLIER = 1;
+
+		static final double MINION_MULTIPLIER = 0.02;
+
+		static final long MAX_MAGICAL_POWER = 1865;
+		static final double MP_MULTIPLIER = 0.0006;
+
+		static final long HOTM_LEVEL_THRESHOLD = 10;
+		static final double HOTM_LEVEL_MULTIPLIER = 0.1;
+
+		static final double MITHRIL_THRESHOLD = 12.5;
+		static final double GEMSTONE_THRESHOLD = 20;
+		static final double GLACITE_THRESHOLD = 20;
+		static final double POWDER_MULTIPLIER = 0.02;
+
+		static final double TROPHY_FISH_MULTIPLIER = 0.055;
+
+		static final long DOJO_THRESHOLD = 7000;
+		static final double DOJO_MULTIPLIER = 0.0001;
+
+		static final long MUSEUM_THRESHOLD = 300;
+		static final double MUSEUM_MULTIPLIER = 0.002;
+
+		static final long VISITOR_THRESHOLD = 10000;
+		static final double VISITOR_MULTIPLIER = 0.0001;
+
+		static final long CROP_MILESTONE_THRESHOLD = 46;
+		static final double CROP_MILESTONE_MULTIPLIER = 0.002;
+
+		static final long TIMECHARM_THRESHOLD = 8;
+		static final double TIMECHARM_MULTIPLIER = 0.125;
+
+		static final double RABBIT_COMMON_MULTIPLIER = 0.01;
+		static final double RABBIT_RARE_MULTIPLIER = 0.03;
+
+		static final long MAX_PET_SCORE = 476;
+		static final double PET_SCORE_MULTIPLIER = 0.002;
+
+		static final double HARP_SONG_MULTIPLIER = 0.05;
+
+		static final double IRONMAN_MULTIPLIER = 0.9;
+		static final double GODHUNTER_MULTIPLIER = 2.0;
+
+		static final double API_OFF_PENALTY = 10.0;
+		static final double NEVER_PLAYED_DUNGEONS_PENALTY = 100.0;
+		static final double COLLECTION_ERROR_PENALTY = 0.15;
+		static final double GARDEN_MILESTONE_PENALTY = 0.92;
+		static final double HOPPITY_NO_DATA_PENALTY = 0.38;
+	}
+
+	// Helper class for baldness calculations
+	private static class BaldnessCalculator {
+		private final StringBuilder causes = new StringBuilder();
+		private double baldness = 0.0;
+
+		public void addBaldness(String cause, double amount) {
+			causes.append(cause).append(": +").append(amount).append("\n");
+			baldness += amount;
+		}
+
+		public void addBaldnessForThreshold(String name, long current, long threshold, double multiplier) {
+			if (current < threshold) {
+				double result = (threshold - current) * multiplier;
+				addBaldness(name, result);
+			}
+		}
+
+		public void addBaldnessForThreshold(String name, double current, double threshold, double multiplier) {
+			if (current < threshold) {
+				double result = (threshold - current) * multiplier;
+				addBaldness(name, result);
+			}
+		}
+
+		public String getCauses() {
+			return causes.toString();
+		}
+
+		public double getBaldness() {
+			return baldness;
+		}
+
+		public boolean hasBaldness() {
+			return baldness > 0;
+		}
+
+		public void reset() {
+			causes.setLength(0);
+			baldness = 0.0;
+		}
+	}
+
+	// Skill thresholds configuration
+	private static final Map<String, SkillThreshold> SKILL_THRESHOLDS = new HashMap<>() {{
+		put("SKILL_COMBAT", new SkillThreshold("Combat Level", 60, 0.002));
+		put("SKILL_FARMING", new SkillThreshold("Farming Level", 60, 0.002));
+		put("SKILL_FISHING", new SkillThreshold("Fishing Level", 50, 0.002));
+		put("SKILL_MINING", new SkillThreshold("Mining Level", 60, 0.002));
+		put("SKILL_FORAGING", new SkillThreshold("F*raging Level", 50, 0.002));
+		put("SKILL_ENCHANTING", new SkillThreshold("Enchanting Level", 60, 0.002));
+		put("SKILL_ALCHEMY", new SkillThreshold("Alchemy Level", 50, 0.002));
+		put("SKILL_CARPENTRY", new SkillThreshold("Carpentry Level", 50, 0.002));
+		put("SKILL_TAMING", new SkillThreshold("Taming Level", 60, 0.002));
+	}};
+
+	private record SkillThreshold(String displayName, long threshold, double multiplier) {
+	}
+
+	// Collection thresholds configuration
+	private static final Map<String, CollectionThreshold> COLLECTION_THRESHOLDS = new HashMap<>() {{
+		put("CACTUS", new CollectionThreshold("Cactus Collection", 50000));
+		put("CARROT_ITEM", new CollectionThreshold("Carrot Collection", 100000));
+		put("INK_SACK:3", new CollectionThreshold("Cocoa Beans Collection", 100000));
+		put("FEATHER", new CollectionThreshold("Feather Collection", 50000));
+		put("LEATHER", new CollectionThreshold("Leather Collection", 100000));
+		put("MELON", new CollectionThreshold("Melon Collection", 250000));
+		put("MUSHROOM_COLLECTION", new CollectionThreshold("Mushroom Collection", 50000));
+		put("MUTTON", new CollectionThreshold("Mutton Collection", 100000));
+		put("NETHER_STALK", new CollectionThreshold("Nether Wart Collection", 250000));
+		put("POTATO_ITEM", new CollectionThreshold("Potato Collection", 100000));
+		put("PUMPKIN", new CollectionThreshold("Pumpkin Collection", 250000));
+		put("RAW_CHICKEN", new CollectionThreshold("Chicken Collection", 100000));
+		put("PORK", new CollectionThreshold("Pork Collection", 50000));
+		put("RABBIT", new CollectionThreshold("Rabbit Collection", 50000));
+		put("SEEDS", new CollectionThreshold("Seeds Collection", 25000));
+		put("SUGAR_CANE", new CollectionThreshold("Cane Collection", 50000));
+		put("WHEAT", new CollectionThreshold("Wheat Collection", 100000));
+		put("COAL", new CollectionThreshold("Coal Collection", 100000));
+		put("COBBLESTONE", new CollectionThreshold("Cobblestone Collection", 70000));
+		put("DIAMOND", new CollectionThreshold("Diamond Collection", 50000));
+		put("EMERALD", new CollectionThreshold("Emerald Collection", 100000));
+		put("ENDER_STONE", new CollectionThreshold("End Stone Collection", 50000));
+		put("GEMSTONE_COLLECTION", new CollectionThreshold("Gemstone Collection", 2000000));
+		put("GLOWSTONE_DUST", new CollectionThreshold("Glowstone Collection", 25000));
+		put("GRAVEL", new CollectionThreshold("Gravel Collection", 50000));
+		put("HARD_STONE", new CollectionThreshold("Hard Stone Collection", 1000000));
+		put("ICE", new CollectionThreshold("Ice Collection", 500000));
+		put("IRON_INGOT", new CollectionThreshold("Iron Collection", 400000));
+		put("INK_SACK:4", new CollectionThreshold("Lapis Collection", 250000));
+		put("MITHRIL_ORE", new CollectionThreshold("Mithril Collection", 1000000));
+		put("MYCEL", new CollectionThreshold("Mycelium Collection", 100000));
+		put("QUARTZ", new CollectionThreshold("Quartz Collection", 50000));
+		put("NETHERRACK", new CollectionThreshold("Netherrack Collection", 5000));
+		put("OBSIDIAN", new CollectionThreshold("Obsidian Collection", 100000));
+		put("SAND:1", new CollectionThreshold("Red Sand Collection", 100000));
+		put("REDSTONE", new CollectionThreshold("Redstone Collection", 1400000));
+		put("SAND", new CollectionThreshold("Sand Collection", 5000));
+		put("BLAZE_ROD", new CollectionThreshold("Blaze Rod Collection", 50000));
+		put("BONE", new CollectionThreshold("Bone Collection", 150000));
+		put("ENDER_PEARL", new CollectionThreshold("Ender Pearl Collection", 50000));
+		put("GHAST_TEAR", new CollectionThreshold("Ghast Tear Collection", 25000));
+		put("SULPHUR", new CollectionThreshold("Gunpowder Collection", 50000));
+		put("MAGMA_CREAM", new CollectionThreshold("Magma Cream Collection", 50000));
+		put("ROTTEN_FLESH", new CollectionThreshold("Rotten Flesh Collection", 100000));
+		put("SLIME_BALL", new CollectionThreshold("Slimeball Collection", 50000));
+		put("STRING", new CollectionThreshold("String Collection", 50000));
+		put("LOG_2", new CollectionThreshold("Acacia Collection", 25000));
+		put("LOG:2", new CollectionThreshold("Birch Collection", 50000));
+		put("LOG_2:1", new CollectionThreshold("Dark Oak Collection", 25000));
+		put("LOG:3", new CollectionThreshold("Jungle Collection", 25000));
+		put("LOG", new CollectionThreshold("Oak Collection", 30000));
+		put("LOG:1", new CollectionThreshold("Spruce Collection", 50000));
+		put("CLAY_BALL", new CollectionThreshold("Clay Collection", 2500));
+		put("RAW_FISH:2", new CollectionThreshold("Clownfish Collection", 4000));
+		put("INK_SACK", new CollectionThreshold("Ink Sack Collection", 4000));
+		put("WATER_LILY", new CollectionThreshold("Lily Pad Collection", 10000));
+		put("MAGMA_FISH", new CollectionThreshold("Magmafish Collection", 500000));
+		put("PRISMARINE_CRYSTALS", new CollectionThreshold("Prismarine Crystal Collection", 800));
+		put("PRISMARINE_SHARD", new CollectionThreshold("Prismarine Shard Collection", 800));
+		put("RAW_FISH:3", new CollectionThreshold("Pufferfish Collection", 18000));
+		put("RAW_FISH", new CollectionThreshold("Raw Fish Collection", 60000));
+		put("RAW_FISH:1", new CollectionThreshold("Salmon Collection", 10000));
+		put("SPONGE", new CollectionThreshold("Sponge Collection", 4000));
+		put("GLACITE", new CollectionThreshold("Glacite Collection", 1000000));
+		put("SULPHUR_ORE", new CollectionThreshold("Sulphur Collection", 100000));
+		put("TUNGSTEN", new CollectionThreshold("Tungsten Collection", 1000000));
+		put("UMBER", new CollectionThreshold("Umber Collection", 1000000));
+		put("CHILI_PEPPER", new CollectionThreshold("Chili Pepper Collection", 20000));
+		put("AGARICUS_CAP", new CollectionThreshold("Agaricus Cap Collection", 200));
+		put("CADUCOUS_STEM", new CollectionThreshold("Caducous Stem Collection", 500));
+		put("HALF_EATEN_CARROT", new CollectionThreshold("Half-Eaten Carrot Collection", 3500));
+		put("HEMOVIBE", new CollectionThreshold("Hemovibe Collection", 400000));
+		put("METAL_HEART", new CollectionThreshold("Living Metal Heart Collection", 100));
+		put("WILTED_BERBERIS", new CollectionThreshold("Wilted Berberis Collection", 400));
+	}};
+
+	private record CollectionThreshold(String displayName, long threshold) {
+	}
+
+	// Minion configuration
+	private static final Set<String> REQUIRED_MINIONS = new HashSet<>() {{
+		add("COBBLESTONE_12");
+		add("OBSIDIAN_12");
+		add("GLOWSTONE_12");
+		add("GRAVEL_11");
+		add("SAND_11");
+		add("RED_SAND_12");
+		add("MYCELIUM_12");
+		add("CLAY_11");
+		add("ICE_12");
+		add("SNOW_12");
+		add("COAL_12");
+		add("IRON_12");
+		add("GOLD_12");
+		add("DIAMOND_12");
+		add("LAPIS_12");
+		add("REDSTONE_12");
+		add("EMERALD_12");
+		add("QUARTZ_12");
+		add("ENDER_STONE_11");
+		add("MITHRIL_12");
+		add("HARD_STONE_12");
+		add("WHEAT_12");
+		add("MELON_12");
+		add("PUMPKIN_12");
+		add("CARROT_12");
+		add("POTATO_12");
+		add("MUSHROOM_12");
+		add("CACTUS_12");
+		add("COCOA_12");
+		add("SUGAR_CANE_12");
+		add("NETHER_WARTS_12");
+		add("FLOWER_12");
+		add("FISHING_11");
+		add("ZOMBIE_11");
+		add("REVENANT_12");
+		add("VOIDLING_11");
+		add("INFERNO_11");
+		add("VAMPIRE_11");
+		add("SKELETON_11");
+		add("CREEPER_11");
+		add("SPIDER_11");
+		add("TARANTULA_11");
+		add("CAVESPIDER_11");
+		add("BLAZE_12");
+		add("MAGMA_CUBE_12");
+		add("ENDERMAN_11");
+		add("GHAST_12");
+		add("SLIME_11");
+		add("COW_12");
+		add("PIG_12");
+		add("CHICKEN_12");
+		add("SHEEP_12");
+		add("RABBIT_12");
+		add("OAK_11");
+		add("SPRUCE_11");
+		add("BIRCH_11");
+		add("DARK_OAK_11");
+		add("ACACIA_11");
+		add("JUNGLE_11");
+	}};
+
+	// Trophy fish configuration
+	private static final Set<String> REQUIRED_DIAMOND_TROPHY_FISH = new HashSet<>() {{
+		add("blobfish_diamond");
+		add("gusher_diamond");
+		add("obfuscated_fish_1_diamond");
+		add("flyfish_diamond");
+		add("lava_horse_diamond");
+		add("mana_ray_diamond");
+		add("vanille_diamond");
+		add("volcanic_stonefish_diamond");
+		add("golden_fish_diamond");
+		add("skeleton_fish_diamond");
+		add("steaming_hot_flounder_diamond");
+		add("sulphur_skitter_diamond");
+		add("obfuscated_fish_2_diamond");
+		add("soul_fish_diamond");
+		add("moldfin_diamond");
+		add("slugfish_diamond");
+		add("obfuscated_fish_3_diamond");
+		add("karate_fish_diamond");
+	}};
+
+	// Rabbit configuration
+	private static final Set<String> COMMON_RABBITS = new HashSet<>() {{
+		add("aurora");
+		add("celestia");
+		add("orion");
+		add("starfire");
+		add("vega");
+	}};
+
+	private static final Set<String> RARE_RABBITS = new HashSet<>() {{
+		add("dante");
+		add("einstein");
+		add("galaxy");
+		add("king");
+		add("mu");
+		add("napoleon");
+		add("omega");
+		add("sigma");
+		add("zest_zephyr");
+		add("zeta");
+		add("zorro");
+	}};
+
+	// Harp songs configuration
+	private static final Map<String, String> HARP_SONGS = new HashMap<>() {{
+		put("song_hymn_joy_perfect_completions", "Beethoven Symphony No. 9 in D Minor (Choral); IV. Finale");
+		put("song_frere_jacques_perfect_completions", "Frere Jacques");
+		put("song_amazing_grace_perfect_completions", "Amazing Grace");
+		put("song_brahms_perfect_completions", "Brahms' Lullaby");
+		put("song_happy_birthday_perfect_completions", "Happy Birthday");
+		put("song_greensleeves_perfect_completions", "Greensleeves");
+		put("song_jeopardy_perfect_completions", "Jeopardy");
+		put("song_minuet_perfect_completions", "Bach Minuet");
+		put("song_joy_world_perfect_completions", "Joy to the World");
+		put("song_pure_imagination_perfect_completions", "Pure Imagination");
+		put("song_vie_en_rose_perfect_completions", "La Vie en Rose");
+		put("song_fire_and_flames_perfect_completions", "Campfire");
+		put("song_pachelbel_perfect_completions", "Pachelbel Canon in D Major");
+	}};
+
 	public static void baldness(GenericDiscordEvent e, String playerName, String fruit) {
 		try {
-			String uuid = HypixelManager.getMojang().getUUIDOfUsername(playerName);
-			HypixelHttpClient client = HypixelManager.getClient();
-			HypixelAPI api = new HypixelAPI(client);
-			SkyBlockProfilesReply reply = api.getSkyBlockProfiles(uuid).get();
-			JsonArray object = reply.getProfiles();
-			JsonObject profile = null;
-			String profileUUID = "";
-			boolean ironman = false;
-			if(fruit.isEmpty()) {
-				for(int i = 0; i < object.size(); i++) {
-					profile = object.get(i).getAsJsonObject();
-					if(profile.get("selected").getAsBoolean()) {
-						if(profile.has("game_mode")) {
-							if(profile.get("game_mode").getAsString().equals("ironman")) {
-								ironman = true;
-							}
-						}
-						profileUUID = profile.get("profile_id").getAsString();
-						profile = profile.getAsJsonObject("members").getAsJsonObject(uuid);
-						break;
-					}
-				}
-			} else {
-				for(int i = 0; i < object.size(); i++) {
-					profile = object.get(i).getAsJsonObject();
-					if(profile.get("cute_name").getAsString().equalsIgnoreCase(fruit)) {
-						profileUUID = profile.get("profile_id").getAsString();
-						profile = profile.getAsJsonObject("members").getAsJsonObject(uuid);
-						break;
-					}
-				}
-				if(profileUUID.isEmpty()) {
-					e.reply("This profile does not exist for this user!");
-					return;
-				}
-			}
-			if(profile == null) {
-				e.reply("An error occured!  Check that you typed the Minecraft name correctly.");
+			// Get player data
+			PlayerData playerData = getPlayerData(playerName, fruit);
+			if (playerData == null) {
+				e.reply("An error occurred! Check that you typed the Minecraft name correctly.");
 				return;
 			}
-
-			Dotenv env = Dotenv.load();
-
-			// noinspection deprecation
-			URL url = new URL("https://api.hypixel.net/v2/skyblock/museum?key=" + env.get("HYPIXEL_KEY") + "&profile=" + profileUUID);
-			URLConnection connection = url.openConnection();
-			BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			String inputLine;
-			StringBuilder response = new StringBuilder();
-
-			while((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
-			}
-			in.close();
-
-			JsonObject museum = JsonParser.parseString(String.valueOf(response)).getAsJsonObject().getAsJsonObject("members").getAsJsonObject(uuid);
-
-			// noinspection deprecation
-			url = new URL("https://api.hypixel.net/v2/skyblock/garden?key=" + env.get("HYPIXEL_KEY") + "&profile=" + profileUUID);
-			connection = url.openConnection();
-			in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			response = new StringBuilder();
-
-			while((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
-			}
-			in.close();
-
-			JsonObject garden = JsonParser.parseString(String.valueOf(response)).getAsJsonObject().getAsJsonObject("garden");
-
 
 			EmbedBuilder builder = new EmbedBuilder()
 					.setColor(Color.BLUE)
 					.setFooter("Ling Ling", e.getJDA().getSelfUser().getAvatarUrl())
 					.setTitle("Baldness Factor for " + playerName);
-			double baldness = 0.0;
 
+			double totalBaldness = 0.0;
 			boolean isBaldHunter = playerName.equalsIgnoreCase("GodHunter775");
 
-			/*
-				██╗     ███████╗██╗   ██╗███████╗██╗
-				██║     ██╔════╝██║   ██║██╔════╝██║
-				██║     █████╗  ██║   ██║█████╗  ██║
-				██║     ██╔══╝  ╚██╗ ██╔╝██╔══╝  ██║
-				███████╗███████╗ ╚████╔╝ ███████╗███████╗
-				╚══════╝╚══════╝  ╚═══╝  ╚══════╝╚══════╝
-			 */
-
-			long level = profile.getAsJsonObject("leveling").get("experience").getAsLong() / 100;
-			if(level < 462) {
-				double toAdd = (462 - level) * 0.002;
-				builder.addField("**__SkyBlock Level__**", "**Baldness for SkyBlock Level**: " + toAdd, false);
-			}
-
-			/*
-				███████╗██╗  ██╗██╗██╗     ██╗     ███████╗
-				██╔════╝██║ ██╔╝██║██║     ██║     ██╔════╝
-				███████╗█████╔╝ ██║██║     ██║     ███████╗
-				╚════██║██╔═██╗ ██║██║     ██║     ╚════██║
-				███████║██║  ██╗██║███████╗███████╗███████║
-				╚══════╝╚═╝  ╚═╝╚═╝╚══════╝╚══════╝╚══════╝
-			 */
-
-			String causes = "";
-			double thisBaldness = 0.0;
-
-			JsonObject skills;
-			try {
-				skills = profile.getAsJsonObject("player_data").getAsJsonObject("experience");
-				long combatLevel = Utils.skillLevel(skills.get("SKILL_COMBAT").getAsLong());
-				long farmingLevel = Utils.skillLevel(skills.get("SKILL_FARMING").getAsLong());
-				long fishingLevel = Utils.skillLevel(skills.get("SKILL_FISHING").getAsLong());
-				long miningLevel = Utils.skillLevel(skills.get("SKILL_MINING").getAsLong());
-				long foragingLevel = Utils.skillLevel(skills.get("SKILL_FORAGING").getAsLong());
-				long enchantingLevel = Utils.skillLevel(skills.get("SKILL_ENCHANTING").getAsLong());
-				long alchemyLevel = Utils.skillLevel(skills.get("SKILL_ALCHEMY").getAsLong());
-				long carpentryLevel = Utils.skillLevel(skills.get("SKILL_CARPENTRY").getAsLong());
-				long tamingLevel = Utils.skillLevel(skills.get("SKILL_TAMING").getAsLong());
-
-				if(combatLevel < 60) {
-					double result = (60 - combatLevel) * 0.002;
-					causes += "Combat Level: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				if(farmingLevel < 60) {
-					double result = (60 - farmingLevel) * 0.002;
-					causes += "Farming Level: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				if(fishingLevel < 50) {
-					double result = (50 - fishingLevel) * 0.002;
-					causes += "Fishing Level: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				if(miningLevel < 60) {
-					double result = (60 - miningLevel) * 0.002;
-					causes += "Mining Level: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				if(foragingLevel < 50) {
-					double result = (50 - foragingLevel) * 0.002;
-					causes += "F*raging Level: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				if(enchantingLevel < 60) {
-					double result = (60 - enchantingLevel) * 0.002;
-					causes += "Enchanting Level: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				if(alchemyLevel < 50) {
-					double result = (50 - alchemyLevel) * 0.002;
-					causes += "Alchemy Level: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				if(carpentryLevel < 50) {
-					double result = (50 - carpentryLevel) * 0.002;
-					causes += "Carpentry Level: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				if(tamingLevel < 60) {
-					double result = (60 - tamingLevel) * 0.002;
-					causes += "Taming Level: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				if(thisBaldness > 0) {
-					builder.addField("**__Skills__**", causes + "**Final Baldness for Skills**: " + thisBaldness, false);
-					baldness += thisBaldness;
-				}
-			} catch(Exception exception) {
-				builder.addField("**__Skills__**", "API Off: +10\n**Final Baldness for Skills**: 10", false);
-				baldness += 10;
-			}
-
-			/*
-				██████╗ ██╗   ██╗███╗   ██╗ ██████╗ ███████╗ ██████╗ ███╗   ██╗███████╗
-				██╔══██╗██║   ██║████╗  ██║██╔════╝ ██╔════╝██╔═══██╗████╗  ██║██╔════╝
-				██║  ██║██║   ██║██╔██╗ ██║██║  ███╗█████╗  ██║   ██║██╔██╗ ██║███████╗
-				██║  ██║██║   ██║██║╚██╗██║██║   ██║██╔══╝  ██║   ██║██║╚██╗██║╚════██║
-				██████╔╝╚██████╔╝██║ ╚████║╚██████╔╝███████╗╚██████╔╝██║ ╚████║███████║
-				╚═════╝  ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝ ╚══════╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
-			 */
-
-			causes = "";
-			thisBaldness = 0.0;
-
-			try {
-				JsonObject cata = profile.getAsJsonObject("dungeons").getAsJsonObject("dungeon_types");
-				long cataLevel = Utils.cataLevel(cata.getAsJsonObject("catacombs").get("experience").getAsLong());
-				if(cataLevel < 50) {
-					double result = (50 - cataLevel) * 0.03;
-					causes += "Cata Level: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				JsonObject classes = profile.getAsJsonObject("dungeons").getAsJsonObject("player_classes");
-				long healLevel = Utils.cataLevel(classes.getAsJsonObject("healer").get("experience").getAsLong());
-				long mageLevel = Utils.cataLevel(classes.getAsJsonObject("mage").get("experience").getAsLong());
-				long bersLevel = Utils.cataLevel(classes.getAsJsonObject("berserk").get("experience").getAsLong());
-				long archLevel = Utils.cataLevel(classes.getAsJsonObject("archer").get("experience").getAsLong());
-				long tankLevel = Utils.cataLevel(classes.getAsJsonObject("tank").get("experience").getAsLong());
-
-				if(healLevel < 50) {
-					double result = (50 - healLevel) * 0.004;
-					causes += "Healer Level: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				if(mageLevel < 50) {
-					double result = (50 - mageLevel) * 0.004;
-					causes += "Mage Level: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				if(bersLevel < 50) {
-					double result = (50 - bersLevel) * 0.004;
-					causes += "Berserk Level: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				if(archLevel < 50) {
-					double result = (50 - archLevel) * 0.004;
-					causes += "Archer Level: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				if(tankLevel < 50) {
-					double result = (50 - tankLevel) * 0.004;
-					causes += "Tank Level: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				try {
-					long m7PB = ((long) cata.getAsJsonObject("master_catacombs").getAsJsonObject("fastest_time").get("7").getAsDouble()) / 1000;
-					if(m7PB > 360) {
-						double result = (m7PB - 360) * 0.005;
-						if(result < 0) {
-							result = 0;
-						} else if(result > 1.2) {
-							result = 1.2;
-						}
-						causes += "Bad M7 PB: +" + result + "\n";
-						thisBaldness += result;
-					}
-				} catch(Exception exception) {
-					causes += "Bad M7 PB: +" + 1.2 + "\n";
-					thisBaldness += 1.2;
-				}
-			} catch(Exception exception) {
-				causes += "Never Played Dungeons: +100\n";
-				thisBaldness += 100;
-			}
-
-			if(thisBaldness > 0) {
-				builder.addField("**__Dungeons__**", causes + "**Final Baldness for Dungeons**: " + thisBaldness, false);
-				baldness += thisBaldness;
-			}
-
-			/*
-				 ██████╗ ██████╗ ███╗   ███╗██████╗  █████╗ ████████╗
-				██╔════╝██╔═══██╗████╗ ████║██╔══██╗██╔══██╗╚══██╔══╝
-				██║     ██║   ██║██╔████╔██║██████╔╝███████║   ██║
-				██║     ██║   ██║██║╚██╔╝██║██╔══██╗██╔══██║   ██║
-				╚██████╗╚██████╔╝██║ ╚═╝ ██║██████╔╝██║  ██║   ██║
-				 ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═════╝ ╚═╝  ╚═╝   ╚═╝
-			 */
-
-			causes = "";
-			thisBaldness = 0.0;
-
-			JsonObject slayers = profile.getAsJsonObject("slayer").getAsJsonObject("slayer_bosses");
-			long zombieLevel;
-			try {
-				zombieLevel = Utils.slayerLevel(slayers.getAsJsonObject("zombie").get("xp").getAsLong());
-			} catch(Exception exception) {
-				zombieLevel = 0;
-			}
-			long spiderLevel;
-			try {
-				spiderLevel = Utils.slayerLevel(slayers.getAsJsonObject("spider").get("xp").getAsLong());
-			} catch(Exception exception) {
-				spiderLevel = 0;
-			}
-			long wolfLevel;
-			try {
-				wolfLevel = Utils.slayerLevel(slayers.getAsJsonObject("wolf").get("xp").getAsLong());
-			} catch(Exception exception) {
-				wolfLevel = 0;
-			}
-			long emanLevel;
-			try {
-				emanLevel = Utils.slayerLevel(slayers.getAsJsonObject("enderman").get("xp").getAsLong());
-			} catch(Exception exception) {
-				emanLevel = 0;
-			}
-
-			long blazeLevel;
-			try {
-				blazeLevel = Utils.slayerLevel(slayers.getAsJsonObject("blaze").get("xp").getAsLong());
-			} catch(Exception exception) {
-				blazeLevel = 0;
-			}
-
-			long vampLevel;
-			try {
-				vampLevel = Math.min(5, Utils.skillLevel(slayers.getAsJsonObject("vampire").get("xp").getAsLong() / 2)); // inaccurate but it works
-			} catch(Exception exception) {
-				vampLevel = 0;
-			}
-			if(zombieLevel < 9) {
-				double result = (9 - zombieLevel) * 0.02;
-				causes += "Zombie Slayer Level: +" + result + "\n";
-				thisBaldness += result;
-			}
-
-			if(spiderLevel < 9) {
-				double result = (9 - spiderLevel) * 0.02;
-				causes += "Spider Slayer Level: +" + result + "\n";
-				thisBaldness += result;
-			}
-
-			if(wolfLevel < 9) {
-				double result = (9 - wolfLevel) * 0.02;
-				causes += "Wolf Slayer Level: +" + result + "\n";
-				thisBaldness += result;
-			}
-
-			if(emanLevel < 9) {
-				double result = (9 - emanLevel) * 0.02;
-				causes += "Enderman Slayer Level: +" + result + "\n";
-				thisBaldness += result;
-			}
-
-			if(blazeLevel < 9) {
-				double result = (9 - blazeLevel) * 0.02;
-				causes += "Blaze Slayer Level: +" + result + "\n";
-				thisBaldness += result;
-			}
-
-			if(vampLevel < 5) {
-				double result = (5 - vampLevel) * 0.02;
-				causes += "Vampire Slayer Level: +" + result + "\n";
-				thisBaldness += result;
-			}
-
-			long milestone;
-			try {
-				milestone = profile.getAsJsonObject("bestiary").getAsJsonObject("milestone").get("last_claimed_milestone").getAsLong();
-			} catch(Exception exception) {
-				milestone = 0;
-			}
-
-			if(milestone < 339) {
-				double result = (339 - milestone) * 0.0025;
-				causes += "Bestiary Milestone: +" + result + "\n";
-				thisBaldness += result;
-			}
-
-			if(thisBaldness > 0) {
-				builder.addField("**__Combat__**", causes + "**Final Baldness for Combat**: " + thisBaldness, false);
-				baldness += thisBaldness;
-			}
-
-			/*
-				 ██████╗ ██████╗ ██╗     ██╗     ███████╗ ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗
-				██╔════╝██╔═══██╗██║     ██║     ██╔════╝██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝
-				██║     ██║   ██║██║     ██║     █████╗  ██║        ██║   ██║██║   ██║██╔██╗ ██║███████╗
-				██║     ██║   ██║██║     ██║     ██╔══╝  ██║        ██║   ██║██║   ██║██║╚██╗██║╚════██║
-				╚██████╗╚██████╔╝███████╗███████╗███████╗╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║
-				 ╚═════╝ ╚═════╝ ╚══════╝╚══════╝╚══════╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
-			 */
-
-			causes = "";
-			thisBaldness = 0.0;
-
-			try {
-				JsonObject collections = profile.getAsJsonObject("collection");
-				try {
-					if(collections.get("CACTUS").getAsLong() < 50000) {
-						causes += "Cactus Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("CARROT_ITEM").getAsLong() < 100000) {
-						causes += "Carrot Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("INK_SACK:3").getAsLong() < 100000) {
-						causes += "Cocoa Beans Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("FEATHER").getAsLong() < 50000) {
-						causes += "Feather Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("LEATHER").getAsLong() < 100000) {
-						causes += "Leather Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("MELON").getAsLong() < 250000) {
-						causes += "Melon Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("MUSHROOM_COLLECTION").getAsLong() < 50000) {
-						causes += "Mushroom Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("MUTTON").getAsLong() < 100000) {
-						causes += "Mutton Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("NETHER_STALK").getAsLong() < 250000) {
-						causes += "Nether Wart Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("POTATO_ITEM").getAsLong() < 100000) {
-						causes += "Potato Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("PUMPKIN").getAsLong() < 250000) {
-						causes += "Pumpkin Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("RAW_CHICKEN").getAsLong() < 100000) {
-						causes += "Chicken Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("PORK").getAsLong() < 50000) {
-						causes += "Pork Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("RABBIT").getAsLong() < 50000) {
-						causes += "Rabbit Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("SEEDS").getAsLong() < 25000) {
-						causes += "Seeds Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("SUGAR_CANE").getAsLong() < 50000) {
-						causes += "Cane Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("WHEAT").getAsLong() < 100000) {
-						causes += "Wheat Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("COAL").getAsLong() < 100000) {
-						causes += "Coal Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("COBBLESTONE").getAsLong() < 70000) {
-						causes += "Cobblestone Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("DIAMOND").getAsLong() < 50000) {
-						causes += "Diamond Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("EMERALD").getAsLong() < 100000) {
-						causes += "Emerald Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("ENDER_STONE").getAsLong() < 50000) {
-						causes += "End Stone Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("GEMSTONE_COLLECTION").getAsLong() < 2000000) {
-						causes += "Gemstone Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("GLOWSTONE_DUST").getAsLong() < 25000) {
-						causes += "Glowstone Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("GRAVEL").getAsLong() < 50000) {
-						causes += "Gravel Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("HARD_STONE").getAsLong() < 1000000) {
-						causes += "Hard Stone Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("ICE").getAsLong() < 500000) {
-						causes += "Ice Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("IRON_INGOT").getAsLong() < 400000) {
-						causes += "Iron Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("INK_SACK:4").getAsLong() < 250000) {
-						causes += "Lapis Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("MITHRIL_ORE").getAsLong() < 1000000) {
-						causes += "Mithril Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("MYCEL").getAsLong() < 100000) {
-						causes += "Mycelium Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("QUARTZ").getAsLong() < 50000) {
-						causes += "Quartz Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("NETHERRACK").getAsLong() < 5000) {
-						causes += "Netherrack Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("OBSIDIAN").getAsLong() < 100000) {
-						causes += "Obsidian Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("SAND:1").getAsLong() < 100000) {
-						causes += "Red Sand Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("REDSTONE").getAsLong() < 1400000) {
-						causes += "Redstone Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("SAND").getAsLong() < 5000) {
-						causes += "Sand Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("BLAZE_ROD").getAsLong() < 50000) {
-						causes += "Blaze Rod Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("BONE").getAsLong() < 150000) {
-						causes += "Bone Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("ENDER_PEARL").getAsLong() < 50000) {
-						causes += "Ender Pearl Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("GHAST_TEAR").getAsLong() < 25000) {
-						causes += "Ghast Tear Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("SULPHUR").getAsLong() < 50000) {
-						causes += "Gunpowder Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("MAGMA_CREAM").getAsLong() < 50000) {
-						causes += "Magma Cream Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("ROTTEN_FLESH").getAsLong() < 100000) {
-						causes += "Rotten Flesh Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("SLIME_BALL").getAsLong() < 50000) {
-						causes += "Slimeball Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("STRING").getAsLong() < 50000) {
-						causes += "String Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("LOG_2").getAsLong() < 25000) {
-						causes += "Acacia Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("LOG:2").getAsLong() < 50000) {
-						causes += "Birch Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("LOG_2:1").getAsLong() < 25000) {
-						causes += "Dark Oak Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("LOG:3").getAsLong() < 25000) {
-						causes += "Jungle Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("LOG").getAsLong() < 30000) {
-						causes += "Oak Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("LOG:1").getAsLong() < 50000) {
-						causes += "Spruce Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("CLAY_BALL").getAsLong() < 2500) {
-						causes += "Clay Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("RAW_FISH:2").getAsLong() < 4000) {
-						causes += "Clownfish Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("INK_SACK").getAsLong() < 4000) {
-						causes += "Ink Sack Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("WATER_LILY").getAsLong() < 10000) {
-						causes += "Lily Pad Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("MAGMA_FISH").getAsLong() < 500000) {
-						causes += "Magmafish Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("PRISMARINE_CRYSTALS").getAsLong() < 800) {
-						causes += "Prismarine Crystal Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("PRISMARINE_SHARD").getAsLong() < 800) {
-						causes += "Prismarine Shard Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("RAW_FISH:3").getAsLong() < 18000) {
-						causes += "Pufferfish Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("RAW_FISH").getAsLong() < 60000) {
-						causes += "Raw Fish Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("RAW_FISH:1").getAsLong() < 10000) {
-						causes += "Salmon Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-
-					if(collections.get("SPONGE").getAsLong() < 4000) {
-						causes += "Sponge Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-				} catch(Exception exception) {
-					causes += "An Error Occured!  Very Bald: +0.15\n";
-					thisBaldness += 0.15;
-				}
-
-				try {
-					if(collections.get("GLACITE").getAsLong() < 1000000) {
-						causes += "Glacite Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-				} catch(Exception exception) {
-					causes += "Glacite Collection: +0.015\n";
-					thisBaldness += 0.015;
-				}
-
-				try {
-					if(collections.get("SULPHUR_ORE").getAsLong() < 100000) {
-						causes += "Sulphur Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-				} catch(Exception exception) {
-					causes += "Sulphur Collection: +0.015\n";
-					thisBaldness += 0.015;
-				}
-
-				try {
-					if(collections.get("TUNGSTEN").getAsLong() < 1000000) {
-						causes += "Tungsten Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-				} catch(Exception exception) {
-					causes += "Tungsten Collection: +0.015\n";
-					thisBaldness += 0.015;
-				}
-
-				try {
-					if(collections.get("UMBER").getAsLong() < 1000000) {
-						causes += "Umber Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-				} catch(Exception exception) {
-					causes += "Umber Collection: +0.015\n";
-					thisBaldness += 0.015;
-				}
-
-				try {
-					if(collections.get("CHILI_PEPPER").getAsLong() < 20000) {
-						causes += "Chili Pepper Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-				} catch(Exception exception) {
-					causes += "Chili Pepper Collection: +0.015\n";
-					thisBaldness += 0.015;
-				}
-
-				try {
-					if(collections.get("AGARICUS_CAP").getAsLong() < 200) {
-						causes += "Agaricus Cap Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-				} catch(Exception exception) {
-					causes += "Agaricus Cap Collection: +0.015\n";
-					thisBaldness += 0.015;
-				}
-
-				try {
-					if(collections.get("CADUCOUS_STEM").getAsLong() < 500) {
-						causes += "Caducous Stem Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-				} catch(Exception exception) {
-					causes += "Caducous Stem Collection: +0.015\n";
-					thisBaldness += 0.015;
-				}
-
-				try {
-					if(collections.get("HALF_EATEN_CARROT").getAsLong() < 3500) {
-						causes += "Half-Eaten Carrot Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-				} catch(Exception exception) {
-					causes += "Half-Eaten Carrot Collection: +0.015\n";
-					thisBaldness += 0.015;
-				}
-
-				try {
-					if(collections.get("HEMOVIBE").getAsLong() < 400000) {
-						causes += "Hemovibe Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-				} catch(Exception exception) {
-					causes += "Hemovibe Collection: +0.015\n";
-					thisBaldness += 0.015;
-				}
-
-				try {
-					if(collections.get("METAL_HEART").getAsLong() < 100) {
-						causes += "Living Metal Heart Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-				} catch(Exception exception) {
-					causes += "Living Metal Heart Collection: +0.015\n";
-					thisBaldness += 0.015;
-				}
-
-				try {
-					if(collections.get("WILTED_BERBERIS").getAsLong() < 400) {
-						causes += "Wilted Berberis Collection: +0.015\n";
-						thisBaldness += 0.015;
-					}
-				} catch(Exception exception) {
-					causes += "Wilted Berberis Collection: +0.015\n";
-					thisBaldness += 0.015;
-				}
-
-				try {
-					long gold = collections.get("GOLD_INGOT").getAsLong();
-					if(gold < 100000000) {
-						if(gold < 25000) {
-							causes += "Gold Collection: +0.015\n";
-							thisBaldness += 0.015;
-						}
-						double result = 1 - (Math.sqrt(2 * gold) / (Math.sqrt(2) * 10000));
-						causes += "Bad Gold Collection: + " + result + "\n";
-						thisBaldness += result;
-					}
-				} catch(Exception exception) {
-					causes += "Terrible Gold Collection: +1.015\n";
-					thisBaldness += 1.015;
-				}
-
-				if(thisBaldness > 0) {
-					try {
-						builder.addField("**__Collections__**", causes + "**Final Baldness for Collections**: " + thisBaldness, false);
-					} catch(Exception exception) {
-						builder.addField("**__Collections__**", "Too Many Unmaxed Collections\n**Final Baldness for Collections**: " + thisBaldness, false);
-					}
-					baldness += thisBaldness;
-				}
-			} catch(Exception exception) {
-				builder.addField("**__Collections__**", "API Off: +10\n**Final Baldness for Collections**: 10", false);
-				baldness += 10;
-			}
-
-			/*
-				███╗   ███╗██╗███╗   ██╗██╗ ██████╗ ███╗   ██╗███████╗
-				████╗ ████║██║████╗  ██║██║██╔═══██╗████╗  ██║██╔════╝
-				██╔████╔██║██║██╔██╗ ██║██║██║   ██║██╔██╗ ██║███████╗
-				██║╚██╔╝██║██║██║╚██╗██║██║██║   ██║██║╚██╗██║╚════██║
-				██║ ╚═╝ ██║██║██║ ╚████║██║╚██████╔╝██║ ╚████║███████║
-				╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝
-			 */
-
-			causes = "";
-			thisBaldness = 0.0;
-
-			String minions;
-			try {
-				minions = profile.getAsJsonObject("player_data").getAsJsonArray("crafted_generators").toString();
-			} catch(Exception exception) {
-				minions = "";
-			}
-
-			if(!minions.contains("COBBLESTONE_12")) {
-				causes += "Cobblestone Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("OBSIDIAN_12")) {
-				causes += "Obsidian Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("GLOWSTONE_12")) {
-				causes += "Glowstone Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("GRAVEL_11")) {
-				causes += "Gravel Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("SAND_11")) {
-				causes += "Sand Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("RED_SAND_12")) {
-				causes += "Red Sand Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("MYCELIUM_12")) {
-				causes += "Mycelium Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("CLAY_11")) {
-				causes += "Clay Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("ICE_12")) {
-				causes += "Ice Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("SNOW_12")) {
-				causes += "Snow Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("COAL_12")) {
-				causes += "Coal Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("IRON_12")) {
-				causes += "Iron Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("GOLD_12")) {
-				causes += "Gold Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("DIAMOND_12")) {
-				causes += "Diamond Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("LAPIS_12")) {
-				causes += "Lapis Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("REDSTONE_12")) {
-				causes += "Redstone Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("EMERALD_12")) {
-				causes += "Emerald Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("QUARTZ_12")) {
-				causes += "Quartz Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("ENDER_STONE_11")) {
-				causes += "Cobblestone Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("MITHRIL_12")) {
-				causes += "Mithril Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("HARD_STONE_12")) {
-				causes += "Hard Stone Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("WHEAT_12")) {
-				causes += "Wheat Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("MELON_12")) {
-				causes += "Melon Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("PUMPKIN_12")) {
-				causes += "Pumpkin Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("CARROT_12")) {
-				causes += "Carrot Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("POTATO_12")) {
-				causes += "Potato Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("MUSHROOM_12")) {
-				causes += "Mushroom Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("CACTUS_12")) {
-				causes += "Cactus Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("COCOA_12")) {
-				causes += "Cocoa Beans Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("SUGAR_CANE_12")) {
-				causes += "Cane Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("NETHER_WARTS_12")) {
-				causes += "Nether Wart Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("FLOWER_12")) {
-				causes += "Flower Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("FISHING_11")) {
-				causes += "Fishing Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("ZOMBIE_11")) {
-				causes += "Zombie Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("REVENANT_12")) {
-				causes += "Revenant Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("VOIDLING_11")) {
-				causes += "Voidling Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("INFERNO_11")) {
-				causes += "Inferno Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("VAMPIRE_11")) {
-				causes += "Vampire Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("SKELETON_11")) {
-				causes += "Skeleton Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("CREEPER_11")) {
-				causes += "Creeper Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("SPIDER_11")) {
-				causes += "Spider Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("TARANTULA_11")) {
-				causes += "Tarantula Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("CAVESPIDER_11")) {
-				causes += "Cave Spider Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("BLAZE_12")) {
-				causes += "Blaze Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("MAGMA_CUBE_12")) {
-				causes += "Magma Cube Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("ENDERMAN_11")) {
-				causes += "Enderman Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("GHAST_12")) {
-				causes += "Ghast Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("SLIME_11")) {
-				causes += "Slime Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("COW_12")) {
-				causes += "Cow Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("PIG_12")) {
-				causes += "Pig Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("CHICKEN_12")) {
-				causes += "Chicken Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("SHEEP_12")) {
-				causes += "Sheep Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("RABBIT_12")) {
-				causes += "Rabbit Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("OAK_11")) {
-				causes += "Oak Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("SPRUCE_11")) {
-				causes += "Spruce Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("BIRCH_11")) {
-				causes += "Birch Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("DARK_OAK_11")) {
-				causes += "Dark Oak Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("ACACIA_11")) {
-				causes += "Acacia Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(!minions.contains("JUNGLE_11")) {
-				causes += "Jungle Minion: +0.02\n";
-				thisBaldness += 0.02;
-			}
-
-			if(thisBaldness > 0) {
-				try {
-					builder.addField("**__Minions__**", causes + "**Final Baldness for Minions**: " + thisBaldness, false);
-				} catch(Exception exception) {
-					builder.addField("**__Minions__**", "Too Many Uncrafted Minions\n**Final Baldness for Minions**: " + thisBaldness, false);
-				}
-				baldness += thisBaldness;
-			}
-
-			/*
-				███╗   ███╗██████╗
-				████╗ ████║██╔══██╗
-				██╔████╔██║██████╔╝
-				██║╚██╔╝██║██╔═══╝
-				██║ ╚═╝ ██║██║
-				╚═╝     ╚═╝╚═╝
-			 */
-
-			long mp = profile.getAsJsonObject("accessory_bag_storage").get("highest_magical_power").getAsLong();
-			long maxMP = 1701;
-			if(mp < maxMP) {
-				builder.addField("**__Magical Power__**", "Missing " + (maxMP - mp) + " MP: +" + (maxMP - mp) * 0.0006, false);
-				baldness += (maxMP - mp) * 0.0006;
-			}
-
-			/*
-				███╗   ███╗██╗███╗   ██╗██╗███╗   ██╗ ██████╗
-				████╗ ████║██║████╗  ██║██║████╗  ██║██╔════╝
-				██╔████╔██║██║██╔██╗ ██║██║██╔██╗ ██║██║  ███╗
-				██║╚██╔╝██║██║██║╚██╗██║██║██║╚██╗██║██║   ██║
-				██║ ╚═╝ ██║██║██║ ╚████║██║██║ ╚████║╚██████╔╝
-				╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═══╝ ╚═════╝
-			 */
-
-			causes = "";
-			thisBaldness = 0.0;
-
-			JsonObject hotm = profile.getAsJsonObject("mining_core");
-			long hotmLevel;
-			try {
-				hotmLevel = Utils.hotmLevel(hotm.get("experience").getAsLong());
-			} catch(Exception exception) {
-				hotmLevel = 0;
-			}
-			double mithrilMillions;
-			try {
-				mithrilMillions = (double) (hotm.get("powder_mithril").getAsLong() + hotm.get("powder_spent_mithril").getAsLong()) / 1000000;
-			} catch(Exception exception) {
-				mithrilMillions = 0;
-			}
-
-			double gemstoneMillions;
-			try {
-				gemstoneMillions = (double) (hotm.get("powder_gemstone").getAsLong() + hotm.get("powder_spent_gemstone").getAsLong()) / 1000000;
-			} catch(Exception exception) {
-				gemstoneMillions = 0;
-			}
-
-			double glaciteMillions;
-			try {
-				glaciteMillions = (double) (hotm.get("powder_glacite").getAsLong() + hotm.get("powder_spent_glacite").getAsLong()) / 1000000;
-			} catch(Exception exception) {
-				glaciteMillions = 0;
-			}
-
-			if(hotmLevel < 10) {
-				double result = (10 - hotmLevel) * 0.1;
-				causes += "HOTM Level: +" + result + "\n";
-				thisBaldness += result;
-			}
-
-			if(mithrilMillions < 12.5) {
-				double result = (12.5 - mithrilMillions) * 0.02;
-				causes += "Mithril Powder: +" + result + "\n";
-				thisBaldness += result;
-			}
-
-			if(gemstoneMillions < 20) {
-				double result = (20 - gemstoneMillions) * 0.02;
-				causes += "Gemstone Powder: +" + result + "\n";
-				thisBaldness += result;
-			}
-
-			if(glaciteMillions < 20) {
-				double result = (20 - glaciteMillions) * 0.02;
-				causes += "Glacite Powder: +" + result + "\n";
-				thisBaldness += result;
-			}
-
-			if(thisBaldness > 0) {
-				builder.addField("**__Mining__**", causes + "**Final Baldness for Mining**: " + thisBaldness, false);
-				baldness += thisBaldness;
-			}
-
-			/*
-				███████╗██╗███████╗██╗  ██╗██╗███╗   ██╗ ██████╗
-				██╔════╝██║██╔════╝██║  ██║██║████╗  ██║██╔════╝
-				█████╗  ██║███████╗███████║██║██╔██╗ ██║██║  ███╗
-				██╔══╝  ██║╚════██║██╔══██║██║██║╚██╗██║██║   ██║
-				██║     ██║███████║██║  ██║██║██║ ╚████║╚██████╔╝
-				╚═╝     ╚═╝╚══════╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝
-			 */
-
-			causes = "";
-			thisBaldness = 0.0;
-
-			JsonObject trophyFish = profile.getAsJsonObject("trophy_fish");
-
-			if(!trophyFish.has("blobfish_diamond")) {
-				causes += "Diamond Blobfish: +0.055\n";
-				thisBaldness += 0.055;
-			}
-
-			if(!trophyFish.has("gusher_diamond")) {
-				causes += "Diamond Gusher: +0.055\n";
-				thisBaldness += 0.055;
-			}
-
-			if(!trophyFish.has("obfuscated_fish_1_diamond")) {
-				causes += "Diamond Obf 1: +0.055\n";
-				thisBaldness += 0.055;
-			}
-
-			if(!trophyFish.has("flyfish_diamond")) {
-				causes += "Diamond Flyfish: +0.055\n";
-				thisBaldness += 0.055;
-			}
-
-			if(!trophyFish.has("lava_horse_diamond")) {
-				causes += "Diamond Lavahorse: +0.055\n";
-				thisBaldness += 0.055;
-			}
-
-			if(!trophyFish.has("mana_ray_diamond")) {
-				causes += "Diamond Mana Ray: +0.055\n";
-				thisBaldness += 0.055;
-			}
-
-			if(!trophyFish.has("vanille_diamond")) {
-				causes += "Diamond Vanille: +0.055\n";
-				thisBaldness += 0.055;
-			}
-
-			if(!trophyFish.has("volcanic_stonefish_diamond")) {
-				causes += "Diamond Volcanic Stonefish: +0.055\n";
-				thisBaldness += 0.055;
-			}
-
-			if(!trophyFish.has("golden_fish_diamond")) {
-				causes += "Diamond Goldfish: +0.055\n";
-				thisBaldness += 0.055;
-			}
-
-			if(!trophyFish.has("skeleton_fish_diamond")) {
-				causes += "Diamond Skeleton Fish: +0.055\n";
-				thisBaldness += 0.055;
-			}
-
-			if(!trophyFish.has("steaming_hot_flounder_diamond")) {
-				causes += "Diamond Steaming-Hot Founder: +0.055\n";
-				thisBaldness += 0.055;
-			}
-
-			if(!trophyFish.has("sulphur_skitter_diamond")) {
-				causes += "Diamond Sulphur Skitter: +0.055\n";
-				thisBaldness += 0.055;
-			}
-
-			if(!trophyFish.has("obfuscated_fish_2_diamond")) {
-				causes += "Diamond Obf 2: +0.055\n";
-				thisBaldness += 0.055;
-			}
-
-			if(!trophyFish.has("soul_fish_diamond")) {
-				causes += "Diamond Soul Fish: +0.055\n";
-				thisBaldness += 0.055;
-			}
-
-			if(!trophyFish.has("moldfin_diamond")) {
-				causes += "Diamond Moldfin: +0.055\n";
-				thisBaldness += 0.055;
-			}
-
-			if(!trophyFish.has("slugfish_diamond")) {
-				causes += "Diamond Slugfish: +0.055\n";
-				thisBaldness += 0.055;
-			}
-
-			if(!trophyFish.has("obfuscated_fish_3_diamond")) {
-				causes += "Diamond Obf 3: +0.055\n";
-				thisBaldness += 0.055;
-			}
-
-			if(!trophyFish.has("karate_fish_diamond")) {
-				causes += "Diamond Karate Fish: +0.055\n";
-				thisBaldness += 0.055;
-			}
-
-			if(thisBaldness > 0) {
-				builder.addField("**__Fishing__**", causes + "**Final Baldness for Fishing**: " + thisBaldness, false);
-				baldness += thisBaldness;
-			}
-
-			/*
-				██████╗            ██╗ ██████╗
-				██╔══██╗▄ ██╗▄     ██║██╔═══██╗
-				██║  ██║ ████╗     ██║██║   ██║
-				██║  ██║▀╚██╔▀██   ██║██║   ██║
-				██████╔╝  ╚═╝ ╚█████╔╝╚██████╔╝
-				╚═════╝        ╚════╝  ╚═════╝
-			 */
-
-			long total = 0;
-			try {
-				JsonObject dojo = profile.getAsJsonObject("nether_island_player_data").getAsJsonObject("dojo");
-				if(dojo.has("dojo_points_mob_kb")) {
-					total += dojo.get("dojo_points_mob_kb").getAsLong();
-				}
-
-				if(dojo.has("dojo_points_wall_jump")) {
-					total += dojo.get("dojo_points_wall_jump").getAsLong();
-				}
-
-				if(dojo.has("dojo_points_archer")) {
-					total += dojo.get("dojo_points_archer").getAsLong();
-				}
-
-				if(dojo.has("dojo_points_sword_swap")) {
-					total += dojo.get("dojo_points_sword_swap").getAsLong();
-				}
-
-				if(dojo.has("dojo_points_snake")) {
-					total += dojo.get("dojo_points_snake").getAsLong();
-				}
-
-				if(dojo.has("dojo_points_fireball")) {
-					total += dojo.get("dojo_points_fireball").getAsLong();
-				}
-
-				if(dojo.has("dojo_points_lock_head")) {
-					total += dojo.get("dojo_points_lock_head").getAsLong();
-				}
-			} catch(Exception exception) {
-				// nothing here
-			}
-
-			if(total < 7000) {
-				builder.addField("**__D*jo__**", "Lack of Black Belt: +" + (7000 - total) * 0.0001, false);
-				baldness += (7000 - total) * 0.0001;
-			}
-
-			/*
-				███╗   ███╗██╗   ██╗███████╗███████╗██╗   ██╗███╗   ███╗
-				████╗ ████║██║   ██║██╔════╝██╔════╝██║   ██║████╗ ████║
-				██╔████╔██║██║   ██║███████╗█████╗  ██║   ██║██╔████╔██║
-				██║╚██╔╝██║██║   ██║╚════██║██╔══╝  ██║   ██║██║╚██╔╝██║
-				██║ ╚═╝ ██║╚██████╔╝███████║███████╗╚██████╔╝██║ ╚═╝ ██║
-				╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚══════╝ ╚═════╝ ╚═╝     ╚═╝
-			 */
-
-			long donations;
-			try {
-				donations = museum.getAsJsonObject("items").size();
-			} catch(Exception exception) {
-				donations = 0;
-			}
-			if(donations < 300) {
-				builder.addField("**__Museum__**", "Missing " + (300 - donations) + " Museum Donos: +" + (300 - donations) * 0.002, false);
-				baldness += (300 - donations) * 0.002;
-			}
-
-			/*
-				███████╗ █████╗ ██████╗ ███╗   ███╗██╗███╗   ██╗ ██████╗
-				██╔════╝██╔══██╗██╔══██╗████╗ ████║██║████╗  ██║██╔════╝
-				█████╗  ███████║██████╔╝██╔████╔██║██║██╔██╗ ██║██║  ███╗
-				██╔══╝  ██╔══██║██╔══██╗██║╚██╔╝██║██║██║╚██╗██║██║   ██║
-				██║     ██║  ██║██║  ██║██║ ╚═╝ ██║██║██║ ╚████║╚██████╔╝
-				╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝
-			 */
-
-			causes = "";
-			thisBaldness = 0;
-
-			long visitors;
-			try {
-				visitors = garden.getAsJsonObject("commission_data").get("total_completed").getAsLong();
-			} catch(Exception exception) {
-				visitors = 0;
-			}
-			if(visitors < 10000) {
-				double result = (10000 - visitors) * 0.0001;
-				causes += "Visitors: +" + result + "\n";
-				thisBaldness += result;
-			}
-
-			try {
-				JsonObject milestones = garden.getAsJsonObject("resources_collected");
-				long wheatMilestone = Utils.cropMilestone(milestones.get("WHEAT").getAsLong(), 1);
-				long carrotMilestone = Utils.cropMilestone(milestones.get("CARROT_ITEM").getAsLong(), 3.25);
-				long potatoMilestone = Utils.cropMilestone(milestones.get("POTATO_ITEM").getAsLong(), 3.25);
-				long melonMilestone = Utils.cropMilestone(milestones.get("MELON").getAsLong(), 5);
-				long pumpkinMilestone = Utils.cropMilestone(milestones.get("PUMPKIN").getAsLong(), 1);
-				long cocoaMilestone = Utils.cropMilestone(milestones.get("INK_SACK:3").getAsLong(), 3);
-				long caneMilestone = Utils.cropMilestone(milestones.get("SUGAR_CANE").getAsLong(), 2);
-				long cactusMilestone = Utils.cropMilestone(milestones.get("CACTUS").getAsLong(), 2);
-				long mushroomMilestone = Utils.cropMilestone(milestones.get("MUSHROOM_COLLECTION").getAsLong(), 1);
-				long wartMilestone = Utils.cropMilestone(milestones.get("NETHER_STALK").getAsLong(), 3);
-
-				if(wheatMilestone < 46) {
-					double result = (46 - wheatMilestone) * 0.002;
-					causes += "Wheat Milestone: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				if(carrotMilestone < 46) {
-					double result = (46 - carrotMilestone) * 0.002;
-					causes += "Carrot Milestone: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				if(potatoMilestone < 46) {
-					double result = (46 - potatoMilestone) * 0.002;
-					causes += "Potato Milestone: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				if(melonMilestone < 46) {
-					double result = (46 - melonMilestone) * 0.002;
-					causes += "Melon Milestone: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				if(pumpkinMilestone < 46) {
-					double result = (46 - pumpkinMilestone) * 0.002;
-					causes += "Pumpkin Milestone: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				if(cocoaMilestone < 46) {
-					double result = (46 - cocoaMilestone) * 0.002;
-					causes += "Cocoa Beans Milestone: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				if(caneMilestone < 46) {
-					double result = (46 - caneMilestone) * 0.002;
-					causes += "Cane Milestone: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				if(cactusMilestone < 46) {
-					double result = (46 - cactusMilestone) * 0.002;
-					causes += "Cactus Milestone: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				if(mushroomMilestone < 46) {
-					double result = (46 - mushroomMilestone) * 0.002;
-					causes += "Mushroom Milestone: +" + result + "\n";
-					thisBaldness += result;
-				}
-
-				if(wartMilestone < 46) {
-					double result = (46 - wartMilestone) * 0.002;
-					causes += "Nether Wart Milestone: +" + result + "\n";
-					thisBaldness += result;
-				}
-			} catch(Exception exception) {
-				causes += "Has not unlocked all Garden milestones: +0.92\n";
-				thisBaldness += 0.92;
-			}
-
-			if(thisBaldness > 0) {
-				builder.addField("**__Garden__**", causes + "**Final Baldness for Garden**: " + thisBaldness, false);
-				baldness += thisBaldness;
-			}
-
-			/*
-				██████╗ ██╗███████╗████████╗
-				██╔══██╗██║██╔════╝╚══██╔══╝
-				██████╔╝██║█████╗     ██║
-				██╔══██╗██║██╔══╝     ██║
-				██║  ██║██║██║        ██║
-				╚═╝  ╚═╝╚═╝╚═╝        ╚═╝
-			 */
-
-			try {
-				long timecharms = profile.getAsJsonObject("rift").getAsJsonObject("gallery").getAsJsonArray("secured_trophies").size();
-				if(timecharms < 7) {
-					builder.addField("**__Rift Timecharms__**", "Missing " + (7 - timecharms) + " Timecharms: +" + (7 - timecharms) * 0.15, false);
-					baldness += (7 - timecharms) * 0.15;
-				}
-			} catch(Exception exception) {
-				builder.addField("**__Rift Timecharms__**", "Missing 7 Timecharms: +1.05", false);
-				baldness += 1.05;
-			}
-
-			/*
-				██╗  ██╗ ██████╗ ██████╗ ██████╗ ██╗████████╗██╗   ██╗
-				██║  ██║██╔═══██╗██╔══██╗██╔══██╗██║╚══██╔══╝╚██╗ ██╔╝
-				███████║██║   ██║██████╔╝██████╔╝██║   ██║    ╚████╔╝
-				██╔══██║██║   ██║██╔═══╝ ██╔═══╝ ██║   ██║     ╚██╔╝
-				██║  ██║╚██████╔╝██║     ██║     ██║   ██║      ██║
-				╚═╝  ╚═╝ ╚═════╝ ╚═╝     ╚═╝     ╚═╝   ╚═╝      ╚═╝
-			 */
-
-			causes = "";
-			thisBaldness = 0.0;
-
-			try {
-				JsonObject rabbits = profile.getAsJsonObject("events").getAsJsonObject("easter").getAsJsonObject("rabbits");
-
-				if(!rabbits.has("aurora")) {
-					causes += "Aurora Rabbit: +0.01\n";
-					thisBaldness += 0.01;
-				}
-
-				if(!rabbits.has("celestia")) {
-					causes += "Celestia Rabbit: +0.01\n";
-					thisBaldness += 0.01;
-				}
-
-				if(!rabbits.has("orion")) {
-					causes += "Orion Rabbit: +0.01\n";
-					thisBaldness += 0.01;
-				}
-
-				if(!rabbits.has("starfire")) {
-					causes += "Starfire Rabbit: +0.01\n";
-					thisBaldness += 0.01;
-				}
-
-				if(!rabbits.has("vega")) {
-					causes += "Vega Rabbit: +0.01\n";
-					thisBaldness += 0.01;
-				}
-
-				if(!rabbits.has("dante")) {
-					causes += "Dante Rabbit: +0.03\n";
-					thisBaldness += 0.03;
-				}
-
-				if(!rabbits.has("einstein")) {
-					causes += "Einstein Rabbit: +0.03\n";
-					thisBaldness += 0.03;
-				}
-
-				if(!rabbits.has("galaxy")) {
-					causes += "Galaxy Rabbit: +0.03\n";
-					thisBaldness += 0.03;
-				}
-
-				if(!rabbits.has("king")) {
-					causes += "King Rabbit: +0.03\n";
-					thisBaldness += 0.03;
-				}
-
-				if(!rabbits.has("mu")) {
-					causes += "Mu Rabbit: +0.03\n";
-					thisBaldness += 0.03;
-				}
-
-				if(!rabbits.has("napoleon")) {
-					causes += "Napoleon Rabbit: +0.03\n";
-					thisBaldness += 0.03;
-				}
-
-				if(!rabbits.has("omega")) {
-					causes += "Omega Rabbit: +0.03\n";
-					thisBaldness += 0.03;
-				}
-
-				if(!rabbits.has("sigma")) {
-					causes += "Sigma Rabbit: +0.03\n";
-					thisBaldness += 0.03;
-				}
-
-				if(!rabbits.has("zest_zephyr")) {
-					causes += "Zest Zephyr Rabbit: +0.03\n";
-					thisBaldness += 0.03;
-				}
-
-				if(!rabbits.has("zeta")) {
-					causes += "Zeta Rabbit: +0.03\n";
-					thisBaldness += 0.03;
-				}
-
-				if(!rabbits.has("zorro")) {
-					causes += "Zorro Rabbit: +0.03\n";
-					thisBaldness += 0.03;
-				}
-
-				if(thisBaldness > 0) {
-					builder.addField("**__Hoppity__**", causes + "**Final Baldness for Hoppity**: " + thisBaldness, false);
-					baldness += thisBaldness;
-				}
-			} catch(Exception exception) {
-				builder.addField("**__Hoppity__**", "No Data!\n**Final Baldness for Hoppity**: 0.38", false);
-				baldness += 0.38;
-			}
-
-			/*
-				██████╗ ███████╗████████╗███████╗
-				██╔══██╗██╔════╝╚══██╔══╝██╔════╝
-				██████╔╝█████╗     ██║   ███████╗
-				██╔═══╝ ██╔══╝     ██║   ╚════██║
-				██║     ███████╗   ██║   ███████║
-				╚═╝     ╚══════╝   ╚═╝   ╚══════╝
-			 */
-
-			long score = profile.getAsJsonObject("leveling").get("highest_pet_score").getAsLong();
-			long maxPetScore = 445;
-			if(score < maxPetScore) {
-				builder.addField("**__Pet Score__**", "Missing " + (maxPetScore - score) + " Pet Score: +" + (maxPetScore - score) * 0.002, false);
-				baldness += (maxPetScore - score) * 0.002;
-			}
-
-			/*
-				███╗   ███╗███████╗██╗      ██████╗ ██████╗ ██╗   ██╗
-				████╗ ████║██╔════╝██║     ██╔═══██╗██╔══██╗╚██╗ ██╔╝
-				██╔████╔██║█████╗  ██║     ██║   ██║██║  ██║ ╚████╔╝
-				██║╚██╔╝██║██╔══╝  ██║     ██║   ██║██║  ██║  ╚██╔╝
-				██║ ╚═╝ ██║███████╗███████╗╚██████╔╝██████╔╝   ██║
-				╚═╝     ╚═╝╚══════╝╚══════╝ ╚═════╝ ╚═════╝    ╚═╝
-			 */
-
-			causes = "";
-			thisBaldness = 0;
-
-			JsonObject melody = profile.getAsJsonObject("quests").getAsJsonObject("harp_quest");
-
-			if(melody == null) {
-				melody = new JsonObject();
-			}
-
-			if(!melody.has("song_hymn_joy_perfect_completions")) {
-				causes += "Beethoven Symphony No. 9 in D Minor (Choral); IV. Finale: +0.05\n";
-				thisBaldness += 0.05;
-			}
-
-			if(!melody.has("song_frere_jacques_perfect_completions")) {
-				causes += "Frere Jacques: +0.05\n";
-				thisBaldness += 0.05;
-			}
-
-			if(!melody.has("song_amazing_grace_perfect_completions")) {
-				causes += "Amazing Grace: +0.05\n";
-				thisBaldness += 0.05;
-			}
-
-			if(!melody.has("song_brahms_perfect_completions")) {
-				causes += "Brahms' Lullaby: +0.05\n";
-				thisBaldness += 0.05;
-			}
-
-			if(!melody.has("song_happy_birthday_perfect_completions")) {
-				causes += "Happy Birthday: +0.05\n";
-				thisBaldness += 0.05;
-			}
-
-			if(!melody.has("song_greensleeves_perfect_completions")) {
-				causes += "Greensleeves: +0.05\n";
-				thisBaldness += 0.05;
-			}
-
-			if(!melody.has("song_jeopardy_perfect_completions")) {
-				causes += "Jeopardy: +0.05\n";
-				thisBaldness += 0.05;
-			}
-
-			if(!melody.has("song_minuet_perfect_completions")) {
-				causes += "Bach Minuet: +0.05\n";
-				thisBaldness += 0.05;
-			}
-
-			if(!melody.has("song_joy_world_perfect_completions")) {
-				causes += "Joy to the World: +0.05\n";
-				thisBaldness += 0.05;
-			}
-
-			if(!melody.has("song_pure_imagination_perfect_completions")) {
-				causes += "Pure Imagination: +0.05\n";
-				thisBaldness += 0.05;
-			}
-
-			if(!melody.has("song_vie_en_rose_perfect_completions")) {
-				causes += "La Vie en Rose: +0.05\n";
-				thisBaldness += 0.05;
-			}
-
-			if(!melody.has("song_fire_and_flames_perfect_completions")) {
-				causes += "Campfire: +0.05\n";
-				thisBaldness += 0.05;
-			}
-
-			if(!melody.has("song_pachelbel_perfect_completions")) {
-				causes += "Pachelbel Canon in D Major: +0.05\n";
-				thisBaldness += 0.05;
-			}
-
-			if(thisBaldness > 0) {
-				builder.addField("**__Harp__**", causes + "**Final Baldness for Harp**: " + thisBaldness, false);
-				baldness += thisBaldness;
-			}
-
-			causes = "";
-
-			if(ironman) {
-				causes += "Ironman (Respect): x0.9\n";
-				baldness *= 0.9;
-			}
-
-			if(isBaldHunter) {
-				causes += "Is GodHunter775: x2\n";
-				baldness *= 2;
-			}
-
-			builder.addField("**__Multipliers__**", causes, false);
+			// Calculate baldness for each category
+			totalBaldness += calculateSkyBlockLevelBaldness(builder, playerData);
+			totalBaldness += calculateSkillsBaldness(builder, playerData);
+			totalBaldness += calculateDungeonsBaldness(builder, playerData);
+			totalBaldness += calculateCombatBaldness(builder, playerData);
+			totalBaldness += calculateCollectionsBaldness(builder, playerData);
+			totalBaldness += calculateMinionsBaldness(builder, playerData);
+			totalBaldness += calculateMagicalPowerBaldness(builder, playerData);
+			totalBaldness += calculateMiningBaldness(builder, playerData);
+			totalBaldness += calculateFishingBaldness(builder, playerData);
+			totalBaldness += calculateDojoBaldness(builder, playerData);
+			totalBaldness += calculateMuseumBaldness(builder, playerData);
+			totalBaldness += calculateGardenBaldness(builder, playerData);
+			totalBaldness += calculateRiftBaldness(builder, playerData);
+			totalBaldness += calculateHoppityBaldness(builder, playerData);
+			totalBaldness += calculatePetScoreBaldness(builder, playerData);
+			totalBaldness += calculateHarpBaldness(builder, playerData);
+
+			// Apply multipliers
+			totalBaldness = applyMultipliers(builder, totalBaldness, playerData.ironman, isBaldHunter);
 
 			e.replyEmbeds(builder.build());
 
-			String rank;
-			if(baldness < 2) {
-				rank = "Not Bald";
-			} else if(baldness < 5) {
-				rank = "Slightly Bald";
-			} else if(baldness < 9) {
-				rank = "Bald";
-			} else if(baldness < 14) {
-				rank = "Very Bald";
-			} else {
-				rank = "Extremely Bald";
+			String rank = getBaldnessRank(totalBaldness);
+			e.sendMessage("# **Final Baldness Score for `" + playerName + "`**: **||" + totalBaldness + "||**\n# **Baldness Rank**: **||" + rank + "||**");
+
+		} catch (ExecutionException exception) {
+			e.reply("This user does not exist!");
+		} catch (Exception exception) {
+			exception.printStackTrace();
+			e.reply("Something went wrong! Contact the dev to get him to sort out the issue.");
+		}
+	}
+
+	private static PlayerData getPlayerData(String playerName, String fruit) throws Exception {
+		String uuid = HypixelManager.getMojang().getUUIDOfUsername(playerName);
+		HypixelHttpClient client = HypixelManager.getClient();
+		HypixelAPI api = new HypixelAPI(client);
+		SkyBlockProfilesReply reply = api.getSkyBlockProfiles(uuid).get();
+		JsonArray profiles = reply.getProfiles();
+
+		JsonObject profile = null;
+		String profileUUID = "";
+		boolean ironman = false;
+
+		if (fruit.isEmpty()) {
+			for (int i = 0; i < profiles.size(); i++) {
+				JsonObject p = profiles.get(i).getAsJsonObject();
+				if (p.get("selected").getAsBoolean()) {
+					if (p.has("game_mode") && p.get("game_mode").getAsString().equals("ironman")) {
+						ironman = true;
+					}
+					profileUUID = p.get("profile_id").getAsString();
+					profile = p.getAsJsonObject("members").getAsJsonObject(uuid);
+					break;
+				}
+			}
+		} else {
+			for (int i = 0; i < profiles.size(); i++) {
+				JsonObject p = profiles.get(i).getAsJsonObject();
+				if (p.get("cute_name").getAsString().equalsIgnoreCase(fruit)) {
+					profileUUID = p.get("profile_id").getAsString();
+					profile = p.getAsJsonObject("members").getAsJsonObject(uuid);
+					break;
+				}
+			}
+		}
+
+		if (profile == null) return null;
+
+		// Get museum and garden data
+		JsonObject museum = getMuseumData(profileUUID, uuid);
+		JsonObject garden = getGardenData(profileUUID);
+
+		return new PlayerData(profile, museum, garden, ironman);
+	}
+
+	private static JsonObject getMuseumData(String profileUUID, String uuid) throws Exception {
+		Dotenv env = Dotenv.load();
+		HttpClient client = HttpClient.newHttpClient();
+		HttpRequest request = HttpRequest.newBuilder()
+				.uri(URI.create("https://api.hypixel.net/v2/skyblock/museum?key=" + env.get("HYPIXEL_KEY") + "&profile=" + profileUUID))
+				.build();
+
+		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+		return JsonParser.parseString(response.body()).getAsJsonObject()
+				.getAsJsonObject("members").getAsJsonObject(uuid);
+	}
+
+	private static JsonObject getGardenData(String profileUUID) throws Exception {
+		Dotenv env = Dotenv.load();
+		HttpClient client = HttpClient.newHttpClient();
+		HttpRequest request = HttpRequest.newBuilder()
+				.uri(URI.create("https://api.hypixel.net/v2/skyblock/garden?key=" + env.get("HYPIXEL_KEY") + "&profile=" + profileUUID))
+				.build();
+
+		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+		return JsonParser.parseString(response.body()).getAsJsonObject()
+				.getAsJsonObject("garden");
+	}
+
+	private record PlayerData(JsonObject profile, JsonObject museum, JsonObject garden, boolean ironman) {
+	}
+
+	private static double calculateSkyBlockLevelBaldness(EmbedBuilder builder, PlayerData data) {
+		BaldnessCalculator calc = new BaldnessCalculator();
+
+		long level = data.profile.getAsJsonObject("leveling").get("experience").getAsLong() / 100;
+		calc.addBaldnessForThreshold("SkyBlock Level", level, BaldnessConfig.SKYBLOCK_LEVEL_THRESHOLD, BaldnessConfig.SKYBLOCK_LEVEL_MULTIPLIER);
+
+		if (calc.hasBaldness()) {
+			builder.addField("**__SkyBlock Level__**", "**Baldness for SkyBlock Level**: " + calc.getBaldness(), false);
+		}
+
+		return calc.getBaldness();
+	}
+
+	private static double calculateSkillsBaldness(EmbedBuilder builder, PlayerData data) {
+		BaldnessCalculator calc = new BaldnessCalculator();
+
+		try {
+			JsonObject skills = data.profile.getAsJsonObject("player_data").getAsJsonObject("experience");
+
+			for (Map.Entry<String, SkillThreshold> entry : SKILL_THRESHOLDS.entrySet()) {
+				String skillKey = entry.getKey();
+				SkillThreshold threshold = entry.getValue();
+
+				long skillLevel = Utils.skillLevel(skills.get(skillKey).getAsLong());
+				calc.addBaldnessForThreshold(threshold.displayName, skillLevel, threshold.threshold, threshold.multiplier);
 			}
 
-			e.sendMessage("# **Final Baldness Score for `" + playerName + "`**: **||" + baldness + "||**\n# **Baldness Rank**: **||" + rank + "||**");
-		} catch(ExecutionException exception) {
-			e.reply("This user doees not exist!");
-		} catch(Exception exception) {
-			exception.printStackTrace();
-			e.reply("Something went wrong!  Contact the dev to get him to sort out the issue.");
+			if (calc.hasBaldness()) {
+				builder.addField("**__Skills__**", calc.getCauses() + "**Final Baldness for Skills**: " + calc.getBaldness(), false);
+			}
+		} catch (Exception exception) {
+			builder.addField("**__Skills__**", "API Off: +" + BaldnessConfig.API_OFF_PENALTY + "\n**Final Baldness for Skills**: " + BaldnessConfig.API_OFF_PENALTY, false);
+			calc.addBaldness("API Off", BaldnessConfig.API_OFF_PENALTY);
 		}
+
+		return calc.getBaldness();
+	}
+
+	private static double calculateDungeonsBaldness(EmbedBuilder builder, PlayerData data) {
+		BaldnessCalculator calc = new BaldnessCalculator();
+
+		try {
+			JsonObject dungeons = data.profile.getAsJsonObject("dungeons");
+			JsonObject cata = dungeons.getAsJsonObject("dungeon_types");
+
+			// Catacombs level
+			long cataLevel = Utils.cataLevel(cata.getAsJsonObject("catacombs").get("experience").getAsLong());
+			calc.addBaldnessForThreshold("Cata Level", cataLevel, BaldnessConfig.CATA_LEVEL_THRESHOLD, BaldnessConfig.CATA_LEVEL_MULTIPLIER);
+
+			// Class levels
+			JsonObject classes = dungeons.getAsJsonObject("player_classes");
+			String[] classNames = {"healer", "mage", "berserk", "archer", "tank"};
+			String[] classDisplayNames = {"Healer Level", "Mage Level", "Berserk Level", "Archer Level", "Tank Level"};
+
+			for (int i = 0; i < classNames.length; i++) {
+				long classLevel = Utils.cataLevel(classes.getAsJsonObject(classNames[i]).get("experience").getAsLong());
+				calc.addBaldnessForThreshold(classDisplayNames[i], classLevel, BaldnessConfig.CLASS_LEVEL_THRESHOLD, BaldnessConfig.CLASS_LEVEL_MULTIPLIER);
+			}
+
+			// M7 PB
+			try {
+				long m7PB = ((long) cata.getAsJsonObject("master_catacombs").getAsJsonObject("fastest_time").get("7").getAsDouble()) / 1000;
+				if (m7PB > BaldnessConfig.M7_PB_THRESHOLD) {
+					double result = (m7PB - BaldnessConfig.M7_PB_THRESHOLD) * BaldnessConfig.M7_PB_MULTIPLIER;
+					result = Math.max(0, Math.min(result, BaldnessConfig.M7_PB_MAX));
+					calc.addBaldness("Bad M7 PB", result);
+				}
+			} catch (Exception exception) {
+				calc.addBaldness("Bad M7 PB", BaldnessConfig.M7_PB_MAX);
+			}
+
+		} catch (Exception exception) {
+			calc.addBaldness("Never Played Dungeons", BaldnessConfig.NEVER_PLAYED_DUNGEONS_PENALTY);
+		}
+
+		if (calc.hasBaldness()) {
+			builder.addField("**__Dungeons__**", calc.getCauses() + "**Final Baldness for Dungeons**: " + calc.getBaldness(), false);
+		}
+
+		return calc.getBaldness();
+	}
+
+	private static double calculateCombatBaldness(EmbedBuilder builder, PlayerData data) {
+		BaldnessCalculator calc = new BaldnessCalculator();
+
+		// Slayer levels
+		JsonObject slayers = data.profile.getAsJsonObject("slayer").getAsJsonObject("slayer_bosses");
+		String[] slayerTypes = {"zombie", "spider", "wolf", "enderman", "blaze"};
+		String[] slayerDisplayNames = {"Zombie Slayer Level", "Spider Slayer Level", "Wolf Slayer Level", "Enderman Slayer Level", "Blaze Slayer Level"};
+
+		for (int i = 0; i < slayerTypes.length; i++) {
+			long slayerLevel = getSlayerLevel(slayers, slayerTypes[i]);
+			calc.addBaldnessForThreshold(slayerDisplayNames[i], slayerLevel, BaldnessConfig.SLAYER_LEVEL_THRESHOLD, BaldnessConfig.SLAYER_LEVEL_MULTIPLIER);
+		}
+
+		// Vampire slayer (different threshold)
+		long vampLevel = getVampireSlayerLevel(slayers);
+		calc.addBaldnessForThreshold("Vampire Slayer Level", vampLevel, BaldnessConfig.VAMP_SLAYER_THRESHOLD, BaldnessConfig.VAMP_SLAYER_MULTIPLIER);
+
+		// Bestiary milestone
+		long milestone = getBestiaryMilestone(data.profile);
+		calc.addBaldnessForThreshold("Bestiary Milestone", milestone, BaldnessConfig.BESTIARY_THRESHOLD, BaldnessConfig.BESTIARY_MULTIPLIER);
+
+		if (calc.hasBaldness()) {
+			builder.addField("**__Combat__**", calc.getCauses() + "**Final Baldness for Combat**: " + calc.getBaldness(), false);
+		}
+
+		return calc.getBaldness();
+	}
+
+	private static double calculateCollectionsBaldness(EmbedBuilder builder, PlayerData data) {
+		BaldnessCalculator calc = new BaldnessCalculator();
+
+		try {
+			JsonObject collections = data.profile.getAsJsonObject("collection");
+
+			// Standard collections
+			for (Map.Entry<String, CollectionThreshold> entry : COLLECTION_THRESHOLDS.entrySet()) {
+				String collectionKey = entry.getKey();
+				CollectionThreshold threshold = entry.getValue();
+
+				try {
+					long collectionAmount = collections.get(collectionKey).getAsLong();
+					if (collectionAmount < threshold.threshold) {
+						calc.addBaldness(threshold.displayName, BaldnessConfig.COLLECTION_THRESHOLD_MULTIPLIER);
+					}
+				} catch (Exception e) {
+					calc.addBaldness(threshold.displayName, BaldnessConfig.COLLECTION_THRESHOLD_MULTIPLIER);
+				}
+			}
+
+			// Special gold collection calculation
+			try {
+				long gold = collections.get("GOLD_INGOT").getAsLong();
+				if (gold < 100000000) {
+					if (gold < 25000) {
+						calc.addBaldness("Gold Collection", BaldnessConfig.COLLECTION_THRESHOLD_MULTIPLIER);
+					}
+					double result = 1 - (Math.sqrt(2 * gold) / (Math.sqrt(2) * 10000));
+					calc.addBaldness("Bad Gold Collection", result);
+				}
+			} catch (Exception exception) {
+				calc.addBaldness("Terrible Gold Collection", BaldnessConfig.GOLD_COLLECTION_MULTIPLIER);
+			}
+
+		} catch (Exception exception) {
+			calc.addBaldness("API Off", BaldnessConfig.API_OFF_PENALTY);
+		}
+
+		if (calc.hasBaldness()) {
+			try {
+				builder.addField("**__Collections__**", calc.getCauses() + "**Final Baldness for Collections**: " + calc.getBaldness(), false);
+			} catch (Exception exception) {
+				builder.addField("**__Collections__**", "Too Many Unmaxed Collections\n**Final Baldness for Collections**: " + calc.getBaldness(), false);
+			}
+		}
+
+		return calc.getBaldness();
+	}
+
+	private static double calculateMinionsBaldness(EmbedBuilder builder, PlayerData data) {
+		BaldnessCalculator calc = new BaldnessCalculator();
+
+		String minions = getMinionString(data.profile);
+
+		for (String requiredMinion : REQUIRED_MINIONS) {
+			if (!minions.contains(requiredMinion)) {
+				String displayName = getMinionDisplayName(requiredMinion);
+				calc.addBaldness(displayName, BaldnessConfig.MINION_MULTIPLIER);
+			}
+		}
+
+		if (calc.hasBaldness()) {
+			try {
+				builder.addField("**__Minions__**", calc.getCauses() + "**Final Baldness for Minions**: " + calc.getBaldness(), false);
+			} catch (Exception exception) {
+				builder.addField("**__Minions__**", "Too Many Uncrafted Minions\n**Final Baldness for Minions**: " + calc.getBaldness(), false);
+			}
+		}
+
+		return calc.getBaldness();
+	}
+
+	private static double calculateMagicalPowerBaldness(EmbedBuilder builder, PlayerData data) {
+		BaldnessCalculator calc = new BaldnessCalculator();
+
+		long mp = data.profile.getAsJsonObject("accessory_bag_storage").get("highest_magical_power").getAsLong();
+		calc.addBaldnessForThreshold("Missing MP", mp, BaldnessConfig.MAX_MAGICAL_POWER, BaldnessConfig.MP_MULTIPLIER);
+
+		if (calc.hasBaldness()) {
+			long missing = BaldnessConfig.MAX_MAGICAL_POWER - mp;
+			builder.addField("**__Magical Power__**", "Missing " + missing + " MP: +" + calc.getBaldness(), false);
+		}
+
+		return calc.getBaldness();
+	}
+
+	private static double calculateMiningBaldness(EmbedBuilder builder, PlayerData data) {
+		BaldnessCalculator calc = new BaldnessCalculator();
+
+		JsonObject hotm = data.profile.getAsJsonObject("mining_core");
+
+		// HOTM Level
+		long hotmLevel = getHotmLevel(hotm);
+		calc.addBaldnessForThreshold("HOTM Level", hotmLevel, BaldnessConfig.HOTM_LEVEL_THRESHOLD, BaldnessConfig.HOTM_LEVEL_MULTIPLIER);
+
+		// Powders
+		double mithrilMillions = getPowderMillions(hotm, "mithril");
+		double gemstoneMillions = getPowderMillions(hotm, "gemstone");
+		double glaciteMillions = getPowderMillions(hotm, "glacite");
+
+		calc.addBaldnessForThreshold("Mithril Powder", mithrilMillions, BaldnessConfig.MITHRIL_THRESHOLD, BaldnessConfig.POWDER_MULTIPLIER);
+		calc.addBaldnessForThreshold("Gemstone Powder", gemstoneMillions, BaldnessConfig.GEMSTONE_THRESHOLD, BaldnessConfig.POWDER_MULTIPLIER);
+		calc.addBaldnessForThreshold("Glacite Powder", glaciteMillions, BaldnessConfig.GLACITE_THRESHOLD, BaldnessConfig.POWDER_MULTIPLIER);
+
+		if (calc.hasBaldness()) {
+			builder.addField("**__Mining__**", calc.getCauses() + "**Final Baldness for Mining**: " + calc.getBaldness(), false);
+		}
+
+		return calc.getBaldness();
+	}
+
+	private static double calculateFishingBaldness(EmbedBuilder builder, PlayerData data) {
+		BaldnessCalculator calc = new BaldnessCalculator();
+
+		JsonObject trophyFish = data.profile.getAsJsonObject("trophy_fish");
+
+		for (String fishType : REQUIRED_DIAMOND_TROPHY_FISH) {
+			if (!trophyFish.has(fishType)) {
+				String displayName = getTrophyFishDisplayName(fishType);
+				calc.addBaldness(displayName, BaldnessConfig.TROPHY_FISH_MULTIPLIER);
+			}
+		}
+
+		if (calc.hasBaldness()) {
+			builder.addField("**__Fishing__**", calc.getCauses() + "**Final Baldness for Fishing**: " + calc.getBaldness(), false);
+		}
+
+		return calc.getBaldness();
+	}
+
+	private static double calculateDojoBaldness(EmbedBuilder builder, PlayerData data) {
+		BaldnessCalculator calc = new BaldnessCalculator();
+
+		long total = getDojoPoints(data.profile);
+		calc.addBaldnessForThreshold("Lack of Black Belt", total, BaldnessConfig.DOJO_THRESHOLD, BaldnessConfig.DOJO_MULTIPLIER);
+
+		if (calc.hasBaldness()) {
+			builder.addField("**__D*jo__**", "Lack of Black Belt: +" + calc.getBaldness(), false);
+		}
+
+		return calc.getBaldness();
+	}
+
+	private static double calculateMuseumBaldness(EmbedBuilder builder, PlayerData data) {
+		BaldnessCalculator calc = new BaldnessCalculator();
+
+		long donations = getMuseumDonations(data.museum);
+		calc.addBaldnessForThreshold("Missing Museum Donos", donations, BaldnessConfig.MUSEUM_THRESHOLD, BaldnessConfig.MUSEUM_MULTIPLIER);
+
+		if (calc.hasBaldness()) {
+			long missing = BaldnessConfig.MUSEUM_THRESHOLD - donations;
+			builder.addField("**__Museum__**", "Missing " + missing + " Museum Donos: +" + calc.getBaldness(), false);
+		}
+
+		return calc.getBaldness();
+	}
+
+	private static double calculateGardenBaldness(EmbedBuilder builder, PlayerData data) {
+		BaldnessCalculator calc = new BaldnessCalculator();
+
+		// Visitors
+		long visitors = getVisitorCount(data.garden);
+		calc.addBaldnessForThreshold("Visitors", visitors, BaldnessConfig.VISITOR_THRESHOLD, BaldnessConfig.VISITOR_MULTIPLIER);
+
+		// Crop milestones
+		try {
+			JsonObject milestones = data.garden.getAsJsonObject("resources_collected");
+			String[] crops = {"WHEAT", "CARROT_ITEM", "POTATO_ITEM", "MELON", "PUMPKIN", "INK_SACK:3", "SUGAR_CANE", "CACTUS", "MUSHROOM_COLLECTION", "NETHER_STALK"};
+			double[] multipliers = {1, 3.25, 3.25, 5, 1, 3, 2, 2, 1, 3};
+			String[] displayNames = {"Wheat Milestone", "Carrot Milestone", "Potato Milestone", "Melon Milestone", "Pumpkin Milestone", "Cocoa Beans Milestone", "Cane Milestone", "Cactus Milestone", "Mushroom Milestone", "Nether Wart Milestone"};
+
+			for (int i = 0; i < crops.length; i++) {
+				long milestone = Utils.cropMilestone(milestones.get(crops[i]).getAsLong(), multipliers[i]);
+				calc.addBaldnessForThreshold(displayNames[i], milestone, BaldnessConfig.CROP_MILESTONE_THRESHOLD, BaldnessConfig.CROP_MILESTONE_MULTIPLIER);
+			}
+		} catch (Exception exception) {
+			calc.addBaldness("Has not unlocked all Garden milestones", BaldnessConfig.GARDEN_MILESTONE_PENALTY);
+		}
+
+		if (calc.hasBaldness()) {
+			builder.addField("**__Garden__**", calc.getCauses() + "**Final Baldness for Garden**: " + calc.getBaldness(), false);
+		}
+
+		return calc.getBaldness();
+	}
+
+	private static double calculateRiftBaldness(EmbedBuilder builder, PlayerData data) {
+		BaldnessCalculator calc = new BaldnessCalculator();
+
+		long timecharms = getTimecharmsCount(data.profile);
+		calc.addBaldnessForThreshold("Missing Timecharms", timecharms, BaldnessConfig.TIMECHARM_THRESHOLD, BaldnessConfig.TIMECHARM_MULTIPLIER);
+
+		if (calc.hasBaldness()) {
+			long missing = BaldnessConfig.TIMECHARM_THRESHOLD - timecharms;
+			builder.addField("**__Rift Timecharms__**", "Missing " + missing + " Timecharms: +" + calc.getBaldness(), false);
+		}
+
+		return calc.getBaldness();
+	}
+
+	private static double calculateHoppityBaldness(EmbedBuilder builder, PlayerData data) {
+		BaldnessCalculator calc = new BaldnessCalculator();
+
+		try {
+			JsonObject rabbits = data.profile.getAsJsonObject("events").getAsJsonObject("easter").getAsJsonObject("rabbits");
+
+			// Common rabbits
+			for (String rabbit : COMMON_RABBITS) {
+				if (!rabbits.has(rabbit)) {
+					String displayName = getRabbitDisplayName(rabbit);
+					calc.addBaldness(displayName, BaldnessConfig.RABBIT_COMMON_MULTIPLIER);
+				}
+			}
+
+			// Rare rabbits
+			for (String rabbit : RARE_RABBITS) {
+				if (!rabbits.has(rabbit)) {
+					String displayName = getRabbitDisplayName(rabbit);
+					calc.addBaldness(displayName, BaldnessConfig.RABBIT_RARE_MULTIPLIER);
+				}
+			}
+
+			if (calc.hasBaldness()) {
+				builder.addField("**__Hoppity__**", calc.getCauses() + "**Final Baldness for Hoppity**: " + calc.getBaldness(), false);
+			}
+		} catch (Exception exception) {
+			builder.addField("**__Hoppity__**", "No Data!\n**Final Baldness for Hoppity**: " + BaldnessConfig.HOPPITY_NO_DATA_PENALTY, false);
+			calc.addBaldness("No Data", BaldnessConfig.HOPPITY_NO_DATA_PENALTY);
+		}
+
+		return calc.getBaldness();
+	}
+
+	private static double calculatePetScoreBaldness(EmbedBuilder builder, PlayerData data) {
+		BaldnessCalculator calc = new BaldnessCalculator();
+
+		long score = data.profile.getAsJsonObject("leveling").get("highest_pet_score").getAsLong();
+		calc.addBaldnessForThreshold("Missing Pet Score", score, BaldnessConfig.MAX_PET_SCORE, BaldnessConfig.PET_SCORE_MULTIPLIER);
+
+		if (calc.hasBaldness()) {
+			long missing = BaldnessConfig.MAX_PET_SCORE - score;
+			builder.addField("**__Pet Score__**", "Missing " + missing + " Pet Score: +" + calc.getBaldness(), false);
+		}
+
+		return calc.getBaldness();
+	}
+
+	private static double calculateHarpBaldness(EmbedBuilder builder, PlayerData data) {
+		BaldnessCalculator calc = new BaldnessCalculator();
+
+		JsonObject melody = data.profile.getAsJsonObject("quests").getAsJsonObject("harp_quest");
+		if (melody == null) {
+			melody = new JsonObject();
+		}
+
+		for (Map.Entry<String, String> entry : HARP_SONGS.entrySet()) {
+			String songKey = entry.getKey();
+			String displayName = entry.getValue();
+
+			if (!melody.has(songKey)) {
+				calc.addBaldness(displayName, BaldnessConfig.HARP_SONG_MULTIPLIER);
+			}
+		}
+
+		if (calc.hasBaldness()) {
+			builder.addField("**__Harp__**", calc.getCauses() + "**Final Baldness for Harp**: " + calc.getBaldness(), false);
+		}
+
+		return calc.getBaldness();
+	}
+
+	private static double applyMultipliers(EmbedBuilder builder, double baldness, boolean ironman, boolean isBaldHunter) {
+		StringBuilder multipliers = new StringBuilder();
+
+		if (ironman) {
+			multipliers.append("Ironman (Respect): x").append(BaldnessConfig.IRONMAN_MULTIPLIER).append("\n");
+			baldness *= BaldnessConfig.IRONMAN_MULTIPLIER;
+		}
+
+		if (isBaldHunter) {
+			multipliers.append("Is GodHunter775: x").append(BaldnessConfig.GODHUNTER_MULTIPLIER).append("\n");
+			baldness *= BaldnessConfig.GODHUNTER_MULTIPLIER;
+		}
+
+		builder.addField("**__Multipliers__**", multipliers.toString(), false);
+		return baldness;
+	}
+
+	private static String getBaldnessRank(double baldness) {
+		if (baldness < 2) return "Not Bald";
+		if (baldness < 5) return "Slightly Bald";
+		if (baldness < 9) return "Bald";
+		if (baldness < 14) return "Very Bald";
+		return "Extremely Bald";
+	}
+
+	// Helper methods
+	private static long getSlayerLevel(JsonObject slayers, String slayerType) {
+		try {
+			return Utils.slayerLevel(slayers.getAsJsonObject(slayerType).get("xp").getAsLong());
+		} catch (Exception e) {
+			return 0;
+		}
+	}
+
+	private static long getVampireSlayerLevel(JsonObject slayers) {
+		try {
+			return Math.min(5, Utils.skillLevel(slayers.getAsJsonObject("vampire").get("xp").getAsLong() / 2));
+		} catch (Exception e) {
+			return 0;
+		}
+	}
+
+	private static long getBestiaryMilestone(JsonObject profile) {
+		try {
+			return profile.getAsJsonObject("bestiary").getAsJsonObject("milestone").get("last_claimed_milestone").getAsLong();
+		} catch (Exception e) {
+			return 0;
+		}
+	}
+
+	private static String getMinionString(JsonObject profile) {
+		try {
+			return profile.getAsJsonObject("player_data").getAsJsonArray("crafted_generators").toString();
+		} catch (Exception e) {
+			return "";
+		}
+	}
+
+	private static String getMinionDisplayName(String minionKey) {
+		return minionKey.replace("_", " ").replace("12", "").replace("11", "").trim() + " Minion";
+	}
+
+	private static long getHotmLevel(JsonObject hotm) {
+		try {
+			return Utils.hotmLevel(hotm.get("experience").getAsLong());
+		} catch (Exception e) {
+			return 0;
+		}
+	}
+
+	private static double getPowderMillions(JsonObject hotm, String powderType) {
+		try {
+			long current = hotm.get("powder_" + powderType).getAsLong();
+			long spent = hotm.get("powder_spent_" + powderType).getAsLong();
+			return (double) (current + spent) / 1000000;
+		} catch (Exception e) {
+			return 0;
+		}
+	}
+
+	private static String getTrophyFishDisplayName(String fishKey) {
+		return fishKey.replace("_diamond", "").replace("_", " ").replace("Diamond ", "Diamond ");
+	}
+
+	private static long getDojoPoints(JsonObject profile) {
+		try {
+			JsonObject dojo = profile.getAsJsonObject("nether_island_player_data").getAsJsonObject("dojo");
+			long total = 0;
+			String[] dojoTypes = {"dojo_points_mob_kb", "dojo_points_wall_jump", "dojo_points_archer", "dojo_points_sword_swap", "dojo_points_snake", "dojo_points_fireball", "dojo_points_lock_head"};
+
+			for (String type : dojoTypes) {
+				if (dojo.has(type)) {
+					total += dojo.get(type).getAsLong();
+				}
+			}
+			return total;
+		} catch (Exception e) {
+			return 0;
+		}
+	}
+
+	private static long getMuseumDonations(JsonObject museum) {
+		try {
+			return museum.getAsJsonObject("items").size();
+		} catch (Exception e) {
+			return 0;
+		}
+	}
+
+	private static long getVisitorCount(JsonObject garden) {
+		try {
+			return garden.getAsJsonObject("commission_data").get("total_completed").getAsLong();
+		} catch (Exception e) {
+			return 0;
+		}
+	}
+
+	private static long getTimecharmsCount(JsonObject profile) {
+		try {
+			return profile.getAsJsonObject("rift").getAsJsonObject("gallery").getAsJsonArray("secured_trophies").size();
+		} catch (Exception e) {
+			return 0;
+		}
+	}
+
+	private static String getRabbitDisplayName(String rabbitKey) {
+		return rabbitKey.replace("_", " ").replace("zest zephyr", "Zest Zephyr") + " Rabbit";
 	}
 }
