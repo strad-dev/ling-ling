@@ -87,6 +87,9 @@ public class Craft {
 			case "essence" -> {
 				return ":sparkles:";
 			}
+			case "RNGesusBox" -> {
+				return Emoji.RNGESUS_BOX;
+			}
 			default -> {
 				return "Error 404 - Yell at the developer for being stupid.";
 			}
