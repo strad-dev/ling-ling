@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>dev.strad</groupId>
     <artifactId>Ling_Ling</artifactId>
-    <version>6.4.0</version>
+    <version>6.5.0_3</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -16,7 +16,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.5.0</version>
+            <version>6.2.0</version>
         </dependency>
         <dependency>
             <groupId>com.vdurmont</groupId>
@@ -41,22 +41,22 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.13.1</version>
+            <version>2.13.2</version>
         </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
-            <version>5.4.0</version>
+            <version>5.6.2</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.5.18</version>
+            <version>1.5.23</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.12.2</version>
+            <version>6.0.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>

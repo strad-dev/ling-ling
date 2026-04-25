@@ -122,7 +122,7 @@ public class Craft {
 							"\n" + Utils.formatNumber(data.get("steel")) + "/`20`" + Emoji.STEEL +
 							"\n" + Utils.formatNumber(data.get("horseHair")) + "/`20`" + Emoji.HORSE_HAIR +
 							"\nID: `violinService`", true)
-					.addBlankField(true)
+					.addField("**RNGesus Box** " + Emoji.RNGESUS_BOX, Utils.formatNumber(data.get("essence")) + "/`40 000`:sparkles:\nID: `rngesusbox`", true)
 					.addField("**1x Luthier**", Utils.formatNumber(data.get("grains")) + "/`1000`" + Emoji.GRAINS +
 							"\n" + Utils.formatNumber(data.get("plastic")) + "/`1 000`" + Emoji.PLASTIC +
 							"\n" + Utils.formatNumber(data.get("water")) + "/`1 000`" + Emoji.WATER +
@@ -183,6 +183,10 @@ public class Craft {
 				recipe.put("pineSap", 20L);
 				recipe.put("steel", 20L);
 				recipe.put("horseHair", 20L);
+			}
+			case "rngesusbox" -> {
+				item = "RNGesusBox";
+				recipe.put("essence", 40000L);
 			}
 			case "luthier" -> {
 				item = "luthierBalance";
