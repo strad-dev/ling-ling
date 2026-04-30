@@ -41,7 +41,7 @@ public class Ban {
 					.sendMessage("""
 							:hammer: **THE BAN HAMMER HAS SPOKEN** :hammer:
 							            Someone has been banned.
-												
+							
 							https://i.imgur.com/KTyk7EC.mp4
 							""").queue();
 			LogCase.logCase(e, "BAN", idToModerate, reason);

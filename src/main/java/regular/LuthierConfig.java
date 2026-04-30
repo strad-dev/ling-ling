@@ -231,8 +231,8 @@ public class LuthierConfig {
 						}
 					}
 
-					if(amount < 0) {
-						e.reply("You cannot add a negative amount!");
+					if(amount <= 0) {
+						e.reply("You must add a positive amount!");
 					}
 					if(amount > balance) {
 						amount = balance;
@@ -304,8 +304,8 @@ public class LuthierConfig {
 						}
 					}
 
-					if(amount < 0) {
-						e.reply("You cannot remove a negative amount!");
+					if(amount <= 0) {
+						e.reply("You must remove a positive amount!");
 						return;
 					}
 

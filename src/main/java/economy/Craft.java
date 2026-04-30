@@ -8,6 +8,7 @@ import processes.Utils;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Craft {
 	private static void craftItems(GenericDiscordEvent e, JSONObject data, String what, Map<String, Long> recipe, long craftAmount) {
@@ -35,6 +36,14 @@ public class Craft {
 			data.replace(what, (long) data.get(what) + craftAmount);
 		}
 		e.reply(result.toString());
+
+		if((what.equals("RNGesusBox") || what.equals("luthierBalance")) && craftAmount > 0) {
+			EmbedBuilder builder = new EmbedBuilder()
+					.setTitle("Valuable Item Crafted!")
+					.addField("User: **" + data.get("discordName") + "** `" + data.get("discordID") + "`", "Item: " + what, false)
+					.setColor(new Color(165, 42, 42));
+			Objects.requireNonNull(Objects.requireNonNull(e.getJDA().getGuildById("670725611207262219")).getTextChannelById("1029498872441077860")).sendMessageEmbeds(builder.build()).queue();
+		}
 	}
 
 	private static String getEmoji(String key) {

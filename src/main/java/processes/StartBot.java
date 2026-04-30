@@ -92,10 +92,10 @@ public class StartBot {
 		}
 
 		HypixelManager.connectToHypixel(BETA, env.get("HYPIXEL_KEY"));
+//		OptionData optionData;
 			/*
 			// ONE TIEM UPSERT OF SLASH COMMANDS
 
-			OptionData optionData;
 			jda.upsertCommand(Commands.slash("h", "Collect all pending hourly income!")).queue();
 
 			// help page 1
@@ -214,20 +214,21 @@ public class StartBot {
 						.addOptions(data1, data2)
 						.addOption(OptionType.STRING, "amount", "Pick the amount you want to Buy or Sell.")
 						.addOption(OptionType.INTEGER, "price", "Pick the price you want to Sell your items at.")
+		).queue(); */
+		/* optionData = new OptionData(OptionType.STRING, "item", "Choose the item you want to craft.")
+				.addChoice("Rice", "rice")
+				.addChoice("Bubble Tea", "tea")
+				.addChoice("Rosin", "rosin")
+				.addChoice("New Strings", "string")
+				.addChoice("Bow Hair", "bowHair")
+				.addChoice("Violin Service", "violinService")
+				.addChoice("RNGesus Box", "RNGesusBox")
+				.addChoice("1x Luthier", "luthier");
+		jda.upsertCommand(
+				Commands.slash("craft", "Craft items!")
+						.addOptions(optionData)
+						.addOption(OptionType.STRING, "amount", "How much do you want to craft?")
 		).queue();
-			/*optionData = new OptionData(OptionType.STRING, "item", "Choose the item you want to craft.")
-					.addChoice("Rice", "rice")
-					.addChoice("Bubble Tea", "tea")
-					.addChoice("Rosin", "rosin")
-					.addChoice("New Strings", "string")
-					.addChoice("Bow Hair", "bowHair")
-					.addChoice("Violin Service", "violinService")
-					.addChoice("1x Luthier", "luthier");
-			jda.upsertCommand(
-					Commands.slash("craft", "Craft items!")
-							.addOptions(optionData)
-							.addOption(OptionType.STRING, "amount", "How much do you want to craft?")
-			).queue();
 			/*jda.upsertCommand(
 					Commands.slash("link", "Link your Minecraft acccount!  SEE /rules FOR POLICIES REGARDING MINECRAFT LINKING.")
 							.addOption(OptionType.STRING, "ign", "Put in your Minecraft IGN!")
